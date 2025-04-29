@@ -73,7 +73,7 @@ const SideBar = () => {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <SidebarSeparator />
+      <SidebarSeparator className="mx-0" />
       <SidebarContent>
         <SidebarGroup></SidebarGroup>
         <SidebarGroupLabel>Application</SidebarGroupLabel>
