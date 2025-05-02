@@ -37,7 +37,7 @@ import {
 
 export default function AddProjectPage() {
   const formSchema = z.object({
-    title: z.string().min(1, {
+    name: z.string().min(1, {
       message: "Title is required.",
     }),
     description: z.string().nullable().default(null),
@@ -56,13 +56,32 @@ export default function AddProjectPage() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     const payload = {
       ...values,
       startDate: values.startDate ? values.startDate.toISOString() : null,
       endDate: values.endDate ? values.endDate.toISOString() : null,
     };
     console.log(payload);
+
+    try {
+      const response = await fetch("/api/projects", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create project");
+      }
+
+      const data = await response.json();
+      console.log("Project created:", data);
+    } catch (error) {
+      console.error("Error creating project:", error);
+    }
   }
 
   return (
@@ -73,10 +92,10 @@ export default function AddProjectPage() {
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <FormField
             control={form.control}
-            name="title"
+            name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Title</FormLabel>
+                <FormLabel>Name</FormLabel>
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
