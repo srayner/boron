@@ -137,7 +137,9 @@ const SideBar = () => {
         <SidebarGroup>
           <SidebarGroupLabel>Projects</SidebarGroupLabel>
           <SidebarGroupAction>
-            <Plus /> <span className="sr-only">Add Project</span>
+            <Link href="/projects/add">
+              <Plus /> <span className="sr-only">Add Project</span>
+            </Link>
           </SidebarGroupAction>
           <SidebarGroupContent>
             <SidebarMenu>

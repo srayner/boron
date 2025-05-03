@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { format } from "date-fns";
@@ -36,6 +37,8 @@ import {
 } from "@/components/ui/popover";
 
 export default function AddProjectPage() {
+  const router = useRouter();
+
   const formSchema = z.object({
     name: z.string().min(1, {
       message: "Title is required.",
@@ -77,8 +80,7 @@ export default function AddProjectPage() {
         throw new Error("Failed to create project");
       }
 
-      const data = await response.json();
-      console.log("Project created:", data);
+      router.push("/");
     } catch (error) {
       console.error("Error creating project:", error);
     }
