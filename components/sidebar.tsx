@@ -145,6 +145,14 @@ const SideBar = () => {
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
+              <SidebarMenuItem key="all">
+                <SidebarMenuButton asChild>
+                  <Link href={"/projects"}>
+                    <Projector />
+                    <span>Show All Projects</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
