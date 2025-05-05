@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRecentProjects } from "@/app/context/recent-projects-context";
 import {
   Calendar,
   ChevronUp,
@@ -64,40 +68,27 @@ const items = [
   },
 ];
 
-const projects = [
-  {
-    title: "Civrays InMoov",
-    url: "/",
-    icon: Wrench,
-  },
-  {
-    title: "Z80 Computer",
-    url: "/",
-    icon: Wrench,
-  },
-  {
-    title: "Argon",
-    url: "/",
-    icon: Code,
-  },
-  {
-    title: "Boron",
-    url: "/",
-    icon: Code,
-  },
-  {
-    title: "Alarm Clock",
-    url: "/",
-    icon: Wrench,
-  },
-  {
-    title: "See All Projects",
-    url: "/",
-    icon: Projector,
-  },
-];
-
 const SideBar = () => {
+  const { recentProjects } = useRecentProjects();
+  // const [projects, setProjects] = useState([]);
+
+  // useEffect(() => {
+  //   const fetchRecentProjects = async () => {
+  //     try {
+  //       const res = await fetch(
+  //         "/api/projects?limit=5&orderBy=updatedAt&orderDir=desc"
+  //       );
+  //       if (!res.ok) throw new Error("Failed to fetch projects");
+  //       const data = await res.json();
+  //       setProjects(data.projects);
+  //     } catch (err) {
+  //       console.error(err);
+  //     }
+  //   };
+
+  //   fetchRecentProjects();
+  // }, []);
+
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="py-4">
@@ -143,16 +134,17 @@ const SideBar = () => {
           </SidebarGroupAction>
           <SidebarGroupContent>
             <SidebarMenu>
-              {projects.map((project) => (
-                <SidebarMenuItem key={project.title}>
-                  <SidebarMenuButton asChild>
-                    <Link href={project.url}>
-                      <project.icon />
-                      <span>{project.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {Array.isArray(recentProjects) &&
+                recentProjects.map((project) => (
+                  <SidebarMenuItem key={project.id}>
+                    <SidebarMenuButton asChild>
+                      <Link href={`/projects/${project.id}`}>
+                        <Wrench />
+                        <span>{project.name}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { format } from "date-fns";
+import { useRecentProjects } from "@/app/context/recent-projects-context";
 import { CalendarIcon } from "lucide-react";
 import { string, z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -38,6 +39,7 @@ import {
 
 export default function AddProjectPage() {
   const router = useRouter();
+  const { refreshRecentProjects } = useRecentProjects();
 
   const formSchema = z.object({
     name: z.string().min(1, {
@@ -80,6 +82,7 @@ export default function AddProjectPage() {
         throw new Error("Failed to create project");
       }
 
+      refreshRecentProjects();
       router.push("/");
     } catch (error) {
       console.error("Error creating project:", error);

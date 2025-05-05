@@ -6,7 +6,7 @@ import NavBar from "@/components/navbar";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { cookies } from "next/headers";
-import { responseCookiesToRequestCookies } from "next/dist/server/web/spec-extension/adapters/request-cookies";
+import { RecentProjectsProvider } from "./context/recent-projects-context";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,13 +41,15 @@ export default async function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <SidebarProvider defaultOpen={defaultOpen}>
-            <SideBar />
-            <main className="w-full">
-              <NavBar />
-              <div className="px-4">{children}</div>
-            </main>
-          </SidebarProvider>
+          <RecentProjectsProvider>
+            <SidebarProvider defaultOpen={defaultOpen}>
+              <SideBar />
+              <main className="w-full">
+                <NavBar />
+                <div className="px-4">{children}</div>
+              </main>
+            </SidebarProvider>
+          </RecentProjectsProvider>
         </ThemeProvider>
       </body>
     </html>
