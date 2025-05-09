@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { handleAppError } from "./error";
+import { Context } from "@/types/api";
 
 export function withErrorHandling<T>(
-  handler: (req: NextRequest) => Promise<T>
+  handler: (req: NextRequest, context: Context) => Promise<T>
 ) {
-  return async function (req: NextRequest) {
+  return async function (req: NextRequest, context: Context) {
     try {
-      const result = await handler(req);
+      const result = await handler(req, context);
 
       if (result && typeof result === "object" && "status" in result) {
         const { status, ...data } = result as any;
@@ -15,6 +16,7 @@ export function withErrorHandling<T>(
 
       return NextResponse.json(result);
     } catch (err) {
+      console.log("caught the err");
       return handleAppError(err);
     }
   };

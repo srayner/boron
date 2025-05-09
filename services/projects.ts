@@ -12,6 +12,20 @@ export const createProject = async (data: any) => {
   });
 };
 
+export const updateProject = async (id: string, data: any) => {
+  if (!data.name) throw new AppError("Project name is required", 422);
+
+  delete data.id;
+
+  return prisma.project.update({
+    where: { id },
+    data: {
+      name: data.name,
+      description: data.description || "",
+    },
+  });
+};
+
 export async function getProjects(params: {
   search: string;
   pagination: { take: number; skip: number };
@@ -35,7 +49,7 @@ export async function getProjects(params: {
 }
 
 export const getProjectById = async (id: string) => {
-  const project = await prisma.project.findUnique({
+  return await prisma.project.findUnique({
     where: { id },
     include: {
       tasks: true,
@@ -43,10 +57,10 @@ export const getProjectById = async (id: string) => {
       milestones: true,
     },
   });
+};
 
-  if (!project) {
-    throw new Error("Project not found");
-  }
-
-  return project;
+export const deleteProjectById = async (id: string) => {
+  return await prisma.project.delete({
+    where: { id },
+  });
 };

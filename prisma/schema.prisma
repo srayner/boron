@@ -24,6 +24,19 @@ enum ProjectPriority {
   CRITICAL
 }
 
+enum ProjectType {
+  AUTOMATION
+  DESIGN
+  ELECTRONICS
+  GENERAL
+  MAKER
+  REPAIR
+  WEBAPP
+  WEBSITE
+  WRITING
+  OTHER
+}
+
 enum TaskStatus {
   TODO
   IN_PROGRESS
@@ -77,6 +90,7 @@ model Project {
   id                  String             @id @default(cuid())
   name                String
   description         String?
+  type                ProjectType        @default(OTHER)
   status              ProjectStatus      @default(PLANNED)
   priority            ProjectPriority    @default(MEDIUM)
   startDate           DateTime?

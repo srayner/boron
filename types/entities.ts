@@ -7,6 +7,17 @@ export type ProjectStatus =
   | "COMPLETED"
   | "CANCELLED";
 export type ProjectPriority = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+export type ProjectType =
+  | "AUTOMATION"
+  | "DESIGN"
+  | "GENERAL"
+  | "ELECTRONICS"
+  | "MAKER"
+  | "REPAIR"
+  | "WEBAPP"
+  | "WEBSITE"
+  | "WRITING"
+  | "OTHER";
 export type TaskStatus =
   | "TODO"
   | "INPROGRESS"
@@ -82,6 +93,7 @@ export interface Project {
   id: string;
   name: string;
   description: string;
+  type: ProjectType;
   status: ProjectStatus;
   priority: ProjectPriority;
   startDate: string;

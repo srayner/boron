@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 
 const isDev = process.env.NODE_ENV === "development";
 
@@ -11,8 +12,23 @@ export class AppError extends Error {
 }
 
 export const handleAppError = (err: unknown) => {
+  // Handle our own application errors
   if (err instanceof AppError) {
     return NextResponse.json({ error: err.message }, { status: err.status });
+  }
+
+  // Handle Prisma-specific errors
+  if (err instanceof Prisma.PrismaClientKnownRequestError) {
+    if (err.code === "P2025") {
+      console.log(err.meta);
+      return NextResponse.json({ error: "Record not found" }, { status: 404 });
+    }
+    if (err.code === "P2003") {
+      return NextResponse.json(
+        { error: "Foreign key constraint failed" },
+        { status: 400 }
+      );
+    }
   }
 
   console.error("Unexpected error:", err);
