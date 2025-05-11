@@ -16,14 +16,11 @@ import {
   InfoIcon,
 } from "lucide-react";
 import { Project } from "@/types/entities";
-import {
-  ProjectNameWithIcon,
-  ProjectTypeBadge,
-  ProjectTypeWithIcon,
-} from "@/components/projects/project-type";
+import { ProjectNameWithIcon } from "@/components/projects/project-type";
 import { ProjectStatusBadge } from "@/components/projects/project-status";
 import { format, formatDistanceToNow } from "date-fns";
 import { formatCurrency, titleCase } from "@/lib/utils";
+import { ConfirmationModal } from "@/components/ui/confirmation-modal";
 
 type ProjectPageProps = {
   params: Promise<{ id: string }>;
@@ -33,6 +30,7 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
   const router = useRouter();
   const { id: projectId } = React.use(params);
   const [project, setProject] = useState<Project | null>(null);
+  const [isConfirmOpen, setIsConfirmOpen] = useState<boolean>(false);
 
   const fetchProject = async () => {
     const response = await fetch(`/api/projects/${projectId}`);
@@ -43,6 +41,15 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
   useEffect(() => {
     fetchProject();
   }, []);
+
+  const handleConfirmDelete = async () => {
+    setIsConfirmOpen(false);
+    await fetch(`/api/projects/${projectId}`, {
+      method: "DELETE",
+    });
+
+    router.push("/projects");
+  };
 
   if (!project) return <div>Loading...</div>;
 
@@ -72,7 +79,13 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
           >
             <PencilIcon className="w-4 h-4 mr-1" /> Edit
           </Button>
-          <Button variant="destructive" size="sm">
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={() => {
+              setIsConfirmOpen(true);
+            }}
+          >
             <Trash2Icon className="w-4 h-4 mr-1" /> Delete
           </Button>
         </div>
@@ -184,6 +197,16 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
           </div>
         </TabsContent>
       </Tabs>
+
+      <ConfirmationModal
+        open={isConfirmOpen}
+        title="Delete Project"
+        message={`Are you sure you want to delete project: ${project.name}`}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => {
+          setIsConfirmOpen(false);
+        }}
+      />
     </div>
   );
 };
