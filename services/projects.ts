@@ -4,10 +4,26 @@ import { AppError } from "@/lib/api/error";
 export const createProject = async (data: any) => {
   if (!data.name) throw new AppError("Project name is required", 422);
 
+  const startDate = data.startDate ? new Date(data.startDate) : null;
+  const dueDate = data.dueDate ? new Date(data.dueDate) : null;
+
+  if (startDate && isNaN(startDate.getTime())) {
+    throw new AppError("Invalid start date", 422);
+  }
+  if (dueDate && isNaN(dueDate.getTime())) {
+    throw new AppError("Invalid due date", 422);
+  }
+
   return prisma.project.create({
     data: {
       name: data.name,
       description: data.description || "",
+      type: data.type,
+      status: data.status,
+      priority: data.priority,
+      startDate: startDate,
+      dueDate: dueDate,
+      budget: data.budget,
     },
   });
 };
@@ -15,13 +31,27 @@ export const createProject = async (data: any) => {
 export const updateProject = async (id: string, data: any) => {
   if (!data.name) throw new AppError("Project name is required", 422);
 
-  delete data.id;
+  const startDate = data.startDate ? new Date(data.startDate) : null;
+  const dueDate = data.dueDate ? new Date(data.dueDate) : null;
+
+  if (startDate && isNaN(startDate.getTime())) {
+    throw new AppError("Invalid start date", 422);
+  }
+  if (dueDate && isNaN(dueDate.getTime())) {
+    throw new AppError("Invalid due date", 422);
+  }
 
   return prisma.project.update({
     where: { id },
     data: {
       name: data.name,
       description: data.description || "",
+      type: data.type,
+      status: data.status,
+      priority: data.priority,
+      startDate: startDate,
+      dueDate: dueDate,
+      budget: data.budget,
     },
   });
 };

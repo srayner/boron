@@ -9,17 +9,21 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
   CalendarIcon,
-  DollarSignIcon,
+  PoundSterlingIcon,
   PencilIcon,
   Trash2Icon,
+  CircleGaugeIcon,
+  InfoIcon,
 } from "lucide-react";
 import { Project } from "@/types/entities";
 import {
   ProjectNameWithIcon,
   ProjectTypeBadge,
+  ProjectTypeWithIcon,
 } from "@/components/projects/project-type";
 import { ProjectStatusBadge } from "@/components/projects/project-status";
 import { format, formatDistanceToNow } from "date-fns";
+import { formatCurrency, titleCase } from "@/lib/utils";
 
 type ProjectPageProps = {
   params: Promise<{ id: string }>;
@@ -52,7 +56,7 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
           </h1>
           <div className="flex items-center gap-2 mt-1">
             <ProjectStatusBadge status={project.status} />
-            <span text-sm text-muted-foreground>
+            <span className="text-sm text-muted-foreground">
               Updated{" "}
               {formatDistanceToNow(new Date(project.updatedAt), {
                 addSuffix: true,
@@ -74,14 +78,25 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
         </div>
       </div>
 
-      <Separator className="my-6" />
+      <Separator className="my-3" />
+
+      <p className="my-3">{project.description}</p>
 
       {/* Info Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card>
           <CardContent className="py-4">
-            <h3 className="text-sm text-muted-foreground mb-1">Description</h3>
-            <p>{project.description}</p>
+            <h3 className="text-sm text-muted-foreground mb-1 flex items-center gap-1">
+              <InfoIcon className="w-4 h-4" /> Summary
+            </h3>
+            <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+              <dt className="font-medium text-muted-foreground">Type:</dt>
+              <dd className="text-foreground">{titleCase(project.type)}</dd>
+              <dt className="font-medium text-muted-foreground">Priority:</dt>
+              <dd className="text-foreground">{titleCase(project.priority)}</dd>
+              <dt className="font-medium text-muted-foreground">Status:</dt>
+              <dd className="text-foreground">{titleCase(project.status)}</dd>
+            </dl>
           </CardContent>
         </Card>
         <Card>
@@ -89,31 +104,52 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
             <h3 className="text-sm text-muted-foreground mb-1 flex items-center gap-1">
               <CalendarIcon className="w-4 h-4" /> Dates
             </h3>
-            <p>
-              Start:{" "}
-              {project.startAt && format(new Date(project.startAt), "MMM yyyy")}
-              <br />
-              End:{" "}
-              {project.endAt && format(new Date(project.endAt), "MMM yyyy")}
-              <br />
-              Deadline:{" "}
-              {project.deadline &&
-                format(new Date(project.deadline), "MMM yyyy")}
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="py-4">
-            <h3 className="text-sm text-muted-foreground mb-1">Completion</h3>
-            <p>{project.completion}%</p>
+            <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+              <dt className="font-medium text-muted-foreground">Start</dt>
+              <dd className="text-forground">
+                {project.startDate &&
+                  format(new Date(project.startDate), "dd MMM yyyy")}
+              </dd>
+
+              <dt className="font-medium text-muted-foreground">End</dt>
+              <dd className="text-forground">
+                {project.dueDate &&
+                  format(new Date(project.dueDate), "dd MMM yyyy")}
+              </dd>
+            </dl>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="py-4">
             <h3 className="text-sm text-muted-foreground mb-1 flex items-center gap-1">
-              <DollarSignIcon className="w-4 h-4" /> Actual Cost
+              <CircleGaugeIcon className="w-4 h-4" /> Progress
             </h3>
-            <p>£ 0.00</p>
+            <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+              <dt className="font-medium text-muted-foreground">
+                Percent Complete:
+              </dt>
+              <dd className="text-forground">{project.completionPercent}</dd>
+            </dl>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="py-4">
+            <h3 className="text-sm text-muted-foreground mb-1 flex items-center gap-1">
+              <PoundSterlingIcon className="w-4 h-4" /> Costs
+            </h3>
+            <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+              <dt className="font-medium text-muted-foreground">Budget:</dt>
+              <dd className="text-foreground">
+                {formatCurrency(project.budget)}
+              </dd>
+
+              <dt className="font-medium text-muted-foreground">
+                Actual Cost:
+              </dt>
+              <dd className="text-forground">
+                {formatCurrency(project.actualCost)}
+              </dd>
+            </dl>
           </CardContent>
         </Card>
       </div>

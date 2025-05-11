@@ -32,7 +32,6 @@ export const DELETE = withErrorHandling(
 
 export const PUT = withErrorHandling(
   async (req: NextRequest, context: Context) => {
-    console.log("in put endpoint");
     const { id: projectId } = await context.params;
     const data = await req.json();
 

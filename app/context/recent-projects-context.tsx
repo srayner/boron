@@ -26,7 +26,6 @@ export const RecentProjectsProvider = ({
       );
       if (!res.ok) throw new Error("Failed to fetch recent projects");
       const { projects } = await res.json();
-      console.log("Fetched recent projects:", projects);
       setRecentProjects(projects);
     } catch (err) {
       console.error(err);

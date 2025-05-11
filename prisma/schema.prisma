@@ -94,19 +94,17 @@ model Project {
   status              ProjectStatus      @default(PLANNED)
   priority            ProjectPriority    @default(MEDIUM)
   startDate           DateTime?
-  endDate             DateTime?
+  dueDate             DateTime?
   budget              Decimal?           @db.Decimal(10, 2)
   actualCost          Decimal            @db.Decimal(10, 2) @default(0.00)
   completionPercent   Decimal            @db.Decimal(10, 2) @default(0.0)
   archived            Boolean            @default(false)
-  deadline            DateTime?
 
   tags                Tag[]              @relation("ProjectTags")
   tasks               Task[]             @relation("ProjectTasks")
   costs               Cost[]             @relation("ProjectCosts")
   milestones          Milestone[]        @relation("ProjectMilestones")
   
-
   createdAt           DateTime           @default(now())
   updatedAt           DateTime           @updatedAt
 }
@@ -117,8 +115,8 @@ model Task {
   description         String?
   status              TaskStatus         @default(TODO)
   priority            TaskPriority       @default(MEDIUM)
-  dueDate             DateTime?
   startDate           DateTime?
+  dueDate             DateTime?
   completedAt         DateTime?
   projectId           String
   project             Project            @relation("ProjectTasks", fields: [projectId], references: [id])

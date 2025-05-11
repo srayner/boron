@@ -96,13 +96,12 @@ export interface Project {
   type: ProjectType;
   status: ProjectStatus;
   priority: ProjectPriority;
-  startAt: string;
-  endAt: string;
+  startDate: string;
+  dueDate: string;
   budget: number;
   actualCost: number;
-  completion: number;
+  completionPercent: number;
   archived: boolean;
-  deadline: string;
   tags: Tag[];
   tasks: Task[];
   costs: Cost[];

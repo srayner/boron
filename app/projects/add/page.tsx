@@ -4,13 +4,9 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { format } from "date-fns";
 import { useRecentProjects } from "@/app/context/recent-projects-context";
-import { CalendarIcon } from "lucide-react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { Calendar } from "@/components/ui/calendar";
 import {
   Form,
   FormControl,
@@ -29,11 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { DatePickerField } from "@/components/ui/form/date-picker-field";
 
 export default function AddProjectPage() {
   const router = useRouter();
@@ -43,19 +35,26 @@ export default function AddProjectPage() {
     name: z.string().min(1, {
       message: "Title is required.",
     }),
-    description: z.string().nullable().default(null),
+    description: z.string().nullable(),
+    type: z.string(),
     status: z.string(),
     priority: z.string(),
-    startDate: z.coerce.date().nullable().default(null),
-    endDate: z.coerce.date().nullable().default(null),
-    budget: z.string().nullable().default(null),
+    startDate: z.coerce.date().nullable(),
+    dueDate: z.coerce.date().nullable(),
+    budget: z.string().nullable(),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      name: "",
+      description: null,
+      type: "GENERAL",
       status: "PLANNED",
       priority: "MEDIUM",
+      startDate: null,
+      dueDate: null,
+      budget: null,
     },
   });
 
@@ -63,10 +62,8 @@ export default function AddProjectPage() {
     const payload = {
       ...values,
       startDate: values.startDate ? values.startDate.toISOString() : null,
-      endDate: values.endDate ? values.endDate.toISOString() : null,
+      dueDate: values.dueDate ? values.dueDate.toISOString() : null,
     };
-    console.log(payload);
-
     try {
       const response = await fetch("/api/projects", {
         method: "POST",
@@ -126,6 +123,36 @@ export default function AddProjectPage() {
 
           <FormField
             control={form.control}
+            name="type"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Type</FormLabel>
+                <FormControl>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger className="w-[240px]">
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="AUTOMATION">Automation</SelectItem>
+                      <SelectItem value="DESIGN">Design</SelectItem>
+                      <SelectItem value="ELECTRONICS">Electronics</SelectItem>
+                      <SelectItem value="GENERAL">General</SelectItem>
+                      <SelectItem value="MAKER">Maker</SelectItem>
+                      <SelectItem value="REPAIR">Repair</SelectItem>
+                      <SelectItem value="WEBAPP">Web Application</SelectItem>
+                      <SelectItem value="WEBSITE">Website</SelectItem>
+                      <SelectItem value="WRITING">Writing</SelectItem>
+                      <SelectItem value="OTHER">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
             name="status"
             render={({ field }) => (
               <FormItem>
@@ -177,79 +204,15 @@ export default function AddProjectPage() {
             control={form.control}
             name="startDate"
             render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Start Date</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-[240px] pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
-                        )}
-                      >
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      disabled={(date) => date < new Date("1900-01-01")}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
-              </FormItem>
+              <DatePickerField field={field} label="Start Date" />
             )}
           />
 
           <FormField
             control={form.control}
-            name="endDate"
+            name="dueDate"
             render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>End Date</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-[240px] pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
-                        )}
-                      >
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      disabled={(date) => date < new Date("1900-01-01")}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
-              </FormItem>
+              <DatePickerField field={field} label="Due Date" />
             )}
           />
 

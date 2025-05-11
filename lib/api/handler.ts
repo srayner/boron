@@ -16,7 +16,6 @@ export function withErrorHandling<T>(
 
       return NextResponse.json(result);
     } catch (err) {
-      console.log("caught the err");
       return handleAppError(err);
     }
   };

@@ -6,7 +6,6 @@ import React, { useEffect, useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { format } from "date-fns";
 import {
   Form,
   FormControl,
@@ -19,7 +18,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { CalendarIcon } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -27,13 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { cn } from "@/lib/utils";
+import { DatePickerField } from "@/components/ui/form/date-picker-field";
 
 type ProjectEditPageProps = {
   params: Promise<{ id: string }>;
@@ -44,12 +36,13 @@ const ProjectEditPage: NextPage<ProjectEditPageProps> = ({ params }) => {
     name: z.string().min(1, {
       message: "Title is required.",
     }),
-    description: z.string().nullable().default(null),
+    description: z.string().nullable(),
+    type: z.string(),
     status: z.string(),
     priority: z.string(),
-    startDate: z.coerce.date().nullable().default(null),
-    endDate: z.coerce.date().nullable().default(null),
-    budget: z.string().nullable().default(null),
+    startDate: z.coerce.date().nullable(),
+    dueDate: z.coerce.date().nullable(),
+    budget: z.string().nullable(),
   });
 
   type EditProjectSchema = z.infer<typeof editProjectSchema>;
@@ -64,13 +57,18 @@ const ProjectEditPage: NextPage<ProjectEditPageProps> = ({ params }) => {
     resolver: zodResolver(editProjectSchema),
   });
 
-  const onSubmit = async (data: FieldValues) => {
+  const onSubmit = async (values: FieldValues) => {
+    const payload = {
+      ...values,
+      startDate: values.startDate ? values.startDate.toISOString() : null,
+      dueDate: values.dueDate ? values.dueDate.toISOString() : null,
+    };
     await fetch(`/api/projects/${projectId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify(payload),
     });
     router.push(`/projects/${projectId}`);
   };
@@ -87,7 +85,6 @@ const ProjectEditPage: NextPage<ProjectEditPageProps> = ({ params }) => {
         }
 
         const { project } = await projectResponse.json();
-        console.log(project);
         const { id, ...rest } = project;
 
         form.reset(rest);
@@ -136,6 +133,36 @@ const ProjectEditPage: NextPage<ProjectEditPageProps> = ({ params }) => {
                 <FormDescription>
                   A brief description of what your project involves.
                 </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="type"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Type</FormLabel>
+                <FormControl>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger className="w-[240px]">
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="AUTOMATION">Automation</SelectItem>
+                      <SelectItem value="DESIGN">Design</SelectItem>
+                      <SelectItem value="ELECTRONICS">Electronics</SelectItem>
+                      <SelectItem value="GENERAL">General</SelectItem>
+                      <SelectItem value="MAKER">Maker</SelectItem>
+                      <SelectItem value="REPAIR">Repair</SelectItem>
+                      <SelectItem value="WEBAPP">Web Application</SelectItem>
+                      <SelectItem value="WEBSITE">Website</SelectItem>
+                      <SelectItem value="WRITING">Writing</SelectItem>
+                      <SelectItem value="OTHER">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
@@ -194,79 +221,15 @@ const ProjectEditPage: NextPage<ProjectEditPageProps> = ({ params }) => {
             control={form.control}
             name="startDate"
             render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Start Date</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-[240px] pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
-                        )}
-                      >
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      disabled={(date) => date < new Date("1900-01-01")}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
-              </FormItem>
+              <DatePickerField field={field} label="Start Date" />
             )}
           />
 
           <FormField
             control={form.control}
-            name="endDate"
+            name="dueDate"
             render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>End Date</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-[240px] pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
-                        )}
-                      >
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      disabled={(date) => date < new Date("1900-01-01")}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
-              </FormItem>
+              <DatePickerField field={field} label="Due Date" />
             )}
           />
 
