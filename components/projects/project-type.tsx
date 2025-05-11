@@ -11,6 +11,7 @@ import {
   Settings,
   Lightbulb,
 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 const getIconForProjectType = (type: ProjectType) => {
   switch (type) {
@@ -37,6 +38,10 @@ const getIconForProjectType = (type: ProjectType) => {
   }
 };
 
+const formatProjectTypeName = (type: ProjectType) => {
+  return type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
+};
+
 export const ProjectNameWithIcon: FC<{ name: string; type: ProjectType }> = ({
   name,
   type,
@@ -50,14 +55,18 @@ export const ProjectNameWithIcon: FC<{ name: string; type: ProjectType }> = ({
 };
 
 export const ProjectTypeWithIcon: FC<{ type: ProjectType }> = ({ type }) => {
-  const formatProjectTypeName = (type: ProjectType) => {
-    return type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
-  };
-
   return (
     <div className="flex items-center space-x-2 gap-2">
       {getIconForProjectType(type)}
       {formatProjectTypeName(type)}
     </div>
+  );
+};
+
+export const ProjectTypeBadge: FC<{ type: ProjectType }> = ({ type }) => {
+  return (
+    <Badge className="bg-orange-100 text-orange-700">
+      {formatProjectTypeName(type)}
+    </Badge>
   );
 };

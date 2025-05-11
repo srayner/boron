@@ -10,7 +10,7 @@ import { Context } from "@/types/api";
 
 export const GET = withErrorHandling(
   async (req: NextRequest, context: Context) => {
-    const projectId = context.params.id;
+    const { id: projectId } = await context.params;
     const project = await getProjectById(projectId);
 
     if (!project) {
@@ -23,16 +23,21 @@ export const GET = withErrorHandling(
 
 export const DELETE = withErrorHandling(
   async (req: NextRequest, context: Context) => {
-    const projectId = context.params.id;
-    return await deleteProjectById(projectId);
+    const { id: projectId } = await context.params;
+    const deletedProject = await deleteProjectById(projectId);
+
+    return { project: deletedProject };
   }
 );
 
 export const PUT = withErrorHandling(
   async (req: NextRequest, context: Context) => {
-    const projectId = context.params.id;
+    console.log("in put endpoint");
+    const { id: projectId } = await context.params;
     const data = await req.json();
 
-    return await updateProject(projectId, data);
+    const updatedProject = await updateProject(projectId, data);
+
+    return { project: updatedProject };
   }
 );

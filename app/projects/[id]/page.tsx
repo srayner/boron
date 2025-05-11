@@ -1,4 +1,8 @@
-import { Badge } from "@/components/ui/badge";
+"use client";
+
+import { NextPage } from "next";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -9,27 +13,59 @@ import {
   PencilIcon,
   Trash2Icon,
 } from "lucide-react";
+import { Project } from "@/types/entities";
+import {
+  ProjectNameWithIcon,
+  ProjectTypeBadge,
+} from "@/components/projects/project-type";
+import { ProjectStatusBadge } from "@/components/projects/project-status";
+import { format, formatDistanceToNow } from "date-fns";
 
-export default function ProjectDetail() {
+type ProjectPageProps = {
+  params: Promise<{ id: string }>;
+};
+
+const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
+  const router = useRouter();
+  const { id: projectId } = React.use(params);
+  const [project, setProject] = useState<Project | null>(null);
+
+  const fetchProject = async () => {
+    const response = await fetch(`/api/projects/${projectId}`);
+    const { project } = await response.json();
+    setProject(project);
+  };
+
+  useEffect(() => {
+    fetchProject();
+  }, []);
+
+  if (!project) return <div>Loading...</div>;
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-orange-700">
-            Project Alpha
+            <ProjectNameWithIcon name={project.name} type={project.type} />
           </h1>
           <div className="flex items-center gap-2 mt-1">
-            <Badge className="bg-orange-100 text-orange-700">
-              Infrastructure
-            </Badge>
-            <span className="text-sm text-muted-foreground">
-              Last activity: 2 days ago
+            <ProjectStatusBadge status={project.status} />
+            <span text-sm text-muted-foreground>
+              Updated{" "}
+              {formatDistanceToNow(new Date(project.updatedAt), {
+                addSuffix: true,
+              })}
             </span>
           </div>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => router.push(`/projects/${projectId}/edit`)}
+          >
             <PencilIcon className="w-4 h-4 mr-1" /> Edit
           </Button>
           <Button variant="destructive" size="sm">
@@ -45,7 +81,7 @@ export default function ProjectDetail() {
         <Card>
           <CardContent className="py-4">
             <h3 className="text-sm text-muted-foreground mb-1">Description</h3>
-            <p>Migration of legacy systems to cloud infrastructure.</p>
+            <p>{project.description}</p>
           </CardContent>
         </Card>
         <Card>
@@ -54,16 +90,22 @@ export default function ProjectDetail() {
               <CalendarIcon className="w-4 h-4" /> Dates
             </h3>
             <p>
-              Start: Jan 2024
+              Start:{" "}
+              {project.startAt && format(new Date(project.startAt), "MMM yyyy")}
               <br />
-              End: Dec 2024
+              End:{" "}
+              {project.endAt && format(new Date(project.endAt), "MMM yyyy")}
+              <br />
+              Deadline:{" "}
+              {project.deadline &&
+                format(new Date(project.deadline), "MMM yyyy")}
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="py-4">
             <h3 className="text-sm text-muted-foreground mb-1">Completion</h3>
-            <p>67%</p>
+            <p>{project.completion}%</p>
           </CardContent>
         </Card>
         <Card>
@@ -71,7 +113,7 @@ export default function ProjectDetail() {
             <h3 className="text-sm text-muted-foreground mb-1 flex items-center gap-1">
               <DollarSignIcon className="w-4 h-4" /> Actual Cost
             </h3>
-            <p>$24,000</p>
+            <p>£ 0.00</p>
           </CardContent>
         </Card>
       </div>
@@ -108,4 +150,6 @@ export default function ProjectDetail() {
       </Tabs>
     </div>
   );
-}
+};
+
+export default ProjectDetailPage;
