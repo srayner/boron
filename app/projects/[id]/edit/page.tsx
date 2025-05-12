@@ -26,6 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DatePickerField } from "@/components/ui/form/date-picker-field";
+import { useRecentProjects } from "@/app/context/recent-projects-context";
 
 type ProjectEditPageProps = {
   params: Promise<{ id: string }>;
@@ -49,6 +50,8 @@ const ProjectEditPage: NextPage<ProjectEditPageProps> = ({ params }) => {
 
   const { id: projectId } = React.use(params);
 
+  const { refreshRecentProjects } = useRecentProjects();
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string>();
   const router = useRouter();
@@ -70,6 +73,7 @@ const ProjectEditPage: NextPage<ProjectEditPageProps> = ({ params }) => {
       },
       body: JSON.stringify(payload),
     });
+    refreshRecentProjects();
     router.push(`/projects/${projectId}`);
   };
 

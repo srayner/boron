@@ -21,6 +21,7 @@ import { ProjectStatusBadge } from "@/components/projects/project-status";
 import { format, formatDistanceToNow } from "date-fns";
 import { formatCurrency, titleCase } from "@/lib/utils";
 import { ConfirmationModal } from "@/components/ui/confirmation-modal";
+import { useRecentProjects } from "@/app/context/recent-projects-context";
 
 type ProjectPageProps = {
   params: Promise<{ id: string }>;
@@ -28,6 +29,7 @@ type ProjectPageProps = {
 
 const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
   const router = useRouter();
+  const { refreshRecentProjects } = useRecentProjects();
   const { id: projectId } = React.use(params);
   const [project, setProject] = useState<Project | null>(null);
   const [isConfirmOpen, setIsConfirmOpen] = useState<boolean>(false);
@@ -48,6 +50,7 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
       method: "DELETE",
     });
 
+    refreshRecentProjects();
     router.push("/projects");
   };
 
