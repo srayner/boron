@@ -77,8 +77,10 @@ export default function AddProjectPage() {
         throw new Error("Failed to create project");
       }
 
+      const { project: newProject } = await response.json();
+
       refreshRecentProjects();
-      router.push("/");
+      router.push(`/projects/${newProject.id}`);
     } catch (error) {
       console.error("Error creating project:", error);
     }
