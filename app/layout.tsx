@@ -1,12 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import SideBar from "@/components/sidebar";
-import NavBar from "@/components/navbar";
 import { ThemeProvider } from "@/components/providers/theme-provider";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { cookies } from "next/headers";
-import { RecentProjectsProvider } from "./context/recent-projects-context";
+import "./globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,17 +18,15 @@ export const metadata: Metadata = {
   description: "Project Management",
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const cookieStore = await cookies();
-  const defaultOpen = cookieStore.get("sidebar_state")?.value === "true";
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased flex`}
+        className={`${geistSans.variable} ${geistMono.variable} min-h-screen antialiased`}
       >
         <ThemeProvider
           attribute="class"
@@ -41,15 +34,7 @@ export default async function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <RecentProjectsProvider>
-            <SidebarProvider defaultOpen={defaultOpen}>
-              <SideBar />
-              <main className="w-full">
-                <NavBar />
-                <div className="px-8">{children}</div>
-              </main>
-            </SidebarProvider>
-          </RecentProjectsProvider>
+          {children}
         </ThemeProvider>
       </body>
     </html>
