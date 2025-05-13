@@ -27,9 +27,9 @@ export const {
   callbacks: {
     async signIn({ user }) {
       const existingUser = await getUserById(user.id);
-      //   if (!existingUser || !existingUser.emailVerified) {
-      //     return false;
-      //   }
+      if (!existingUser || !existingUser.emailVerified) {
+        return false;
+      }
       return true;
     },
     async session({ token, session }) {
