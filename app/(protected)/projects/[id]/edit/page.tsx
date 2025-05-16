@@ -53,7 +53,6 @@ const ProjectEditPage: NextPage<ProjectEditPageProps> = ({ params }) => {
   const { refreshRecentProjects } = useRecentProjects();
 
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string>();
   const router = useRouter();
 
   const form = useForm<EditProjectSchema>({
@@ -89,11 +88,8 @@ const ProjectEditPage: NextPage<ProjectEditPageProps> = ({ params }) => {
         }
 
         const { project } = await projectResponse.json();
-        const { id, ...rest } = project;
-
-        form.reset(rest);
+        form.reset(project);
       } catch (error) {
-        setError("Failed to fetch data from the API.");
         console.error("Error:", error);
       } finally {
         setIsLoading(false);
@@ -101,7 +97,7 @@ const ProjectEditPage: NextPage<ProjectEditPageProps> = ({ params }) => {
     };
 
     fetchData();
-  }, []);
+  }, [form, projectId]);
 
   if (isLoading) return <div>Loading...</div>;
 
@@ -132,7 +128,11 @@ const ProjectEditPage: NextPage<ProjectEditPageProps> = ({ params }) => {
               <FormItem>
                 <FormLabel>Description</FormLabel>
                 <FormControl>
-                  <Textarea className="h-32" {...field} />
+                  <Textarea
+                    className="h-32"
+                    {...field}
+                    value={field.value ?? ""}
+                  />
                 </FormControl>
                 <FormDescription>
                   A brief description of what your project involves.
@@ -246,6 +246,7 @@ const ProjectEditPage: NextPage<ProjectEditPageProps> = ({ params }) => {
                 <FormControl>
                   <Input
                     {...field}
+                    value={field.value ?? ""}
                     className="w-[240px]"
                     type="text"
                     placeholder="£0.00"

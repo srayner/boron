@@ -113,7 +113,11 @@ export default function AddProjectPage() {
               <FormItem>
                 <FormLabel>Description</FormLabel>
                 <FormControl>
-                  <Textarea className="h-32" {...field} />
+                  <Textarea
+                    className="h-32"
+                    {...field}
+                    value={field.value ?? ""}
+                  />
                 </FormControl>
                 <FormDescription>
                   A brief description of what your project involves.
@@ -227,6 +231,7 @@ export default function AddProjectPage() {
                 <FormControl>
                   <Input
                     {...field}
+                    value={field.value ?? ""}
                     className="w-[240px]"
                     type="text"
                     placeholder="£0.00"

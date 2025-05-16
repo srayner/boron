@@ -1,3 +1,3 @@
 export interface Context {
-  params: { [key: string]: string };
+  params: Record<string, string>;
 }

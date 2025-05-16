@@ -1,11 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useRecentProjects } from "@/app/context/recent-projects-context";
 import {
   Calendar,
   ChevronUp,
-  Code,
   Home,
   Inbox,
   Plus,
@@ -70,24 +68,6 @@ const items = [
 
 const SideBar = () => {
   const { recentProjects } = useRecentProjects();
-  // const [projects, setProjects] = useState([]);
-
-  // useEffect(() => {
-  //   const fetchRecentProjects = async () => {
-  //     try {
-  //       const res = await fetch(
-  //         "/api/projects?limit=5&orderBy=updatedAt&orderDir=desc"
-  //       );
-  //       if (!res.ok) throw new Error("Failed to fetch projects");
-  //       const data = await res.json();
-  //       setProjects(data.projects);
-  //     } catch (err) {
-  //       console.error(err);
-  //     }
-  //   };
-
-  //   fetchRecentProjects();
-  // }, []);
 
   return (
     <Sidebar collapsible="icon">

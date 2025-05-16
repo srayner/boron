@@ -6,11 +6,10 @@ import {
   updateProject,
 } from "@/services/projects";
 import { AppError } from "@/lib/api/error";
-import { Context } from "@/types/api";
 
 export const GET = withErrorHandling(
-  async (req: NextRequest, context: Context) => {
-    const { id: projectId } = await context.params;
+  async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
+    const { id: projectId } = await params;
     const project = await getProjectById(projectId);
 
     if (!project) {
@@ -22,8 +21,8 @@ export const GET = withErrorHandling(
 );
 
 export const DELETE = withErrorHandling(
-  async (req: NextRequest, context: Context) => {
-    const { id: projectId } = await context.params;
+  async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
+    const { id: projectId } = await params;
     const deletedProject = await deleteProjectById(projectId);
 
     return { project: deletedProject };
@@ -31,8 +30,8 @@ export const DELETE = withErrorHandling(
 );
 
 export const PUT = withErrorHandling(
-  async (req: NextRequest, context: Context) => {
-    const { id: projectId } = await context.params;
+  async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
+    const { id: projectId } = await params;
     const data = await req.json();
 
     const updatedProject = await updateProject(projectId, data);

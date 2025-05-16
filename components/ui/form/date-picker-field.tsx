@@ -2,7 +2,7 @@
 
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
-import { ControllerRenderProps } from "react-hook-form";
+import { FieldValues, ControllerRenderProps, Path } from "react-hook-form";
 import { cn } from "@/lib/utils";
 import {
   FormControl,
@@ -19,17 +19,17 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-type DatePickerFieldProps = {
-  field: ControllerRenderProps<any, any>;
+interface DatePickerFieldProps<T extends FieldValues> {
+  field: ControllerRenderProps<T, Path<T>>;
   label: string;
   description?: string;
-};
+}
 
-export function DatePickerField({
+export function DatePickerField<T extends FieldValues>({
   field,
   label,
   description,
-}: DatePickerFieldProps) {
+}: DatePickerFieldProps<T>) {
   return (
     <FormItem className="flex flex-col">
       <FormLabel>{label}</FormLabel>

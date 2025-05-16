@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { withErrorHandling } from "@/lib/api/handler";
 import { parseQueryParams } from "@/lib/api/query";
 import { createProject, getProjects } from "@/services/projects";
