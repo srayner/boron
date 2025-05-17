@@ -2,6 +2,7 @@
 
 import { NextPage } from "next";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -14,6 +15,8 @@ import {
   Trash2Icon,
   CircleGaugeIcon,
   InfoIcon,
+  Pencil,
+  Trash2,
 } from "lucide-react";
 import { Project } from "@/types/entities";
 import { ProjectNameWithIcon } from "@/components/projects/project-type";
@@ -24,15 +27,26 @@ import { ConfirmationModal } from "@/components/ui/confirmation-modal";
 import { useRecentProjects } from "@/app/context/recent-projects-context";
 
 type ProjectPageProps = {
-  params: Promise<{ id: string }>;
+  params: Promise<{ projectId: string }>;
 };
+
+type DeletableType = "project" | "task" | "milestone" | "cost";
+interface DeletableItem {
+  id: string;
+  name: string;
+}
 
 const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
   const router = useRouter();
   const { refreshRecentProjects } = useRecentProjects();
-  const { id: projectId } = React.use(params);
+  const { projectId } = React.use(params);
   const [project, setProject] = useState<Project | null>(null);
-  const [isConfirmOpen, setIsConfirmOpen] = useState<boolean>(false);
+
+  const [deleteInfo, setDeleteInfo] = useState<{
+    type: DeletableType;
+    item: DeletableItem;
+  } | null>(null);
+  const isConfirmOpen = !!deleteInfo;
 
   const fetchProject = async () => {
     const response = await fetch(`/api/projects/${projectId}`);
@@ -45,13 +59,28 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
   }, []);
 
   const handleConfirmDelete = async () => {
-    setIsConfirmOpen(false);
-    await fetch(`/api/projects/${projectId}`, {
-      method: "DELETE",
-    });
+    if (!deleteInfo) return;
 
+    const apiMap: Record<DeletableType, string> = {
+      project: "projects",
+      task: "tasks",
+      milestone: "milestones",
+      cost: "costs",
+    };
+
+    const endpoint = apiMap[deleteInfo.type];
+    const url = `/api/${endpoint}/${deleteInfo.item.id}`;
+
+    await fetch(url, { method: "DELETE" });
+
+    setDeleteInfo(null);
     refreshRecentProjects();
-    router.push("/projects");
+
+    if (deleteInfo.type === "project") {
+      router.push("/projects");
+    } else {
+      fetchProject();
+    }
   };
 
   if (!project) return <div>Loading...</div>;
@@ -86,7 +115,7 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
             variant="destructive"
             size="sm"
             onClick={() => {
-              setIsConfirmOpen(true);
+              setDeleteInfo({ type: "project", item: project });
             }}
           >
             <Trash2Icon className="w-4 h-4 mr-1" /> Delete
@@ -172,7 +201,7 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
 
       {/* Tabs for sub-sections */}
       <Tabs defaultValue="tasks" className="mt-8">
-        <TabsList>
+        <TabsList className="justify-start gap-2">
           <TabsTrigger value="tasks">Tasks</TabsTrigger>
           <TabsTrigger value="milestones">Milestones</TabsTrigger>
           <TabsTrigger value="costs">Costs</TabsTrigger>
@@ -181,7 +210,49 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
         <TabsContent value="tasks">
           {/* Task list placeholder */}
           <div className="mt-4 text-sm text-muted-foreground">
-            List of tasks goes here...
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold">Tasks</h2>
+              <Button asChild size="sm">
+                <Link href={`/projects/${projectId}/tasks/add`}>Add Task</Link>
+              </Button>
+            </div>
+            <table className="w-full text-sm border">
+              <thead>
+                <tr className="bg-muted text-muted-foreground">
+                  <th className="text-left p-2">Name</th>
+                  <th className="text-left p-2">Priority</th>
+                  <th className="text-left p-2">Status</th>
+                  <th className="text-left p-2">Start Date</th>
+                  <th className="text-left p-2">Due Date</th>
+                  <th className="text-left p-2">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {project.tasks.map((task) => (
+                  <tr key={task.id} className="border-t">
+                    <td className="p-2">{task.name}</td>
+                    <td className="p-2">{task.priority}</td>
+                    <td className="p-2">{task.status}</td>
+                    <td className="p-2">{task.startDate}</td>
+                    <td className="p-2">{task.dueDate}</td>
+                    <td className="p-2 flex gap-2">
+                      <Link
+                        href={`/projects/${projectId}/tasks/${task.id}/edit`}
+                      >
+                        <Pencil className="w-4 h-4 hover:text-primary" />
+                      </Link>
+                      <button
+                        onClick={() => {
+                          setDeleteInfo({ type: "task", item: task });
+                        }}
+                      >
+                        <Trash2 className="w-4 h-4 hover:text-destructive" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </TabsContent>
         <TabsContent value="milestones">
@@ -203,12 +274,10 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
 
       <ConfirmationModal
         open={isConfirmOpen}
-        title="Delete Project"
-        message={`Are you sure you want to delete project: ${project.name}`}
+        title={`Delete ${deleteInfo?.type ?? ""}`}
+        message={`Are you sure you want to delete ${deleteInfo?.type}: ${deleteInfo?.item.name}?`}
         onConfirm={handleConfirmDelete}
-        onCancel={() => {
-          setIsConfirmOpen(false);
-        }}
+        onCancel={() => setDeleteInfo(null)}
       />
     </div>
   );

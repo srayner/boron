@@ -38,10 +38,11 @@ enum ProjectType {
 }
 
 enum TaskStatus {
-  TODO
+  PLANNED
   IN_PROGRESS
+  ON_HOLD
   BLOCKED
-  DONE
+  COMPLETED
   CANCELLED
 }
 
@@ -154,15 +155,15 @@ model Project {
 
 model Task {
   id                  String             @id @default(cuid())
-  title               String
+  name                String
   description         String?
-  status              TaskStatus         @default(TODO)
+  status              TaskStatus         @default(PLANNED)
   priority            TaskPriority       @default(MEDIUM)
   startDate           DateTime?
   dueDate             DateTime?
   completedAt         DateTime?
   projectId           String
-  project             Project            @relation("ProjectTasks", fields: [projectId], references: [id])
+  project             Project            @relation("ProjectTasks", fields: [projectId], references: [id], onDelete: Cascade)
   parentTaskId        String?
   parentTask          Task?              @relation("SubTasks", fields: [parentTaskId], references: [id])
   subTasks            Task[]             @relation("SubTasks")
@@ -185,9 +186,9 @@ model Cost {
   note                String?
   date                DateTime?          @default(now())
   projectId           String
-  project             Project            @relation("ProjectCosts", fields: [projectId], references: [id])
+  project             Project            @relation("ProjectCosts", fields: [projectId], references: [id], onDelete: Cascade)
   taskId              String?
-  task                Task?              @relation("TaskCosts", fields: [taskId], references: [id])
+  task                Task?              @relation("TaskCosts", fields: [taskId], references: [id], onDelete: Cascade)
 
   createdAt           DateTime           @default(now())
   updatedAt           DateTime           @updatedAt
@@ -212,7 +213,7 @@ model Milestone {
   targetDate          DateTime? 
   status              MilestoneStatus    @default(PLANNED)
   projectId           String
-  project             Project            @relation("ProjectMilestones", fields: [projectId], references: [id])
+  project             Project            @relation("ProjectMilestones", fields: [projectId], references: [id], onDelete: Cascade)
   tasks               Task[]             @relation("TaskMilestones")
 
   createdAt           DateTime           @default(now())

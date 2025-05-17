@@ -70,7 +70,7 @@ export interface Milestone {
 
 export interface Task {
   id: string;
-  title: string;
+  name: string;
   description: string;
   status: TaskStatus;
   priority: TaskPriority;

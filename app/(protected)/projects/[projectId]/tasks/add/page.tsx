@@ -1,11 +1,12 @@
 "use client";
 
-import { NextPage } from "next";
+import React from "react";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
-import { FieldValues, useForm } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { useRecentProjects } from "@/app/context/recent-projects-context";
+import { z } from "zod";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -15,7 +16,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -26,84 +26,71 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DatePickerField } from "@/components/ui/form/date-picker-field";
-import { useRecentProjects } from "@/app/context/recent-projects-context";
+import { NextPage } from "next";
 
-type ProjectEditPageProps = {
-  params: Promise<{ id: string }>;
+type TaskAddPageProps = {
+  params: Promise<{ projectId: string }>;
 };
 
-const ProjectEditPage: NextPage<ProjectEditPageProps> = ({ params }) => {
-  const editProjectSchema = z.object({
+const TaskAddPage: NextPage<TaskAddPageProps> = ({ params }) => {
+  const router = useRouter();
+  const { refreshRecentProjects } = useRecentProjects();
+
+  const { projectId } = React.use(params);
+
+  const formSchema = z.object({
     name: z.string().min(1, {
-      message: "Title is required.",
+      message: "Name is required.",
     }),
     description: z.string().nullable(),
-    type: z.string(),
     status: z.string(),
     priority: z.string(),
     startDate: z.coerce.date().nullable(),
     dueDate: z.coerce.date().nullable(),
-    budget: z.string().nullable(),
   });
 
-  type EditProjectSchema = z.infer<typeof editProjectSchema>;
-
-  const { id: projectId } = React.use(params);
-
-  const { refreshRecentProjects } = useRecentProjects();
-
-  const [isLoading, setIsLoading] = useState(true);
-  const router = useRouter();
-
-  const form = useForm<EditProjectSchema>({
-    resolver: zodResolver(editProjectSchema),
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      description: null,
+      status: "PLANNED",
+      priority: "MEDIUM",
+      startDate: null,
+      dueDate: null,
+    },
   });
 
-  const onSubmit = async (values: FieldValues) => {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     const payload = {
+      projectId,
       ...values,
       startDate: values.startDate ? values.startDate.toISOString() : null,
       dueDate: values.dueDate ? values.dueDate.toISOString() : null,
     };
-    await fetch(`/api/projects/${projectId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
-    refreshRecentProjects();
-    router.push(`/projects/${projectId}`);
-  };
+    try {
+      const response = await fetch("/api/tasks", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [projectResponse] = await Promise.all([
-          fetch(`/api/projects/${projectId}`),
-        ]);
-
-        if (!projectResponse.ok) {
-          throw new Error("Failed to fetch data");
-        }
-
-        const { project } = await projectResponse.json();
-        form.reset(project);
-      } catch (error) {
-        console.error("Error:", error);
-      } finally {
-        setIsLoading(false);
+      if (!response.ok) {
+        throw new Error("Failed to create task");
       }
-    };
 
-    fetchData();
-  }, [form, projectId]);
-
-  if (isLoading) return <div>Loading...</div>;
+      refreshRecentProjects();
+      router.push(`/projects/${projectId}`);
+    } catch (error) {
+      console.error("Error creating task:", error);
+    }
+  }
 
   return (
     <div>
-      <h2>Edit Project</h2>
+      <h1 className="text-2xl font-semibold text-orange-700">Add Task</h1>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -135,38 +122,8 @@ const ProjectEditPage: NextPage<ProjectEditPageProps> = ({ params }) => {
                   />
                 </FormControl>
                 <FormDescription>
-                  A brief description of what your project involves.
+                  A brief description of what your task involves.
                 </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="type"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Type</FormLabel>
-                <FormControl>
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger className="w-[240px]">
-                      <SelectValue placeholder="Select type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="AUTOMATION">Automation</SelectItem>
-                      <SelectItem value="DESIGN">Design</SelectItem>
-                      <SelectItem value="ELECTRONICS">Electronics</SelectItem>
-                      <SelectItem value="GENERAL">General</SelectItem>
-                      <SelectItem value="MAKER">Maker</SelectItem>
-                      <SelectItem value="REPAIR">Repair</SelectItem>
-                      <SelectItem value="WEBAPP">Web Application</SelectItem>
-                      <SelectItem value="WEBSITE">Website</SelectItem>
-                      <SelectItem value="WRITING">Writing</SelectItem>
-                      <SelectItem value="OTHER">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
@@ -185,8 +142,9 @@ const ProjectEditPage: NextPage<ProjectEditPageProps> = ({ params }) => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="PLANNED">Planned</SelectItem>
-                      <SelectItem value="ACTIVE">Active</SelectItem>
+                      <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
                       <SelectItem value="ON_HOLD">On Hold</SelectItem>
+                      <SelectItem value="BLOCKED">Blocked</SelectItem>
                       <SelectItem value="COMPLETED">Completed</SelectItem>
                       <SelectItem value="CANCELLED">Cancelled</SelectItem>
                     </SelectContent>
@@ -237,30 +195,6 @@ const ProjectEditPage: NextPage<ProjectEditPageProps> = ({ params }) => {
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="budget"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Budget</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    value={field.value ?? ""}
-                    className="w-[240px]"
-                    type="text"
-                    placeholder="£0.00"
-                    onChange={(e) => {
-                      const value = e.target.value.replace(/[^0-9.]/g, ""); // Remove non-numeric characters
-                      field.onChange(value);
-                    }}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
           <Button type="submit">Submit</Button>
         </form>
       </Form>
@@ -268,4 +202,4 @@ const ProjectEditPage: NextPage<ProjectEditPageProps> = ({ params }) => {
   );
 };
 
-export default ProjectEditPage;
+export default TaskAddPage;

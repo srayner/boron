@@ -1,12 +1,11 @@
 "use client";
 
-import React from "react";
+import { NextPage } from "next";
 import { useRouter } from "next/navigation";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { useRecentProjects } from "@/app/context/recent-projects-context";
+import React, { useEffect, useState } from "react";
+import { FieldValues, useForm } from "react-hook-form";
 import { z } from "zod";
-import { Button } from "@/components/ui/button";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
   FormControl,
@@ -16,6 +15,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -26,14 +26,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DatePickerField } from "@/components/ui/form/date-picker-field";
+import { useRecentProjects } from "@/app/context/recent-projects-context";
 
-export default function AddProjectPage() {
-  const router = useRouter();
-  const { refreshRecentProjects } = useRecentProjects();
+type ProjectEditPageProps = {
+  params: Promise<{ projectId: string }>;
+};
 
-  const formSchema = z.object({
+const ProjectEditPage: NextPage<ProjectEditPageProps> = ({ params }) => {
+  const editProjectSchema = z.object({
     name: z.string().min(1, {
-      message: "Name is required.",
+      message: "Title is required.",
     }),
     description: z.string().nullable(),
     type: z.string(),
@@ -44,51 +46,64 @@ export default function AddProjectPage() {
     budget: z.string().nullable(),
   });
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      description: null,
-      type: "GENERAL",
-      status: "PLANNED",
-      priority: "MEDIUM",
-      startDate: null,
-      dueDate: null,
-      budget: null,
-    },
+  type EditProjectSchema = z.infer<typeof editProjectSchema>;
+
+  const { projectId } = React.use(params);
+
+  const { refreshRecentProjects } = useRecentProjects();
+
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+
+  const form = useForm<EditProjectSchema>({
+    resolver: zodResolver(editProjectSchema),
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  const onSubmit = async (values: FieldValues) => {
     const payload = {
       ...values,
       startDate: values.startDate ? values.startDate.toISOString() : null,
       dueDate: values.dueDate ? values.dueDate.toISOString() : null,
     };
-    try {
-      const response = await fetch("/api/projects", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
+    await fetch(`/api/projects/${projectId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+    refreshRecentProjects();
+    router.push(`/projects/${projectId}`);
+  };
 
-      if (!response.ok) {
-        throw new Error("Failed to create project");
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [projectResponse] = await Promise.all([
+          fetch(`/api/projects/${projectId}`),
+        ]);
+
+        if (!projectResponse.ok) {
+          throw new Error("Failed to fetch data");
+        }
+
+        const { project } = await projectResponse.json();
+        form.reset(project);
+      } catch (error) {
+        console.error("Error:", error);
+      } finally {
+        setIsLoading(false);
       }
+    };
 
-      const { project: newProject } = await response.json();
+    fetchData();
+  }, [form, projectId]);
 
-      refreshRecentProjects();
-      router.push(`/projects/${newProject.id}`);
-    } catch (error) {
-      console.error("Error creating project:", error);
-    }
-  }
+  if (isLoading) return <div>Loading...</div>;
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-orange-700">Add Project</h1>
+      <h1 className="text-2xl font-semibold text-orange-700">Edit Project</h1>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -251,4 +266,6 @@ export default function AddProjectPage() {
       </Form>
     </div>
   );
-}
+};
+
+export default ProjectEditPage;

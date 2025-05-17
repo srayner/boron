@@ -1,8 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { AppError } from "@/lib/api/error";
 
-export const createProject = async (data: any) => {
-  if (!data.name) throw new AppError("Project name is required", 422);
+export const createTask = async (data: any) => {
+  if (!data.name) throw new AppError("Task name is required", 422);
 
   const startDate = data.startDate ? new Date(data.startDate) : null;
   const dueDate = data.dueDate ? new Date(data.dueDate) : null;
@@ -14,28 +14,27 @@ export const createProject = async (data: any) => {
     throw new AppError("Invalid due date", 422);
   }
 
-  return prisma.project.create({
+  return prisma.task.create({
     data: {
+      projectId: data.projectId,
       name: data.name,
       description: data.description || "",
-      type: data.type,
       status: data.status,
       priority: data.priority,
       startDate: startDate,
       dueDate: dueDate,
-      budget: data.budget,
     },
   });
 };
 
-export const deleteProject = async (id: string) => {
-  return await prisma.project.delete({
+export const deleteTask = async (id: string) => {
+  return await prisma.task.delete({
     where: { id },
   });
 };
 
-export const updateProject = async (id: string, data: any) => {
-  if (!data.name) throw new AppError("Project name is required", 422);
+export const updateTask = async (id: string, data: any) => {
+  if (!data.name) throw new AppError("Task name is required", 422);
 
   const startDate = data.startDate ? new Date(data.startDate) : null;
   const dueDate = data.dueDate ? new Date(data.dueDate) : null;
@@ -47,26 +46,24 @@ export const updateProject = async (id: string, data: any) => {
     throw new AppError("Invalid due date", 422);
   }
 
-  return prisma.project.update({
+  return prisma.task.update({
     where: { id },
     data: {
       name: data.name,
       description: data.description || "",
-      type: data.type,
       status: data.status,
       priority: data.priority,
       startDate: startDate,
       dueDate: dueDate,
-      budget: data.budget,
     },
   });
 };
 
-export const getProject = async (id: string) => {
-  return await prisma.project.findUnique({
+export const getTask = async (id: string) => {
+  return await prisma.task.findUnique({
     where: { id },
     include: {
-      tasks: true,
+      subTasks: true,
       costs: true,
       milestones: true,
       tags: true,
@@ -74,14 +71,14 @@ export const getProject = async (id: string) => {
   });
 };
 
-export async function getProjects(params: {
+export async function getTasks(params: {
   search: string;
   pagination: { take: number; skip: number };
   ordering: { [key: string]: "asc" | "desc" };
 }) {
-  return prisma.project.findMany({
+  return prisma.task.findMany({
     include: {
-      tasks: true,
+      subTasks: true,
       costs: true,
       milestones: true,
     },

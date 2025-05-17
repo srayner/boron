@@ -1,16 +1,12 @@
 import { NextRequest } from "next/server";
 import { withErrorHandling } from "@/lib/api/handler";
-import {
-  getProjectById,
-  deleteProjectById,
-  updateProject,
-} from "@/services/projects";
+import { getProject, deleteProject, updateProject } from "@/services/projects";
 import { AppError } from "@/lib/api/error";
 
 export const GET = withErrorHandling(
   async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
     const { id: projectId } = await params;
-    const project = await getProjectById(projectId);
+    const project = await getProject(projectId);
 
     if (!project) {
       throw new AppError(`Project with id ${projectId} not found`, 404);
@@ -23,7 +19,7 @@ export const GET = withErrorHandling(
 export const DELETE = withErrorHandling(
   async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
     const { id: projectId } = await params;
-    const deletedProject = await deleteProjectById(projectId);
+    const deletedProject = await deleteProject(projectId);
 
     return { project: deletedProject };
   }
