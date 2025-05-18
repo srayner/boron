@@ -62,7 +62,8 @@ export interface Milestone {
   id: string;
   name: string;
   description: string;
-  targetDate: string;
+  order: number;
+  dueDate: string;
   status: MilestoneStatus;
   createdAt: string;
   updatedAt: string;

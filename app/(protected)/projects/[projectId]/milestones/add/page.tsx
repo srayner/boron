@@ -26,22 +26,26 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DatePickerField } from "@/components/ui/form/date-picker-field";
+import { NextPage } from "next";
 
-export default function AddProjectPage() {
+type MilestoneAddPageProps = {
+  params: Promise<{ projectId: string }>;
+};
+
+const MilestoneAddPage: NextPage<MilestoneAddPageProps> = ({ params }) => {
   const router = useRouter();
   const { refreshRecentProjects } = useRecentProjects();
+
+  const { projectId } = React.use(params);
 
   const formSchema = z.object({
     name: z.string().min(1, {
       message: "Name is required.",
     }),
     description: z.string().nullable(),
-    type: z.string(),
     status: z.string(),
-    priority: z.string(),
-    startDate: z.coerce.date().nullable(),
+    order: z.number().nullable(),
     dueDate: z.coerce.date().nullable(),
-    budget: z.string().nullable(),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -49,23 +53,20 @@ export default function AddProjectPage() {
     defaultValues: {
       name: "",
       description: null,
-      type: "GENERAL",
       status: "PLANNED",
-      priority: "MEDIUM",
-      startDate: null,
+      order: null,
       dueDate: null,
-      budget: null,
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const payload = {
+      projectId,
       ...values,
-      startDate: values.startDate ? values.startDate.toISOString() : null,
       dueDate: values.dueDate ? values.dueDate.toISOString() : null,
     };
     try {
-      const response = await fetch("/api/projects", {
+      const response = await fetch("/api/milestones", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -74,21 +75,21 @@ export default function AddProjectPage() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to create project");
+        throw new Error("Failed to create milestone");
       }
 
-      const { project: newProject } = await response.json();
-
       refreshRecentProjects();
-      router.push(`/projects/${newProject.id}`);
+      router.push(`/projects/${projectId}?tab=milestones`);
     } catch (error) {
-      console.error("Error creating project:", error);
+      console.error("Error creating milestone:", error);
     }
   }
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-orange-700">Create Project</h1>
+      <h1 className="text-2xl font-semibold text-orange-700">
+        Create Milestone
+      </h1>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -120,38 +121,8 @@ export default function AddProjectPage() {
                   />
                 </FormControl>
                 <FormDescription>
-                  A brief description of what your project involves.
+                  A brief description of what your milestone involves.
                 </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="type"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Type</FormLabel>
-                <FormControl>
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger className="w-[240px]">
-                      <SelectValue placeholder="Select type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="AUTOMATION">Automation</SelectItem>
-                      <SelectItem value="DESIGN">Design</SelectItem>
-                      <SelectItem value="ELECTRONICS">Electronics</SelectItem>
-                      <SelectItem value="GENERAL">General</SelectItem>
-                      <SelectItem value="MAKER">Maker</SelectItem>
-                      <SelectItem value="REPAIR">Repair</SelectItem>
-                      <SelectItem value="WEBAPP">Web Application</SelectItem>
-                      <SelectItem value="WEBSITE">Website</SelectItem>
-                      <SelectItem value="WRITING">Writing</SelectItem>
-                      <SelectItem value="OTHER">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
@@ -170,7 +141,7 @@ export default function AddProjectPage() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="PLANNED">Planned</SelectItem>
-                      <SelectItem value="ACTIVE">Active</SelectItem>
+                      <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
                       <SelectItem value="ON_HOLD">On Hold</SelectItem>
                       <SelectItem value="COMPLETED">Completed</SelectItem>
                       <SelectItem value="CANCELLED">Cancelled</SelectItem>
@@ -184,33 +155,25 @@ export default function AddProjectPage() {
 
           <FormField
             control={form.control}
-            name="priority"
+            name="order"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Priority</FormLabel>
+                <FormLabel>Order</FormLabel>
                 <FormControl>
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger className="w-[240px]">
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="LOW">Low</SelectItem>
-                      <SelectItem value="MEDIUM">Medium</SelectItem>
-                      <SelectItem value="HIGH">High</SelectItem>
-                      <SelectItem value="CRITICAL">Critical</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Input
+                    className="w-[240px]"
+                    type="number"
+                    value={field.value ?? ""}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      field.onChange(
+                        val === "" ? undefined : parseInt(val, 10)
+                      );
+                    }}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="startDate"
-            render={({ field }) => (
-              <DatePickerField field={field} label="Start Date" />
             )}
           />
 
@@ -222,33 +185,11 @@ export default function AddProjectPage() {
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="budget"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Budget</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    value={field.value ?? ""}
-                    className="w-[240px]"
-                    type="text"
-                    placeholder="£0.00"
-                    onChange={(e) => {
-                      const value = e.target.value.replace(/[^0-9.]/g, ""); // Remove non-numeric characters
-                      field.onChange(value);
-                    }}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <Button type="submit">Submit</Button>
+          <Button type="submit">Create</Button>
         </form>
       </Form>
     </div>
   );
-}
+};
+
+export default MilestoneAddPage;

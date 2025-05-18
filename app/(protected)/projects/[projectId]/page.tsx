@@ -1,7 +1,7 @@
 "use client";
 
 import { NextPage } from "next";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -38,7 +38,11 @@ interface DeletableItem {
 
 const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const tab = searchParams.get("tab") ?? "costs";
+
   const { refreshRecentProjects } = useRecentProjects();
+  const [activeTab, setActiveTab] = React.useState(tab);
   const { projectId } = React.use(params);
   const [project, setProject] = useState<Project | null>(null);
 
@@ -57,6 +61,17 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
   useEffect(() => {
     fetchProject();
   }, []);
+
+  React.useEffect(() => {
+    if (tab !== activeTab) setActiveTab(tab);
+  }, [tab]);
+
+  const onTabChange = (newTab: string) => {
+    setActiveTab(newTab);
+    const url = new URL(window.location.href);
+    url.searchParams.set("tab", newTab);
+    router.replace(url.toString());
+  };
 
   const handleConfirmDelete = async () => {
     if (!deleteInfo) return;
@@ -200,7 +215,7 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
       </div>
 
       {/* Tabs for sub-sections */}
-      <Tabs defaultValue="tasks" className="mt-8">
+      <Tabs value={activeTab} onValueChange={onTabChange} className="mt-8">
         <TabsList className="justify-start gap-2">
           <TabsTrigger value="tasks">Tasks</TabsTrigger>
           <TabsTrigger value="milestones">Milestones</TabsTrigger>
@@ -208,12 +223,13 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
           <TabsTrigger value="relationships">Relationships</TabsTrigger>
         </TabsList>
         <TabsContent value="tasks">
-          {/* Task list placeholder */}
           <div className="mt-4 text-sm text-muted-foreground">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-semibold">Tasks</h2>
               <Button asChild size="sm">
-                <Link href={`/projects/${projectId}/tasks/add`}>Add Task</Link>
+                <Link href={`/projects/${projectId}/tasks/add`}>
+                  Create Task
+                </Link>
               </Button>
             </div>
             <table className="w-full text-sm border">
@@ -257,12 +273,61 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
         </TabsContent>
         <TabsContent value="milestones">
           <div className="mt-4 text-sm text-muted-foreground">
-            Milestones go here...
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold">Milestones</h2>
+              <Button asChild size="sm">
+                <Link href={`/projects/${projectId}/milestones/add`}>
+                  Create Milestone
+                </Link>
+              </Button>
+            </div>
+            <table className="w-full text-sm border">
+              <thead>
+                <tr className="bg-muted text-muted-foreground">
+                  <th className="text-left p-2">Name</th>
+                  <th className="text-left p-2">Status</th>
+                  <th className="text-left p-2">Order</th>
+                  <th className="text-left p-2">Due Date</th>
+                  <th className="text-left p-2">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {project.milestones.map((milestone) => (
+                  <tr key={milestone.id} className="border-t">
+                    <td className="p-2">{milestone.name}</td>
+                    <td className="p-2">{milestone.status}</td>
+                    <td className="p-2">{milestone.order}</td>
+                    <td className="p-2">{milestone.dueDate}</td>
+                    <td className="p-2 flex gap-2">
+                      <Link
+                        href={`/projects/${projectId}/milestones/${milestone.id}/edit`}
+                      >
+                        <Pencil className="w-4 h-4 hover:text-primary" />
+                      </Link>
+                      <button
+                        onClick={() => {
+                          setDeleteInfo({ type: "milestone", item: milestone });
+                        }}
+                      >
+                        <Trash2 className="w-4 h-4 hover:text-destructive" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </TabsContent>
         <TabsContent value="costs">
           <div className="mt-4 text-sm text-muted-foreground">
-            Cost breakdown goes here...
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold">Costs</h2>
+              <Button asChild size="sm">
+                <Link href={`/projects/${projectId}/costs/add`}>
+                  Create Cost
+                </Link>
+              </Button>
+            </div>
           </div>
         </TabsContent>
         <TabsContent value="relationships">

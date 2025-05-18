@@ -1,5 +1,6 @@
 import {
   Dialog,
+  DialogOverlay,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -29,6 +30,7 @@ export function ConfirmationModal({
 }: ConfirmationModalProps) {
   return (
     <Dialog open={open} onOpenChange={onCancel}>
+      <DialogOverlay />
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>

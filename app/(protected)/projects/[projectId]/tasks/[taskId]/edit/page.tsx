@@ -83,7 +83,7 @@ const TaskEditPage: NextPage<TaskEditPageProps> = ({ params }) => {
       }
 
       refreshRecentProjects();
-      router.push(`/projects/${projectId}`);
+      router.push(`/projects/${projectId}?tab=tasks`);
     } catch (error) {
       console.error("Error updating task:", error);
     }
@@ -224,7 +224,7 @@ const TaskEditPage: NextPage<TaskEditPageProps> = ({ params }) => {
           <div className="flex gap-x-2">
             <Button type="submit">Save</Button>
             <Button asChild type="button" variant="outline">
-              <Link href={`/projects/${projectId}`}>Cancel</Link>
+              <Link href={`/projects/${projectId}?tab=tasks`}>Cancel</Link>
             </Button>
           </div>
         </form>

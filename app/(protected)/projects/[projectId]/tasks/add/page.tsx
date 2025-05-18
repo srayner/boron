@@ -90,7 +90,7 @@ const TaskAddPage: NextPage<TaskAddPageProps> = ({ params }) => {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-orange-700">Add Task</h1>
+      <h1 className="text-2xl font-semibold text-orange-700">Create Task</h1>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">

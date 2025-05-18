@@ -109,7 +109,7 @@ const SideBar = () => {
           <SidebarGroupLabel>Projects</SidebarGroupLabel>
           <SidebarGroupAction>
             <Link href="/projects/add">
-              <Plus /> <span className="sr-only">Add Project</span>
+              <Plus /> <span className="sr-only">Create Project</span>
             </Link>
           </SidebarGroupAction>
           <SidebarGroupContent>
