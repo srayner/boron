@@ -65,7 +65,7 @@ export const getTask = async (id: string) => {
     include: {
       subTasks: true,
       costs: true,
-      milestones: true,
+      milestone: true,
       tags: true,
     },
   });
@@ -80,7 +80,7 @@ export async function getTasks(params: {
     include: {
       subTasks: true,
       costs: true,
-      milestones: true,
+      milestone: true,
     },
     where: {
       name: {
