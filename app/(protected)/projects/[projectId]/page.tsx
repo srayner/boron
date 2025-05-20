@@ -328,6 +328,47 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
                 </Link>
               </Button>
             </div>
+            <table className="w-full text-sm border">
+              <thead>
+                <tr className="bg-muted text-muted-foreground">
+                  <th className="text-left p-2">Amount</th>
+                  <th className="text-left p-2">Type</th>
+                  <th className="text-left p-2">Date</th>
+                  <th className="text-left p-2">Note</th>
+                  <th className="text-left p-2">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {project.costs.map((cost) => (
+                  <tr key={cost.id} className="border-t">
+                    <td className="p-2">{cost.amount}</td>
+                    <td className="p-2">{cost.type}</td>
+                    <td className="p-2">{cost.date}</td>
+                    <td className="p-2">{cost.note}</td>
+                    <td className="p-2 flex gap-2">
+                      <Link
+                        href={`/projects/${projectId}/costs/${cost.id}/edit`}
+                      >
+                        <Pencil className="w-4 h-4 hover:text-primary" />
+                      </Link>
+                      <button
+                        onClick={() => {
+                          setDeleteInfo({
+                            type: "cost",
+                            item: {
+                              ...cost,
+                              name: `${cost.type} - $${cost.amount}`,
+                            },
+                          });
+                        }}
+                      >
+                        <Trash2 className="w-4 h-4 hover:text-destructive" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </TabsContent>
         <TabsContent value="relationships">
