@@ -22,7 +22,7 @@ import { Project } from "@/types/entities";
 import { ProjectNameWithIcon } from "@/components/projects/project-type";
 import { ProjectStatusBadge } from "@/components/projects/project-status";
 import { format, formatDistanceToNow } from "date-fns";
-import { formatCurrency, titleCase } from "@/lib/utils";
+import { formatCurrency, formatDate, titleCase, translate } from "@/lib/utils";
 import { ConfirmationModal } from "@/components/ui/confirmation-modal";
 import { useRecentProjects } from "@/app/context/recent-projects-context";
 
@@ -247,10 +247,10 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
                 {project.tasks.map((task) => (
                   <tr key={task.id} className="border-t">
                     <td className="p-2">{task.name}</td>
-                    <td className="p-2">{task.priority}</td>
-                    <td className="p-2">{task.status}</td>
-                    <td className="p-2">{task.startDate}</td>
-                    <td className="p-2">{task.dueDate}</td>
+                    <td className="p-2">{translate(task.priority)}</td>
+                    <td className="p-2">{translate(task.status)}</td>
+                    <td className="p-2">{formatDate(task.startDate)}</td>
+                    <td className="p-2">{formatDate(task.dueDate)}</td>
                     <td className="p-2 flex gap-2">
                       <Link
                         href={`/projects/${projectId}/tasks/${task.id}/edit`}
@@ -295,9 +295,9 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
                 {project.milestones.map((milestone) => (
                   <tr key={milestone.id} className="border-t">
                     <td className="p-2">{milestone.name}</td>
-                    <td className="p-2">{milestone.status}</td>
+                    <td className="p-2">{translate(milestone.status)}</td>
                     <td className="p-2">{milestone.order}</td>
-                    <td className="p-2">{milestone.dueDate}</td>
+                    <td className="p-2">{formatDate(milestone.dueDate)}</td>
                     <td className="p-2 flex gap-2">
                       <Link
                         href={`/projects/${projectId}/milestones/${milestone.id}/edit`}
@@ -342,8 +342,8 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
                 {project.costs.map((cost) => (
                   <tr key={cost.id} className="border-t">
                     <td className="p-2">{cost.amount}</td>
-                    <td className="p-2">{cost.type}</td>
-                    <td className="p-2">{cost.date}</td>
+                    <td className="p-2">{translate(cost.type)}</td>
+                    <td className="p-2">{formatDate(cost.date)}</td>
                     <td className="p-2">{cost.note}</td>
                     <td className="p-2 flex gap-2">
                       <Link
