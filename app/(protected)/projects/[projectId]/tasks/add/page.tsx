@@ -82,7 +82,7 @@ const TaskAddPage: NextPage<TaskAddPageProps> = ({ params }) => {
       }
 
       refreshRecentProjects();
-      router.push(`/projects/${projectId}`);
+      router.push(`/projects/${projectId}?tab=tasks`);
     } catch (error) {
       console.error("Error creating task:", error);
     }
