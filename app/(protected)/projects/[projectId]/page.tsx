@@ -236,8 +236,9 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
               <thead>
                 <tr className="bg-muted text-muted-foreground">
                   <th className="text-left p-2">Name</th>
-                  <th className="text-left p-2">Priority</th>
                   <th className="text-left p-2">Status</th>
+                  <th className="text-left p-2">Priority</th>
+                  <th className="text-left p-2">Milestone</th>
                   <th className="text-left p-2">Start Date</th>
                   <th className="text-left p-2">Due Date</th>
                   <th className="text-left p-2">Actions</th>
@@ -247,8 +248,11 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
                 {project.tasks.map((task) => (
                   <tr key={task.id} className="border-t">
                     <td className="p-2">{task.name}</td>
-                    <td className="p-2">{translate(task.priority)}</td>
                     <td className="p-2">{translate(task.status)}</td>
+                    <td className="p-2">{translate(task.priority)}</td>
+                    <td className="p-2">
+                      {translate(task.milestone?.name || "")}
+                    </td>
                     <td className="p-2">{formatDate(task.startDate)}</td>
                     <td className="p-2">{formatDate(task.dueDate)}</td>
                     <td className="p-2 flex gap-2">

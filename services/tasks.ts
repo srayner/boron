@@ -21,6 +21,7 @@ export const createTask = async (data: any) => {
       description: data.description || "",
       status: data.status,
       priority: data.priority,
+      milestoneId: data.milestoneId,
       startDate: startDate,
       dueDate: dueDate,
     },

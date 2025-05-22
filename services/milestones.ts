@@ -63,6 +63,7 @@ export async function getMilestones(params: {
   search: string;
   pagination: { take: number; skip: number };
   ordering: { [key: string]: "asc" | "desc" };
+  projectId?: string;
 }) {
   return prisma.milestone.findMany({
     include: {
@@ -73,6 +74,7 @@ export async function getMilestones(params: {
       name: {
         contains: params.search,
       },
+      ...(params.projectId && { projectId: params.projectId }),
     },
     orderBy: params.ordering,
     take: params.pagination.take,

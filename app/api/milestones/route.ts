@@ -5,7 +5,13 @@ import { createMilestone, getMilestones } from "@/services/milestones";
 
 export const GET = withErrorHandling(async (req: NextRequest) => {
   const { search, pagination, ordering } = parseQueryParams(req);
-  const milestones = await getMilestones({ search, pagination, ordering });
+  const projectId = req.nextUrl.searchParams.get("projectId") ?? undefined;
+  const milestones = await getMilestones({
+    search,
+    pagination,
+    ordering,
+    projectId,
+  });
 
   return { milestones };
 });

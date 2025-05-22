@@ -86,7 +86,7 @@ export interface Task {
   order: number;
   tags: Tag[];
   costs: Cost[];
-  milestones: Milestone[];
+  milestone: Milestone | null;
   createdAt: string;
   updatedAt: string;
 }
