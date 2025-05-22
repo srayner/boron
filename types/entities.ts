@@ -65,6 +65,7 @@ export interface Milestone {
   order: number;
   dueDate: string;
   status: MilestoneStatus;
+  completedAt: string;
   createdAt: string;
   updatedAt: string;
 }
