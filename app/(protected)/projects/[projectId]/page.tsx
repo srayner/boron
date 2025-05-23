@@ -105,7 +105,7 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-orange-700">
+          <h1 className="text-2xl font-semibold text-primary">
             <ProjectNameWithIcon name={project.name} type={project.type} />
           </h1>
           <div className="flex items-center gap-2 mt-1">

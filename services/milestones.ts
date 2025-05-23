@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { AppError } from "@/lib/api/error";
+import { MilestoneStatus } from "@/types/entities";
 
 export const createMilestone = async (data: any) => {
   if (!data.name) throw new AppError("Milestone name is required", 422);
@@ -64,6 +65,8 @@ export async function getMilestones(params: {
   pagination: { take: number; skip: number };
   ordering: { [key: string]: "asc" | "desc" };
   projectId?: string;
+  statuses?: MilestoneStatus[];
+  dueDate?: { lt?: Date; gt?: Date };
 }) {
   return prisma.milestone.findMany({
     include: {
@@ -75,9 +78,57 @@ export async function getMilestones(params: {
         contains: params.search,
       },
       ...(params.projectId && { projectId: params.projectId }),
+      ...(params.statuses && { status: { in: params.statuses } }),
+      ...(params.dueDate && { dueDate: params.dueDate }),
     },
     orderBy: params.ordering,
     take: params.pagination.take,
     skip: params.pagination.skip,
   });
+}
+
+export async function getSummary() {
+  const openStatuses: MilestoneStatus[] = ["PLANNED", "IN_PROGRESS", "ON_HOLD"];
+  const now = new Date();
+
+  const milestones = await getMilestones({
+    search: "",
+    pagination: { take: 5, skip: 0 },
+    ordering: { dueDate: "asc" },
+    statuses: openStatuses,
+    dueDate: { gt: now },
+  });
+
+  const [hasAny, hasCompleted, hasUndatedOpen, overdueCount] =
+    await Promise.all([
+      prisma.milestone.count().then((c) => c > 0),
+      prisma.milestone
+        .count({ where: { status: "COMPLETED" } })
+        .then((c) => c > 0),
+      prisma.milestone
+        .count({
+          where: {
+            status: { in: openStatuses },
+            dueDate: null,
+          },
+        })
+        .then((c) => c > 0),
+      prisma.milestone.count({
+        where: {
+          status: { in: openStatuses },
+          dueDate: { lt: now },
+        },
+      }),
+    ]);
+
+  return {
+    milestones,
+    summary: {
+      hasAnyMilestones: hasAny,
+      hasCompletedMilestones: hasCompleted,
+      hasUndatedOpenMilestones: hasUndatedOpen,
+      hasUpcomingMilestones: milestones.length > 0,
+      overdueCount,
+    },
+  };
 }

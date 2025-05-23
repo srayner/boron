@@ -65,6 +65,7 @@ export interface Milestone {
   order: number;
   dueDate: string;
   status: MilestoneStatus;
+  project: Project;
   completedAt: string;
   createdAt: string;
   updatedAt: string;
@@ -110,4 +111,12 @@ export interface Project {
   milestones: Milestone[];
   createdAt: string;
   updatedAt: string;
+}
+
+export interface MilestoneSummary {
+  hasAnyMilestones: boolean;
+  hasCompletedMilestones: boolean;
+  hasUndatedOpenMilestones: boolean;
+  hasUpcomingMilestones: boolean;
+  overdueCount: number;
 }
