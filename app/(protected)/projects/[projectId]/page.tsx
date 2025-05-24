@@ -39,12 +39,11 @@ interface DeletableItem {
 const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const tab = searchParams.get("tab") ?? "costs";
+  const tab = searchParams.get("tab") ?? "tasks";
 
   const { refreshRecentProjects } = useRecentProjects();
   const [activeTab, setActiveTab] = React.useState(tab);
   const { projectId } = use(params);
-  console.log("ProjectId", projectId);
   const [project, setProject] = useState<Project | null>(null);
 
   const [deleteInfo, setDeleteInfo] = useState<{
