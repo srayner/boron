@@ -2,8 +2,8 @@
 
 import { NextPage } from "next";
 import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import { Link } from "@/components/ui/link";
+import React, { useEffect, useState, use } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -43,7 +43,8 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
 
   const { refreshRecentProjects } = useRecentProjects();
   const [activeTab, setActiveTab] = React.useState(tab);
-  const { projectId } = React.use(params);
+  const { projectId } = use(params);
+  console.log("ProjectId", projectId);
   const [project, setProject] = useState<Project | null>(null);
 
   const [deleteInfo, setDeleteInfo] = useState<{
@@ -247,7 +248,9 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
               <tbody>
                 {project.tasks.map((task) => (
                   <tr key={task.id} className="border-t">
-                    <td className="p-2">{task.name}</td>
+                    <td className="p-2">
+                      <Link href={`/tasks/${task.id}`}>{task.name}</Link>
+                    </td>
                     <td className="p-2">{translate(task.status)}</td>
                     <td className="p-2">{translate(task.priority)}</td>
                     <td className="p-2">
@@ -258,6 +261,7 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
                     <td className="p-2 flex gap-2">
                       <Link
                         href={`/projects/${projectId}/tasks/${task.id}/edit`}
+                        className="text-forground"
                       >
                         <Pencil className="w-4 h-4 hover:text-primary" />
                       </Link>
@@ -298,13 +302,18 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
               <tbody>
                 {project.milestones.map((milestone) => (
                   <tr key={milestone.id} className="border-t">
-                    <td className="p-2">{milestone.name}</td>
+                    <td className="p-2">
+                      <Link href={`/milestones/${milestone.id}`}>
+                        {milestone.name}
+                      </Link>
+                    </td>
                     <td className="p-2">{translate(milestone.status)}</td>
                     <td className="p-2">{milestone.order}</td>
                     <td className="p-2">{formatDate(milestone.dueDate)}</td>
                     <td className="p-2 flex gap-2">
                       <Link
                         href={`/projects/${projectId}/milestones/${milestone.id}/edit`}
+                        className="text-forground"
                       >
                         <Pencil className="w-4 h-4 hover:text-primary" />
                       </Link>
@@ -335,9 +344,9 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
             <table className="w-full text-sm border">
               <thead>
                 <tr className="bg-muted text-muted-foreground">
+                  <th className="text-left p-2">Date</th>
                   <th className="text-left p-2">Amount</th>
                   <th className="text-left p-2">Type</th>
-                  <th className="text-left p-2">Date</th>
                   <th className="text-left p-2">Note</th>
                   <th className="text-left p-2">Actions</th>
                 </tr>
@@ -345,13 +354,18 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
               <tbody>
                 {project.costs.map((cost) => (
                   <tr key={cost.id} className="border-t">
-                    <td className="p-2">{cost.amount}</td>
-                    <td className="p-2">{translate(cost.type)}</td>
                     <td className="p-2">{formatDate(cost.date)}</td>
+                    <td className="p-2">
+                      <Link className="text-primary" href={`/costs/${cost.id}`}>
+                        {formatCurrency(cost.amount)}
+                      </Link>
+                    </td>
+                    <td className="p-2">{translate(cost.type)}</td>
                     <td className="p-2">{cost.note}</td>
                     <td className="p-2 flex gap-2">
                       <Link
                         href={`/projects/${projectId}/costs/${cost.id}/edit`}
+                        className="text-forground"
                       >
                         <Pencil className="w-4 h-4 hover:text-primary" />
                       </Link>
