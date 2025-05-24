@@ -73,10 +73,10 @@ const SideBar = () => {
     <Sidebar collapsible="icon">
       <SidebarHeader className="py-4">
         <SidebarMenu>
-          <SidebarMenuItem>
+          <SidebarMenuItem className="h-[28px]">
             <SidebarMenuButton asChild>
-              <Link href="/">
-                <Image alt="logo" src="/logo.svg" width={20} height={20} />
+              <Link href="/dashboard">
+                <Image alt="logo" src="/logo.svg" width={24} height={24} />
                 <span>Boron</span>
               </Link>
             </SidebarMenuButton>

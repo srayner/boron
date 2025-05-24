@@ -21,12 +21,12 @@ const NavBar = () => {
   const { setTheme } = useTheme();
 
   return (
-    <nav className="p-4 flex items-center justify-between">
+    <nav className="px-4 py-3 flex items-center justify-between border-b">
       {/* LEFT */}
       <SidebarTrigger />
       {/* RIGHT */}
       <div className="flex items-center gap-4">
-        <Link href="/">Dashboard</Link>
+        <Link href="/dashboard">Dashboard</Link>
         {/* THEME MENU */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

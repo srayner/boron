@@ -19,12 +19,12 @@ import {
   Trash2,
 } from "lucide-react";
 import { Project } from "@/types/entities";
-import { ProjectNameWithIcon } from "@/components/projects/project-type";
 import { ProjectStatusBadge } from "@/components/projects/project-status";
 import { format, formatDistanceToNow } from "date-fns";
 import { formatCurrency, formatDate, titleCase, translate } from "@/lib/utils";
 import { ConfirmationModal } from "@/components/ui/confirmation-modal";
 import { useRecentProjects } from "@/app/context/recent-projects-context";
+import { ProjectTypeIcon } from "@/components/projects/ProjectTypeIcon";
 
 type ProjectPageProps = {
   params: Promise<{ projectId: string }>;
@@ -45,6 +45,7 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
   const [activeTab, setActiveTab] = React.useState(tab);
   const { projectId } = use(params);
   const [project, setProject] = useState<Project | null>(null);
+  const descriptionFallback = "Every great project starts with a blank page.";
 
   const [deleteInfo, setDeleteInfo] = useState<{
     type: DeletableType;
@@ -101,37 +102,46 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
   if (!project) return <div>Loading...</div>;
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
+    <div className="max-w-4xl mx-auto p-4">
       {/* Header */}
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-primary">
-            <ProjectNameWithIcon name={project.name} type={project.type} />
-          </h1>
-          <div className="flex items-center gap-2 mt-1">
-            <ProjectStatusBadge status={project.status} />
-            <span className="text-sm text-muted-foreground">
-              Updated{" "}
-              {formatDistanceToNow(new Date(project.updatedAt), {
-                addSuffix: true,
-              })}
-            </span>
+      <div className="flex items-end justify-between">
+        {/* Left side*/}
+        <div className="flex items-center gap-4">
+          <ProjectTypeIcon
+            type={project.type}
+            className="h-12 w-12 text-primary"
+          />
+          <div className="flex flex-col">
+            <h1 className="text-2xl font-semibold text-primary">
+              {project.name}
+            </h1>
+            <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
+              <ProjectStatusBadge status={project.status} />
+              <span>
+                Updated{" "}
+                {formatDistanceToNow(new Date(project.updatedAt), {
+                  addSuffix: true,
+                })}
+              </span>
+            </div>
           </div>
         </div>
-        <div className="flex gap-2">
+
+        {/* Right side: buttons */}
+        <div className="flex items-center gap-2">
           <Button
             variant="outline"
             size="sm"
             onClick={() => router.push(`/projects/${projectId}/edit`)}
+            className="flex items-center"
           >
             <PencilIcon className="w-4 h-4 mr-1" /> Edit
           </Button>
           <Button
             variant="destructive"
             size="sm"
-            onClick={() => {
-              setDeleteInfo({ type: "project", item: project });
-            }}
+            onClick={() => setDeleteInfo({ type: "project", item: project })}
+            className="flex items-center"
           >
             <Trash2Icon className="w-4 h-4 mr-1" /> Delete
           </Button>
@@ -140,16 +150,16 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
 
       <Separator className="my-3" />
 
-      <p className="my-3">{project.description}</p>
+      <p className="my-3">{project.description || descriptionFallback}</p>
 
       {/* Info Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card>
-          <CardContent className="py-4">
-            <h3 className="text-sm text-muted-foreground mb-1 flex items-center gap-1">
+        <Card className="py-4">
+          <CardContent>
+            <h3 className="text-muted-foreground flex items-center gap-2">
               <InfoIcon className="w-4 h-4" /> Summary
             </h3>
-            <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+            <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm mt-4">
               <dt className="font-medium text-muted-foreground">Type:</dt>
               <dd className="text-foreground">{titleCase(project.type)}</dd>
               <dt className="font-medium text-muted-foreground">Priority:</dt>
@@ -159,32 +169,36 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
             </dl>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="py-4">
-            <h3 className="text-sm text-muted-foreground mb-1 flex items-center gap-1">
+        <Card className="py-4">
+          <CardContent>
+            <h3 className="text-muted-foreground mb-1 flex items-center gap-2">
               <CalendarIcon className="w-4 h-4" /> Dates
             </h3>
-            <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-              <dt className="font-medium text-muted-foreground">Start</dt>
-              <dd className="text-forground">
-                {project.startDate &&
-                  format(new Date(project.startDate), "dd MMM yyyy")}
+            <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm mt-4">
+              <dt className="font-medium text-muted-foreground">
+                {project.startDate ? "Start:" : "Created:"}
+              </dt>
+              <dd className="text-foreground">
+                {project.startDate
+                  ? formatDate(project.startDate)
+                  : formatDate(project.createdAt)}
               </dd>
 
-              <dt className="font-medium text-muted-foreground">End</dt>
-              <dd className="text-forground">
-                {project.dueDate &&
-                  format(new Date(project.dueDate), "dd MMM yyyy")}
+              <dt className="font-medium text-muted-foreground">Due Date:</dt>
+              <dd className="text-foreground">
+                {project.dueDate
+                  ? format(new Date(project.dueDate), "dd MMM yyyy")
+                  : "No due date"}
               </dd>
             </dl>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="py-4">
-            <h3 className="text-sm text-muted-foreground mb-1 flex items-center gap-1">
+        <Card className="py-4">
+          <CardContent>
+            <h3 className="text-muted-foreground mb-1 flex items-center gap-2">
               <CircleGaugeIcon className="w-4 h-4" /> Progress
             </h3>
-            <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+            <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm mt-4">
               <dt className="font-medium text-muted-foreground">
                 Percent Complete:
               </dt>
@@ -192,12 +206,12 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
             </dl>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="py-4">
-            <h3 className="text-sm text-muted-foreground mb-1 flex items-center gap-1">
+        <Card className="py-4">
+          <CardContent>
+            <h3 className="text-muted-foreground mb-1 flex items-center gap-2">
               <PoundSterlingIcon className="w-4 h-4" /> Costs
             </h3>
-            <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+            <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm mt-4">
               <dt className="font-medium text-muted-foreground">Budget:</dt>
               <dd className="text-foreground">
                 {formatCurrency(project.budget)}
