@@ -11,7 +11,6 @@ import {
   Search,
   Settings,
   User2,
-  Wrench,
 } from "lucide-react";
 import React from "react";
 import {
@@ -37,6 +36,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import { ProjectTypeIcon } from "./projects/ProjectTypeIcon";
 
 const items = [
   {
@@ -119,8 +119,8 @@ const SideBar = () => {
                   <SidebarMenuItem key={project.id}>
                     <SidebarMenuButton asChild>
                       <Link href={`/projects/${project.id}`}>
-                        <Wrench />
-                        <span>{project.name}</span>
+                        <ProjectTypeIcon type={project.type} />
+                        {project.name}
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
