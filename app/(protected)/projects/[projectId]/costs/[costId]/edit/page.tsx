@@ -28,6 +28,8 @@ import {
 } from "@/components/ui/select";
 import { DatePickerField } from "@/components/ui/form/date-picker-field";
 import Link from "next/link";
+import { TextField } from "@/components/ui/form/TextField";
+import { Cost } from "@/types/entities";
 
 type ProjectCostEditPageProps = {
   params: Promise<{ projectId: string; costId: string }>;
@@ -54,6 +56,7 @@ const ProjectCostEditPage: NextPage<ProjectCostEditPageProps> = ({
     ]),
     note: z.string().max(250).optional(),
     date: z.coerce.date().optional(),
+    tags: z.string().nullable(),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -63,6 +66,7 @@ const ProjectCostEditPage: NextPage<ProjectCostEditPageProps> = ({
       type: "PARTS",
       note: "",
       date: undefined,
+      tags: null,
     },
   });
 
@@ -103,8 +107,18 @@ const ProjectCostEditPage: NextPage<ProjectCostEditPageProps> = ({
           throw new Error("Failed to fetch data");
         }
 
-        const { cost } = await costResponse.json();
-        form.reset(cost);
+        const { cost } = (await costResponse.json()) as {
+          cost: Cost;
+        };
+
+        const formData = {
+          amount: cost.amount,
+          type: cost.type,
+          note: cost.note,
+          date: cost.date ? new Date(cost.date) : undefined,
+          tags: cost.tags.map((t) => t.name).join(", "),
+        };
+        form.reset(formData);
       } catch (error) {
         console.error("Error:", error);
       } finally {
@@ -200,6 +214,12 @@ const ProjectCostEditPage: NextPage<ProjectCostEditPageProps> = ({
             render={({ field }) => (
               <DatePickerField field={field} label="Date" />
             )}
+          />
+
+          <FormField
+            control={form.control}
+            name="tags"
+            render={({ field }) => <TextField field={field} label="Tags" />}
           />
 
           <div className="flex gap-x-2">

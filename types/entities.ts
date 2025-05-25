@@ -54,6 +54,7 @@ export interface Cost {
   type: CostType;
   note: string;
   date: string;
+  tags: Tag[];
   createdAt: string;
   updatedAt: string;
 }

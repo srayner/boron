@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/select";
 import { DatePickerField } from "@/components/ui/form/date-picker-field";
 import { NextPage } from "next";
+import { TextField } from "@/components/ui/form/TextField";
 
 type ProjectCostAddPageProps = {
   params: Promise<{ projectId: string }>;
@@ -52,6 +53,7 @@ const ProjectCostAddPage: NextPage<ProjectCostAddPageProps> = ({ params }) => {
     note: z.string().max(250).optional(),
     date: z.coerce.date().optional(),
     taskId: z.string().optional(),
+    tags: z.string().nullable(),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -61,6 +63,7 @@ const ProjectCostAddPage: NextPage<ProjectCostAddPageProps> = ({ params }) => {
       type: "PARTS",
       note: "",
       date: undefined,
+      tags: null,
     },
   });
 
@@ -173,6 +176,12 @@ const ProjectCostAddPage: NextPage<ProjectCostAddPageProps> = ({ params }) => {
             render={({ field }) => (
               <DatePickerField field={field} label="Date" />
             )}
+          />
+
+          <FormField
+            control={form.control}
+            name="tags"
+            render={({ field }) => <TextField field={field} label="Tags" />}
           />
 
           <Button type="submit">Create</Button>

@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { AppError } from "@/lib/api/error";
 import { z } from "zod";
+import { processTagsForCreate, processTagsForUpdate } from "@/services/tags";
 
 const CostSchema = z.object({
   amount: z.coerce.number().min(0),
@@ -48,6 +49,10 @@ async function validateCostInput(data: unknown) {
 export const createCost = async (data: any) => {
   const validated = await validateCostInput(data);
 
+  const tags = data.tags
+    ? await processTagsForCreate(data.tags)
+    : { connect: [] };
+
   return prisma.cost.create({
     data: {
       amount: validated.amount,
@@ -56,6 +61,7 @@ export const createCost = async (data: any) => {
       date: validated.date,
       projectId: validated.projectId,
       taskId: validated.taskId,
+      tags,
     },
   });
 };
@@ -69,6 +75,8 @@ export const deleteCost = async (id: string) => {
 export const updateCost = async (id: string, data: any) => {
   const validated = await validateCostInput(data);
 
+  const tags = data.tags ? await processTagsForUpdate(data.tags) : { set: [] };
+
   return prisma.cost.update({
     where: { id },
     data: {
@@ -78,6 +86,7 @@ export const updateCost = async (id: string, data: any) => {
       date: validated.date,
       projectId: validated.projectId,
       taskId: validated.taskId,
+      tags,
     },
   });
 };
@@ -88,6 +97,7 @@ export const getCost = async (id: string) => {
     include: {
       project: true,
       task: true,
+      tags: true,
     },
   });
 };
