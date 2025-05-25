@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { AppError } from "@/lib/api/error";
+import { processTagsForCreate, processTagsForUpdate } from "@/services/tags";
 
 export const createTask = async (data: any) => {
   if (!data.name) throw new AppError("Task name is required", 422);
@@ -14,6 +15,10 @@ export const createTask = async (data: any) => {
     throw new AppError("Invalid due date", 422);
   }
 
+  const tags = data.tags
+    ? await processTagsForCreate(data.tags)
+    : { connect: [] };
+
   return prisma.task.create({
     data: {
       projectId: data.projectId,
@@ -24,6 +29,7 @@ export const createTask = async (data: any) => {
       milestoneId: data.milestoneId,
       startDate: startDate,
       dueDate: dueDate,
+      tags,
     },
   });
 };
@@ -47,6 +53,8 @@ export const updateTask = async (id: string, data: any) => {
     throw new AppError("Invalid due date", 422);
   }
 
+  const tags = data.tags ? await processTagsForUpdate(data.tags) : { set: [] };
+
   return prisma.task.update({
     where: { id },
     data: {
@@ -56,6 +64,7 @@ export const updateTask = async (id: string, data: any) => {
       priority: data.priority,
       startDate: startDate,
       dueDate: dueDate,
+      tags,
     },
   });
 };

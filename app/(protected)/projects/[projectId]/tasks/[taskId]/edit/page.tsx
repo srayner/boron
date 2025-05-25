@@ -26,8 +26,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { TextField } from "@/components/ui/form/TextField";
 import { DatePickerField } from "@/components/ui/form/date-picker-field";
 import Link from "next/link";
+import { Task } from "@/types/entities";
 
 type TaskEditPageProps = {
   params: Promise<{ projectId: string; taskId: string }>;
@@ -48,6 +50,7 @@ const TaskEditPage: NextPage<TaskEditPageProps> = ({ params }) => {
     priority: z.string(),
     startDate: z.coerce.date().nullable(),
     dueDate: z.coerce.date().nullable(),
+    tags: z.string().nullable(),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -59,6 +62,7 @@ const TaskEditPage: NextPage<TaskEditPageProps> = ({ params }) => {
       priority: "MEDIUM",
       startDate: null,
       dueDate: null,
+      tags: null,
     },
   });
 
@@ -100,8 +104,21 @@ const TaskEditPage: NextPage<TaskEditPageProps> = ({ params }) => {
           throw new Error("Failed to fetch data");
         }
 
-        const { task } = await taskResponse.json();
-        form.reset(task);
+        const { task } = (await taskResponse.json()) as {
+          task: Task;
+        };
+
+        const formData = {
+          name: task.name,
+          description: task.description,
+          status: task.status,
+          priority: task.priority,
+          startDate: task.startDate ? new Date(task.startDate) : null,
+          dueDate: task.dueDate ? new Date(task.dueDate) : null,
+          tags: task.tags.map((t) => t.name).join(", "),
+        };
+
+        form.reset(formData);
       } catch (error) {
         console.error("Error:", error);
       } finally {
@@ -124,16 +141,14 @@ const TaskEditPage: NextPage<TaskEditPageProps> = ({ params }) => {
             control={form.control}
             name="name"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel>Name</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-
-                <FormMessage />
-              </FormItem>
+              <TextField
+                field={field}
+                label="Name"
+                placeholder="Enter your name"
+              />
             )}
           />
+
           <FormField
             control={form.control}
             name="description"
@@ -219,6 +234,12 @@ const TaskEditPage: NextPage<TaskEditPageProps> = ({ params }) => {
             render={({ field }) => (
               <DatePickerField field={field} label="Due Date" />
             )}
+          />
+
+          <FormField
+            control={form.control}
+            name="tags"
+            render={({ field }) => <TextField field={field} label="Tags" />}
           />
 
           <div className="flex gap-x-2">

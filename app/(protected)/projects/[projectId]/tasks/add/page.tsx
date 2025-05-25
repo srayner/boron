@@ -37,6 +37,7 @@ const TaskAddPage: NextPage<TaskAddPageProps> = ({ params }) => {
     milestoneId: z.string().nullable(),
     startDate: z.coerce.date().nullable(),
     dueDate: z.coerce.date().nullable(),
+    tags: z.string().nullable(),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -49,6 +50,7 @@ const TaskAddPage: NextPage<TaskAddPageProps> = ({ params }) => {
       milestoneId: null,
       startDate: null,
       dueDate: null,
+      tags: null,
     },
   });
 
@@ -193,6 +195,12 @@ const TaskAddPage: NextPage<TaskAddPageProps> = ({ params }) => {
             render={({ field }) => (
               <DatePickerField field={field} label="Due Date" />
             )}
+          />
+
+          <FormField
+            control={form.control}
+            name="tags"
+            render={({ field }) => <TextField field={field} label="Tags" />}
           />
 
           <Button type="submit">Submit</Button>
