@@ -124,7 +124,9 @@ model Tag {
   id                  String             @id @default(cuid())
   name                String             @unique
   projects            Project[]          @relation("ProjectTags")
+  milestones          Milestone[]        @relation("MilestoneTags")
   tasks               Task[]             @relation("TaskTags")
+  costs               Cost[]             @relation("CostTags")
 
   createdAt           DateTime           @default(now())
   updatedAt           DateTime           @updatedAt
@@ -190,6 +192,7 @@ model Cost {
   project             Project            @relation("ProjectCosts", fields: [projectId], references: [id], onDelete: Cascade)
   taskId              String?
   task                Task?              @relation("TaskCosts", fields: [taskId], references: [id], onDelete: Cascade)
+  tags                Tag[]              @relation("CostTags")
 
   createdAt           DateTime           @default(now())
   updatedAt           DateTime           @updatedAt
@@ -217,6 +220,7 @@ model Milestone {
   projectId           String
   project             Project            @relation("ProjectMilestones", fields: [projectId], references: [id], onDelete: Cascade)
   tasks               Task[]             @relation("MilestoneTasks")
+  tags                Tag[]              @relation("MilestoneTags")
 
   createdAt           DateTime           @default(now())
   updatedAt           DateTime           @updatedAt

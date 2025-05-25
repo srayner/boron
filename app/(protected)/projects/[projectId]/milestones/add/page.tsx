@@ -46,6 +46,7 @@ const MilestoneAddPage: NextPage<MilestoneAddPageProps> = ({ params }) => {
     status: z.string(),
     order: z.number().nullable(),
     dueDate: z.coerce.date().nullable(),
+    tags: z.string().nullable(),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -56,6 +57,7 @@ const MilestoneAddPage: NextPage<MilestoneAddPageProps> = ({ params }) => {
       status: "PLANNED",
       order: null,
       dueDate: null,
+      tags: null,
     },
   });
 
@@ -182,6 +184,21 @@ const MilestoneAddPage: NextPage<MilestoneAddPageProps> = ({ params }) => {
             name="dueDate"
             render={({ field }) => (
               <DatePickerField field={field} label="Due Date" />
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="tags"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Tags</FormLabel>
+                <FormControl>
+                  <Input {...field} value={field.value ?? ""} />
+                </FormControl>
+
+                <FormMessage />
+              </FormItem>
             )}
           />
 

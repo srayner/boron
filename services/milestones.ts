@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { AppError } from "@/lib/api/error";
 import { MilestoneStatus } from "@/types/entities";
+import { processTagsForCreate, processTagsForUpdate } from "@/services/tags";
 
 export const createMilestone = async (data: any) => {
   if (!data.name) throw new AppError("Milestone name is required", 422);
@@ -11,6 +12,10 @@ export const createMilestone = async (data: any) => {
     throw new AppError("Invalid due date", 422);
   }
 
+  const tags = data.tags
+    ? await processTagsForCreate(data.tags)
+    : { connect: [] };
+
   return prisma.milestone.create({
     data: {
       projectId: data.projectId,
@@ -19,6 +24,7 @@ export const createMilestone = async (data: any) => {
       order: data.order,
       status: data.status,
       dueDate: dueDate,
+      tags,
     },
   });
 };
@@ -38,6 +44,8 @@ export const updateMilestone = async (id: string, data: any) => {
     throw new AppError("Invalid due date", 422);
   }
 
+  const tags = data.tags ? await processTagsForUpdate(data.tags) : { set: [] };
+
   return prisma.milestone.update({
     where: { id },
     data: {
@@ -46,6 +54,7 @@ export const updateMilestone = async (id: string, data: any) => {
       order: data.order,
       status: data.status,
       dueDate: dueDate,
+      tags,
     },
   });
 };
@@ -56,6 +65,7 @@ export const getMilestone = async (id: string) => {
     include: {
       project: true,
       tasks: true,
+      tags: true,
     },
   });
 };

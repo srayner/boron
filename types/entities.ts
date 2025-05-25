@@ -66,6 +66,8 @@ export interface Milestone {
   dueDate: string;
   status: MilestoneStatus;
   project: Project;
+  tasks: Task[];
+  tags: Tag[];
   completedAt: string;
   createdAt: string;
   updatedAt: string;
