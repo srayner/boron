@@ -4,16 +4,16 @@ import React, { use, useEffect, useState } from "react";
 import { NextPage } from "next";
 import { Task } from "@/types/entities";
 import { Separator } from "@/components/ui/separator";
-import { ClipboardList, Flag } from "lucide-react";
+import { ClipboardList } from "lucide-react";
 import { TaskStatusBadge } from "@/components/tasks/TaskStatusBadge";
 import { TagsList } from "@/components/tags/TagsList";
-import { format, formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow } from "date-fns";
 
 type taskPageProps = {
   params: Promise<{ taskId: string }>;
 };
 
-const taskDetailPage: NextPage<taskPageProps> = ({ params }) => {
+const TaskDetailPage: NextPage<taskPageProps> = ({ params }) => {
   const { taskId } = use(params);
   const [task, setTask] = useState<Task | null>(null);
   const descriptionFallback = "Every task is a step toward your goal.";
@@ -61,4 +61,4 @@ const taskDetailPage: NextPage<taskPageProps> = ({ params }) => {
   );
 };
 
-export default taskDetailPage;
+export default TaskDetailPage;

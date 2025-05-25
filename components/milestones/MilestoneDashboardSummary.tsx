@@ -1,5 +1,5 @@
 import React from "react";
-import { Project, Milestone, MilestoneSummary } from "@/types/entities";
+import { Milestone, MilestoneSummary } from "@/types/entities";
 
 interface MilestoneDashboardWidgetProps {
   milestones: Milestone[];
@@ -26,7 +26,7 @@ export function MilestoneDashboardWidget({
         Upcoming Milestones
       </h2>
 
-      {summary?.overdueCount > 0 && (
+      {summary && summary?.overdueCount > 0 && (
         <div className="mb-4 p-3 border border-red-500 rounded-md bg-red-50 dark:bg-red-900">
           <p className="text-red-700 dark:text-red-300 font-semibold cursor-pointer">
             {summary.overdueCount} overdue milestone

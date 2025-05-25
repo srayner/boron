@@ -6,7 +6,7 @@ import { Cost } from "@/types/entities";
 import { formatCurrency } from "@/lib/utils";
 import { PoundSterling } from "lucide-react";
 import { CostStatusBadge } from "@/components/costs/CostStatusBadge";
-import { format, formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow } from "date-fns";
 import { Separator } from "@/components/ui/separator";
 import { TagsList } from "@/components/tags/TagsList";
 

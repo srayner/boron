@@ -7,7 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { TagsList } from "@/components/tags/TagsList";
 import { Flag } from "lucide-react";
 import { MilestoneStatusBadge } from "@/components/milestones/MilestoneStatusBadge";
-import { format, formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow } from "date-fns";
 
 type MilestonePageProps = {
   params: Promise<{ milestoneId: string }>;
