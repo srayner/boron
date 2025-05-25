@@ -42,6 +42,7 @@ export default function AddProjectPage() {
     startDate: z.coerce.date().nullable(),
     dueDate: z.coerce.date().nullable(),
     budget: z.string().nullable(),
+    tags: z.string().nullable(),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -55,6 +56,7 @@ export default function AddProjectPage() {
       startDate: null,
       dueDate: null,
       budget: null,
+      tags: null,
     },
   });
 
@@ -241,6 +243,21 @@ export default function AddProjectPage() {
                     }}
                   />
                 </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="tags"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Tags</FormLabel>
+                <FormControl>
+                  <Input {...field} value={field.value ?? ""} />
+                </FormControl>
+
                 <FormMessage />
               </FormItem>
             )}

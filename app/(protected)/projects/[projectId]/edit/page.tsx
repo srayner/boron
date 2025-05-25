@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/select";
 import { DatePickerField } from "@/components/ui/form/date-picker-field";
 import { useRecentProjects } from "@/app/context/recent-projects-context";
+import { Project } from "@/types/entities";
 
 type ProjectEditPageProps = {
   params: Promise<{ projectId: string }>;
@@ -44,6 +45,7 @@ const ProjectEditPage: NextPage<ProjectEditPageProps> = ({ params }) => {
     startDate: z.coerce.date().nullable(),
     dueDate: z.coerce.date().nullable(),
     budget: z.string().nullable(),
+    tags: z.string().nullable(),
   });
 
   type EditProjectSchema = z.infer<typeof editProjectSchema>;
@@ -87,8 +89,22 @@ const ProjectEditPage: NextPage<ProjectEditPageProps> = ({ params }) => {
           throw new Error("Failed to fetch data");
         }
 
-        const { project } = await projectResponse.json();
-        form.reset(project);
+        const { project } = (await projectResponse.json()) as {
+          project: Project;
+        };
+
+        const formData = {
+          name: project.name,
+          description: project.description,
+          type: project.type,
+          status: project.status,
+          priority: project.priority,
+          startDate: project.startDate ? new Date(project.startDate) : null,
+          dueDate: project.dueDate ? new Date(project.dueDate) : null,
+          budget: project.budget?.toString() ?? null,
+          tags: project.tags.map((t) => t.name).join(", "),
+        };
+        form.reset(formData);
       } catch (error) {
         console.error("Error:", error);
       } finally {
@@ -256,6 +272,21 @@ const ProjectEditPage: NextPage<ProjectEditPageProps> = ({ params }) => {
                     }}
                   />
                 </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="tags"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Tags</FormLabel>
+                <FormControl>
+                  <Input {...field} value={field.value ?? ""} />
+                </FormControl>
+
                 <FormMessage />
               </FormItem>
             )}

@@ -25,6 +25,7 @@ import { formatCurrency, formatDate, titleCase, translate } from "@/lib/utils";
 import { ConfirmationModal } from "@/components/ui/confirmation-modal";
 import { useRecentProjects } from "@/app/context/recent-projects-context";
 import { ProjectTypeIcon } from "@/components/projects/ProjectTypeIcon";
+import { TagsList } from "@/components/tags/TagsList";
 
 type ProjectPageProps = {
   params: Promise<{ projectId: string }>;
@@ -150,7 +151,9 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
 
       <Separator className="my-3" />
 
+      {/* Description and tags */}
       <p className="my-3">{project.description || descriptionFallback}</p>
+      <TagsList tags={project.tags} />
 
       {/* Info Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
