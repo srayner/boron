@@ -12,6 +12,7 @@ import { DatePickerField } from "@/components/ui/form/date-picker-field";
 import { SelectField } from "@/components/ui/form/SelectField";
 import { TextAreaField } from "@/components/ui/form/TextAreaField";
 import { TextField } from "@/components/ui/form/TextField";
+import { TagField } from "@/components/ui/form/TagField";
 import { NextPage } from "next";
 import { Milestone } from "@/types/entities";
 
@@ -200,7 +201,7 @@ const TaskAddPage: NextPage<TaskAddPageProps> = ({ params }) => {
           <FormField
             control={form.control}
             name="tags"
-            render={({ field }) => <TextField field={field} label="Tags" />}
+            render={({ field }) => <TagField field={field} label="Tags" />}
           />
 
           <Button type="submit">Submit</Button>

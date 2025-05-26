@@ -27,6 +27,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DatePickerField } from "@/components/ui/form/date-picker-field";
+import { TagField } from "@/components/ui/form/TagField";
 import Link from "next/link";
 import { Milestone } from "@/types/entities";
 
@@ -227,16 +228,7 @@ const MilestoneEditPage: NextPage<MilestoneEditPageProps> = ({ params }) => {
           <FormField
             control={form.control}
             name="tags"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Tags</FormLabel>
-                <FormControl>
-                  <Input {...field} value={field.value ?? ""} />
-                </FormControl>
-
-                <FormMessage />
-              </FormItem>
-            )}
+            render={({ field }) => <TagField field={field} label="Tags" />}
           />
 
           <div className="flex gap-x-2">

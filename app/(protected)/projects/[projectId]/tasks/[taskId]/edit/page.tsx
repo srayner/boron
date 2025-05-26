@@ -26,6 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { TextField } from "@/components/ui/form/TextField";
+import { TagField } from "@/components/ui/form/TagField";
 import { DatePickerField } from "@/components/ui/form/date-picker-field";
 import Link from "next/link";
 import { Task } from "@/types/entities";
@@ -238,7 +239,7 @@ const TaskEditPage: NextPage<TaskEditPageProps> = ({ params }) => {
           <FormField
             control={form.control}
             name="tags"
-            render={({ field }) => <TextField field={field} label="Tags" />}
+            render={({ field }) => <TagField field={field} label="Tags" />}
           />
 
           <div className="flex gap-x-2">

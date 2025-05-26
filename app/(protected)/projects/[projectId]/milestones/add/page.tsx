@@ -26,6 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DatePickerField } from "@/components/ui/form/date-picker-field";
+import { TagField } from "@/components/ui/form/TagField";
 import { NextPage } from "next";
 
 type MilestoneAddPageProps = {
@@ -190,16 +191,7 @@ const MilestoneAddPage: NextPage<MilestoneAddPageProps> = ({ params }) => {
           <FormField
             control={form.control}
             name="tags"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Tags</FormLabel>
-                <FormControl>
-                  <Input {...field} value={field.value ?? ""} />
-                </FormControl>
-
-                <FormMessage />
-              </FormItem>
-            )}
+            render={({ field }) => <TagField field={field} label="Tags" />}
           />
 
           <Button type="submit">Create</Button>

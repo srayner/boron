@@ -28,7 +28,7 @@ import {
 } from "@/components/ui/select";
 import { DatePickerField } from "@/components/ui/form/date-picker-field";
 import Link from "next/link";
-import { TextField } from "@/components/ui/form/TextField";
+import { TagField } from "@/components/ui/form/TagField";
 import { Cost } from "@/types/entities";
 
 type ProjectCostEditPageProps = {
@@ -219,7 +219,7 @@ const ProjectCostEditPage: NextPage<ProjectCostEditPageProps> = ({
           <FormField
             control={form.control}
             name="tags"
-            render={({ field }) => <TextField field={field} label="Tags" />}
+            render={({ field }) => <TagField field={field} label="Tags" />}
           />
 
           <div className="flex gap-x-2">

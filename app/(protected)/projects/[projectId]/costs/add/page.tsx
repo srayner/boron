@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/select";
 import { DatePickerField } from "@/components/ui/form/date-picker-field";
 import { NextPage } from "next";
-import { TextField } from "@/components/ui/form/TextField";
+import { TagField } from "@/components/ui/form/TagField";
 
 type ProjectCostAddPageProps = {
   params: Promise<{ projectId: string }>;
@@ -181,7 +181,7 @@ const ProjectCostAddPage: NextPage<ProjectCostAddPageProps> = ({ params }) => {
           <FormField
             control={form.control}
             name="tags"
-            render={({ field }) => <TextField field={field} label="Tags" />}
+            render={({ field }) => <TagField field={field} label="Tags" />}
           />
 
           <Button type="submit">Create</Button>

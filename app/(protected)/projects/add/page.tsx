@@ -26,6 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DatePickerField } from "@/components/ui/form/date-picker-field";
+import { TagField } from "@/components/ui/form/TagField";
 
 export default function AddProjectPage() {
   const router = useRouter();
@@ -251,16 +252,7 @@ export default function AddProjectPage() {
           <FormField
             control={form.control}
             name="tags"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Tags</FormLabel>
-                <FormControl>
-                  <Input {...field} value={field.value ?? ""} />
-                </FormControl>
-
-                <FormMessage />
-              </FormItem>
-            )}
+            render={({ field }) => <TagField field={field} label="Tags" />}
           />
 
           <Button type="submit">Submit</Button>
