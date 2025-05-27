@@ -202,10 +202,8 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
               <CircleGaugeIcon className="w-4 h-4" /> Progress
             </h3>
             <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm mt-4">
-              <dt className="font-medium text-muted-foreground">
-                Percent Complete:
-              </dt>
-              <dd className="text-forground">{project.completionPercent}</dd>
+              <dt className="font-medium text-muted-foreground">Progress:</dt>
+              <dd className="text-forground">{project.progress}</dd>
             </dl>
           </CardContent>
         </Card>

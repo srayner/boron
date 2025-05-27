@@ -143,7 +143,7 @@ model Project {
   dueDate             DateTime?
   budget              Decimal?           @db.Decimal(10, 2)
   actualCost          Decimal            @db.Decimal(10, 2) @default(0.00)
-  completionPercent   Decimal            @db.Decimal(10, 2) @default(0.0)
+  progress            Decimal            @db.Decimal(10, 2) @default(0.0)
   archived            Boolean            @default(false)
 
   tags                Tag[]              @relation("ProjectTags")
@@ -163,6 +163,7 @@ model Task {
   priority            TaskPriority       @default(MEDIUM)
   startDate           DateTime?
   dueDate             DateTime?
+  progress            Decimal            @db.Decimal(10, 2) @default(0.0)
   completedAt         DateTime?
   projectId           String
   project             Project            @relation("ProjectTasks", fields: [projectId], references: [id], onDelete: Cascade)
@@ -217,6 +218,7 @@ model Milestone {
   dueDate             DateTime? 
   order               Int?
   status              MilestoneStatus    @default(PLANNED)
+  progress            Decimal            @db.Decimal(10, 2) @default(0.0)
   projectId           String
   project             Project            @relation("ProjectMilestones", fields: [projectId], references: [id], onDelete: Cascade)
   tasks               Task[]             @relation("MilestoneTasks")

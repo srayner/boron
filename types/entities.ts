@@ -66,6 +66,7 @@ export interface Milestone {
   order: number;
   dueDate: string;
   status: MilestoneStatus;
+  progress: number;
   project: Project;
   tasks: Task[];
   tags: Tag[];
@@ -82,6 +83,7 @@ export interface Task {
   priority: TaskPriority;
   dueDate: string;
   startDate: string;
+  progress: number;
   completedAt: string;
   projectId: string;
   parentTask: Task;
@@ -106,7 +108,7 @@ export interface Project {
   dueDate: string;
   budget: number;
   actualCost: number;
-  completionPercent: number;
+  progress: number;
   archived: boolean;
   tags: Tag[];
   tasks: Task[];

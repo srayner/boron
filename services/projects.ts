@@ -104,3 +104,28 @@ export async function getProjects(params: {
     skip: params.pagination.skip,
   });
 }
+
+export async function getProjectProgress() {
+  type ProgressCount = { percentRange: string; count: bigint };
+
+  const rawResults = await prisma.$queryRaw<ProgressCount[]>`
+    SELECT
+      CASE
+        WHEN progress = 100 THEN '100'
+        ELSE CONCAT(FLOOR(progress / 10) * 10, '-', FLOOR(progress / 10) * 10 + 9)
+      END AS percentRange,
+      COUNT(*) AS count
+    FROM Project
+    GROUP BY percentRange
+    ORDER BY
+      CASE
+        WHEN percentRange = '100' THEN 10
+        ELSE FLOOR(CAST(SUBSTRING_INDEX(percentRange, '-', 1) AS UNSIGNED) / 10)
+      END;
+  `;
+
+  return rawResults.map((r) => ({
+    percentRange: r.percentRange,
+    count: Number(r.count),
+  }));
+}
