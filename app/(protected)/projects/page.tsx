@@ -5,18 +5,35 @@ import { formatDistanceToNow } from "date-fns";
 import { ProjectTypeWithIcon } from "@/components/projects/project-type";
 import { Project } from "@/types/entities";
 import Link from "next/link";
+import ProjectListHeader from "@/components/projects/ProjectListHeader";
+import PaginationControls from "@/components/ui/PaginationControls";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
 export default function ProjectPage() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const initialPage = Number(searchParams.get("page") ?? "1");
+  const [page, setPage] = useState<number>(initialPage);
+
+  const initialSearch = searchParams.get("search") ?? "";
+  const [search, setSearch] = useState(initialSearch);
+
+  const limit = 10;
+  const skip = (page - 1) * limit;
   const [projects, setProjects] = useState<Project[]>([]);
+  const [totalCount, setTotalCount] = useState<number | null>(null);
 
   const fetchProjects = async () => {
     try {
       const res = await fetch(
-        "/api/projects?limit=10&orderBy=updatedAt&orderDir=desc"
+        `/api/projects?limit=${limit}&skip=${skip}&orderBy=updatedAt&orderDir=desc&search=${search}`
       );
       if (!res.ok) throw new Error("Failed to fetch recent projects");
-      const { projects } = await res.json();
+      const { projects, totalCount } = await res.json();
       setProjects(projects);
+      setTotalCount(totalCount);
     } catch (err) {
       console.error(err);
     }
@@ -24,11 +41,21 @@ export default function ProjectPage() {
 
   useEffect(() => {
     fetchProjects();
-  }, []);
+  }, [page, search]);
 
   return (
-    <div>
-      <h2 className="text-3xl">All Projects</h2>
+    <div className="max-w-4xl mx-auto my-4">
+      <ProjectListHeader
+        search={search}
+        onSearchChange={(value) => {
+          setSearch(value);
+          const params = new URLSearchParams(searchParams.toString());
+          params.set("search", value);
+          params.set("page", "1"); // reset to first page on search
+          router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+          setPage(1);
+        }}
+      />
       {projects.map((project) => {
         return (
           <div
@@ -56,6 +83,17 @@ export default function ProjectPage() {
           </div>
         );
       })}
+      <PaginationControls
+        currentPage={page}
+        pageSize={limit}
+        totalCount={totalCount ?? 0}
+        onPageChange={(newPage) => {
+          setPage(newPage);
+          const params = new URLSearchParams(searchParams.toString());
+          params.set("page", newPage.toString());
+          router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+        }}
+      />
     </div>
   );
 }

@@ -5,9 +5,9 @@ import { createProject, getProjects } from "@/services/projects";
 
 export const GET = withErrorHandling(async (req: NextRequest) => {
   const { search, pagination, ordering } = parseQueryParams(req);
-  const projects = await getProjects({ search, pagination, ordering });
+  const data = await getProjects({ search, pagination, ordering });
 
-  return { projects };
+  return data;
 });
 
 export const POST = withErrorHandling(async (req: NextRequest) => {

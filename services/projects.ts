@@ -88,21 +88,28 @@ export async function getProjects(params: {
   pagination: { take: number; skip: number };
   ordering: { [key: string]: "asc" | "desc" };
 }) {
-  return prisma.project.findMany({
-    include: {
-      tasks: true,
-      costs: true,
-      milestones: true,
-    },
-    where: {
-      name: {
-        contains: params.search,
+  const [projects, totalCount] = await Promise.all([
+    prisma.project.findMany({
+      include: {
+        tasks: true,
+        costs: true,
+        milestones: true,
       },
-    },
-    orderBy: params.ordering,
-    take: params.pagination.take,
-    skip: params.pagination.skip,
-  });
+      where: {
+        name: { contains: params.search },
+      },
+      take: params.pagination.take,
+      skip: params.pagination.skip,
+      orderBy: params.ordering,
+    }),
+    prisma.project.count({
+      where: {
+        name: { contains: params.search },
+      },
+    }),
+  ]);
+
+  return { projects, totalCount };
 }
 
 export async function getProjectProgress() {
