@@ -2,7 +2,7 @@
 
 import { NextPage } from "next";
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useRecentProjects } from "@/app/context/recent-projects-context";
@@ -31,6 +31,7 @@ import { DatePickerField } from "@/components/ui/form/date-picker-field";
 import Link from "next/link";
 import { Milestone, Task } from "@/types/entities";
 import { SelectField } from "@/components/ui/form/SelectField";
+import { getReturnUrl } from "@/lib/navigation";
 
 type TaskEditPageProps = {
   params: Promise<{ projectId: string; taskId: string }>;
@@ -38,9 +39,12 @@ type TaskEditPageProps = {
 
 const TaskEditPage: NextPage<TaskEditPageProps> = ({ params }) => {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnTo = searchParams.get("returnTo") ?? "";
   const { refreshRecentProjects } = useRecentProjects();
   const { projectId, taskId } = React.use(params);
   const [milestones, setMilestones] = useState<Milestone[]>([]);
+  const [originalTask, setOriginalTask] = useState<Task | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const formSchema = z.object({
@@ -50,7 +54,7 @@ const TaskEditPage: NextPage<TaskEditPageProps> = ({ params }) => {
     description: z.string().nullable(),
     status: z.string(),
     priority: z.string(),
-    milestoneId: z.string().nullable(),
+    milestoneId: z.string().optional().nullable(),
     startDate: z.coerce.date().nullable(),
     dueDate: z.coerce.date().nullable(),
     tags: z.string().nullable(),
@@ -91,7 +95,14 @@ const TaskEditPage: NextPage<TaskEditPageProps> = ({ params }) => {
       }
 
       refreshRecentProjects();
-      router.push(`/projects/${projectId}?tab=tasks`);
+
+      router.push(
+        getReturnUrl(returnTo, {
+          projectId: originalTask?.projectId,
+          milestoneId: originalTask?.milestone?.id,
+          taskId,
+        })
+      );
     } catch (error) {
       console.error("Error updating task:", error);
     }
@@ -116,16 +127,18 @@ const TaskEditPage: NextPage<TaskEditPageProps> = ({ params }) => {
         const { milestones } = await milestonesResponse.json();
         setMilestones(milestones);
 
+        setOriginalTask(task);
+
         const formData = {
           name: task.name,
           description: task.description,
           status: task.status,
           priority: task.priority,
+          milestoneId: task.milestone?.id,
           startDate: task.startDate ? new Date(task.startDate) : null,
           dueDate: task.dueDate ? new Date(task.dueDate) : null,
           tags: task.tags.map((t) => t.name).join(", "),
         };
-
         form.reset(formData);
       } catch (error) {
         console.error("Error:", error);
@@ -261,7 +274,15 @@ const TaskEditPage: NextPage<TaskEditPageProps> = ({ params }) => {
           <div className="flex gap-x-2">
             <Button type="submit">Save</Button>
             <Button asChild type="button" variant="outline">
-              <Link href={`/projects/${projectId}?tab=tasks`}>Cancel</Link>
+              <Link
+                href={getReturnUrl(returnTo, {
+                  projectId: originalTask?.projectId,
+                  milestoneId: originalTask?.milestone?.id,
+                  taskId,
+                })}
+              >
+                Cancel
+              </Link>
             </Button>
           </div>
         </form>
