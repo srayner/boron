@@ -195,7 +195,7 @@ const MilestoneDetailPage: NextPage<MilestonePageProps> = ({ params }) => {
       <h3 className="mt-4 mb-2">Tasks</h3>
       <TasksTable
         tasks={milestone.tasks}
-        onDelete={({ type: string, item: unknown }) => {}}
+        onDelete={setDeleteInfo}
         returnTo={"milestone"}
       />
 

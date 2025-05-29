@@ -1,20 +1,16 @@
-import { FC } from "react";
 import { formatDate, translate } from "@/lib/utils";
 import { Task } from "@/types/entities";
 import { Pencil, Trash2 } from "lucide-react";
 import { Link } from "../ui/link";
+import { DeleteInfo } from "@/types/ui";
 
-type TaskTableProps<TType, TItem> = {
+type TaskTableProps = {
   tasks: Task[];
-  onDelete: (args: { type: TType; item: TItem }) => void;
+  onDelete: (info: DeleteInfo) => void;
   returnTo: string;
 };
 
-const TasksTable = <TType, TItem>({
-  tasks,
-  onDelete,
-  returnTo,
-}: TaskTableProps<TType, TItem>) => {
+const TasksTable = ({ tasks, onDelete, returnTo }: TaskTableProps) => {
   return (
     <table className="w-full text-sm border">
       <thead>
