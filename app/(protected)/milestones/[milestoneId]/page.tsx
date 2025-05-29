@@ -8,6 +8,7 @@ import { TagsList } from "@/components/tags/TagsList";
 import { Flag } from "lucide-react";
 import { MilestoneStatusBadge } from "@/components/milestones/MilestoneStatusBadge";
 import { formatDistanceToNow } from "date-fns";
+import TasksTable from "@/components/tasks/TasksTable";
 
 type MilestonePageProps = {
   params: Promise<{ milestoneId: string }>;
@@ -59,6 +60,12 @@ const MilestoneDetailPage: NextPage<MilestonePageProps> = ({ params }) => {
       {/* Description and tags */}
       <p className="my-3">{milestone.description || descriptionFallback}</p>
       <TagsList tags={milestone.tags} />
+
+      <h3 className="mt-4 mb-2">Tasks</h3>
+      <TasksTable
+        tasks={milestone.tasks}
+        onDelete={({ type: string, item: unknown }) => {}}
+      />
     </div>
   );
 };

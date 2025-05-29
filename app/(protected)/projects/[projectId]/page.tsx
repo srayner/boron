@@ -26,6 +26,7 @@ import { ConfirmationModal } from "@/components/ui/confirmation-modal";
 import { useRecentProjects } from "@/app/context/recent-projects-context";
 import { ProjectTypeIcon } from "@/components/projects/ProjectTypeIcon";
 import { TagsList } from "@/components/tags/TagsList";
+import TasksTable from "@/components/tasks/TasksTable";
 
 type ProjectPageProps = {
   params: Promise<{ projectId: string }>;
@@ -247,50 +248,7 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
                 </Link>
               </Button>
             </div>
-            <table className="w-full text-sm border">
-              <thead>
-                <tr className="bg-muted text-muted-foreground">
-                  <th className="text-left p-2">Name</th>
-                  <th className="text-left p-2">Status</th>
-                  <th className="text-left p-2">Priority</th>
-                  <th className="text-left p-2">Milestone</th>
-                  <th className="text-left p-2">Start Date</th>
-                  <th className="text-left p-2">Due Date</th>
-                  <th className="text-left p-2">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {project.tasks.map((task) => (
-                  <tr key={task.id} className="border-t">
-                    <td className="p-2">
-                      <Link href={`/tasks/${task.id}`}>{task.name}</Link>
-                    </td>
-                    <td className="p-2">{translate(task.status)}</td>
-                    <td className="p-2">{translate(task.priority)}</td>
-                    <td className="p-2">
-                      {translate(task.milestone?.name || "")}
-                    </td>
-                    <td className="p-2">{formatDate(task.startDate)}</td>
-                    <td className="p-2">{formatDate(task.dueDate)}</td>
-                    <td className="p-2 flex gap-2">
-                      <Link
-                        href={`/projects/${projectId}/tasks/${task.id}/edit`}
-                        className="text-forground"
-                      >
-                        <Pencil className="w-4 h-4 hover:text-primary" />
-                      </Link>
-                      <button
-                        onClick={() => {
-                          setDeleteInfo({ type: "task", item: task });
-                        }}
-                      >
-                        <Trash2 className="w-4 h-4 hover:text-destructive" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <TasksTable tasks={project.tasks} onDelete={setDeleteInfo} />
           </div>
         </TabsContent>
         <TabsContent value="milestones">
