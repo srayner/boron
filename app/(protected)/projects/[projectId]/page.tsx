@@ -27,16 +27,11 @@ import { useRecentProjects } from "@/app/context/recent-projects-context";
 import { ProjectTypeIcon } from "@/components/projects/ProjectTypeIcon";
 import { TagsList } from "@/components/tags/TagsList";
 import TasksTable from "@/components/tasks/TasksTable";
+import { DeleteInfo, DeletableType } from "@/types/ui";
 
 type ProjectPageProps = {
   params: Promise<{ projectId: string }>;
 };
-
-type DeletableType = "project" | "task" | "milestone" | "cost";
-interface DeletableItem {
-  id: string;
-  name: string;
-}
 
 const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
   const router = useRouter();
@@ -49,10 +44,7 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
   const [project, setProject] = useState<Project | null>(null);
   const descriptionFallback = "Every great project starts with a blank page.";
 
-  const [deleteInfo, setDeleteInfo] = useState<{
-    type: DeletableType;
-    item: DeletableItem;
-  } | null>(null);
+  const [deleteInfo, setDeleteInfo] = useState<DeleteInfo | null>(null);
   const isConfirmOpen = !!deleteInfo;
 
   const fetchProject = async () => {
@@ -134,7 +126,9 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => router.push(`/projects/${projectId}/edit`)}
+            onClick={() =>
+              router.push(`/projects/${projectId}/edit?returnTo=project`)
+            }
             className="flex items-center"
           >
             <PencilIcon className="w-4 h-4 mr-1" /> Edit
@@ -248,7 +242,11 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
                 </Link>
               </Button>
             </div>
-            <TasksTable tasks={project.tasks} onDelete={setDeleteInfo} />
+            <TasksTable
+              tasks={project.tasks}
+              onDelete={setDeleteInfo}
+              returnTo="project:tasks"
+            />
           </div>
         </TabsContent>
         <TabsContent value="milestones">
@@ -284,7 +282,7 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
                     <td className="p-2">{formatDate(milestone.dueDate)}</td>
                     <td className="p-2 flex gap-2">
                       <Link
-                        href={`/projects/${projectId}/milestones/${milestone.id}/edit`}
+                        href={`/projects/${projectId}/milestones/${milestone.id}/edit?returnTo=project:milestones`}
                         className="text-forground"
                       >
                         <Pencil className="w-4 h-4 hover:text-primary" />
@@ -336,7 +334,7 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
                     <td className="p-2">{cost.note}</td>
                     <td className="p-2 flex gap-2">
                       <Link
-                        href={`/projects/${projectId}/costs/${cost.id}/edit`}
+                        href={`/projects/${projectId}/costs/${cost.id}/edit?returnTo=project:costs`}
                         className="text-forground"
                       >
                         <Pencil className="w-4 h-4 hover:text-primary" />

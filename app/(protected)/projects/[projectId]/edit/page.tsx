@@ -1,7 +1,7 @@
 "use client";
 
 import { NextPage } from "next";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
 import { z } from "zod";
@@ -29,6 +29,7 @@ import { DatePickerField } from "@/components/ui/form/date-picker-field";
 import { TagField } from "@/components/ui/form/TagField";
 import { useRecentProjects } from "@/app/context/recent-projects-context";
 import { Project } from "@/types/entities";
+import { getReturnUrl } from "@/lib/navigation";
 
 type ProjectEditPageProps = {
   params: Promise<{ projectId: string }>;
@@ -57,6 +58,8 @@ const ProjectEditPage: NextPage<ProjectEditPageProps> = ({ params }) => {
 
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnTo = searchParams.get("returnTo") ?? "";
 
   const form = useForm<EditProjectSchema>({
     resolver: zodResolver(editProjectSchema),
@@ -76,7 +79,7 @@ const ProjectEditPage: NextPage<ProjectEditPageProps> = ({ params }) => {
       body: JSON.stringify(payload),
     });
     refreshRecentProjects();
-    router.push(`/projects/${projectId}`);
+    router.push(getReturnUrl(returnTo, { projectId }));
   };
 
   useEffect(() => {

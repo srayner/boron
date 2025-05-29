@@ -2,7 +2,7 @@
 
 import { NextPage } from "next";
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useRecentProjects } from "@/app/context/recent-projects-context";
@@ -30,6 +30,7 @@ import { DatePickerField } from "@/components/ui/form/date-picker-field";
 import { TagField } from "@/components/ui/form/TagField";
 import Link from "next/link";
 import { Milestone } from "@/types/entities";
+import { getReturnUrl } from "@/lib/navigation";
 
 type MilestoneEditPageProps = {
   params: Promise<{ projectId: string; milestoneId: string }>;
@@ -37,6 +38,8 @@ type MilestoneEditPageProps = {
 
 const MilestoneEditPage: NextPage<MilestoneEditPageProps> = ({ params }) => {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnTo = searchParams.get("returnTo") ?? "";
   const { refreshRecentProjects } = useRecentProjects();
   const { projectId, milestoneId } = React.use(params);
   const [isLoading, setIsLoading] = useState(true);
@@ -84,7 +87,7 @@ const MilestoneEditPage: NextPage<MilestoneEditPageProps> = ({ params }) => {
       }
 
       refreshRecentProjects();
-      router.push(`/projects/${projectId}?tab=milestones`);
+      router.push(getReturnUrl(returnTo, { projectId, milestoneId }));
     } catch (error) {
       console.error("Error updating milestone:", error);
     }

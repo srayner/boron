@@ -7,11 +7,13 @@ import { Link } from "../ui/link";
 type TaskTableProps<TType, TItem> = {
   tasks: Task[];
   onDelete: (args: { type: TType; item: TItem }) => void;
+  returnTo: string;
 };
 
 const TasksTable = <TType, TItem>({
   tasks,
   onDelete,
+  returnTo,
 }: TaskTableProps<TType, TItem>) => {
   return (
     <table className="w-full text-sm border">
@@ -39,7 +41,7 @@ const TasksTable = <TType, TItem>({
             <td className="p-2">{formatDate(task.dueDate)}</td>
             <td className="p-2 flex gap-2">
               <Link
-                href={`/projects/${task.projectId}/tasks/${task.id}/edit`}
+                href={`/projects/${task.projectId}/tasks/${task.id}/edit?returnTo=${returnTo}`}
                 className="text-forground"
               >
                 <Pencil className="w-4 h-4 hover:text-primary" />
