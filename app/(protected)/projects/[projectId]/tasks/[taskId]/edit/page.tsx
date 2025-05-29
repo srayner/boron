@@ -29,7 +29,8 @@ import { TextField } from "@/components/ui/form/TextField";
 import { TagField } from "@/components/ui/form/TagField";
 import { DatePickerField } from "@/components/ui/form/date-picker-field";
 import Link from "next/link";
-import { Task } from "@/types/entities";
+import { Milestone, Task } from "@/types/entities";
+import { SelectField } from "@/components/ui/form/SelectField";
 
 type TaskEditPageProps = {
   params: Promise<{ projectId: string; taskId: string }>;
@@ -39,6 +40,7 @@ const TaskEditPage: NextPage<TaskEditPageProps> = ({ params }) => {
   const router = useRouter();
   const { refreshRecentProjects } = useRecentProjects();
   const { projectId, taskId } = React.use(params);
+  const [milestones, setMilestones] = useState<Milestone[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const formSchema = z.object({
@@ -48,6 +50,7 @@ const TaskEditPage: NextPage<TaskEditPageProps> = ({ params }) => {
     description: z.string().nullable(),
     status: z.string(),
     priority: z.string(),
+    milestoneId: z.string().nullable(),
     startDate: z.coerce.date().nullable(),
     dueDate: z.coerce.date().nullable(),
     tags: z.string().nullable(),
@@ -60,6 +63,7 @@ const TaskEditPage: NextPage<TaskEditPageProps> = ({ params }) => {
       description: null,
       status: "PLANNED",
       priority: "MEDIUM",
+      milestoneId: null,
       startDate: null,
       dueDate: null,
       tags: null,
@@ -96,17 +100,21 @@ const TaskEditPage: NextPage<TaskEditPageProps> = ({ params }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [taskResponse] = await Promise.all([
+        const [taskResponse, milestonesResponse] = await Promise.all([
           fetch(`/api/tasks/${taskId}`),
+          fetch(`/api/milestones?projectId=${projectId}`),
         ]);
 
-        if (!taskResponse.ok) {
+        if (!taskResponse.ok || !milestonesResponse) {
           throw new Error("Failed to fetch data");
         }
 
         const { task } = (await taskResponse.json()) as {
           task: Task;
         };
+
+        const { milestones } = await milestonesResponse.json();
+        setMilestones(milestones);
 
         const formData = {
           name: task.name,
@@ -217,6 +225,14 @@ const TaskEditPage: NextPage<TaskEditPageProps> = ({ params }) => {
                 </FormControl>
                 <FormMessage />
               </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="milestoneId"
+            render={({ field }) => (
+              <SelectField field={field} label="Milestone" items={milestones} />
             )}
           />
 
