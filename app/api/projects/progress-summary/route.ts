@@ -1,8 +1,7 @@
-import { NextRequest } from "next/server";
 import { withErrorHandling } from "@/lib/api/handler";
 import { getProjectProgress } from "@/services/projects";
 
-export const GET = withErrorHandling(async (req: NextRequest) => {
+export const GET = withErrorHandling(async () => {
   const data = await getProjectProgress();
 
   return { data };

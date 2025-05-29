@@ -24,11 +24,6 @@ export default function ProjectProgressGraph() {
       const res = await fetch("/api/projects/progress-summary");
       if (res.ok) {
         const { data } = await res.json();
-        // Map API response keys to recharts keys (name, count)
-        const mapped = data.map(({ percentRange, count }: ProgressData) => ({
-          name: percentRange,
-          count,
-        }));
 
         // Expected ranges as percentages
         const allRanges = [
@@ -57,17 +52,18 @@ export default function ProjectProgressGraph() {
         }
 
         // Map API data keys to percentage labels
-        const mappedWithPercentLabels = mapped.map((d) => ({
-          name: convertRangeToPercentLabel(d.name),
+        const mappedWithPercentLabels = data.map((d: ProgressData) => ({
+          percentRange: convertRangeToPercentLabel(d.percentRange),
           count: d.count,
         }));
 
-        const filledData = allRanges.map((range) => {
-          const found = mappedWithPercentLabels.find((d) => d.name === range);
-          return found ?? { name: range, count: 0 };
+        const filledData: ProgressData[] = allRanges.map((range) => {
+          const found = mappedWithPercentLabels.find(
+            (d: ProgressData) => d.percentRange === range
+          );
+          return found ?? { percentRange: range, count: 0 };
         });
 
-        setData(filledData);
         setData(filledData);
       }
     }
@@ -82,7 +78,7 @@ export default function ProjectProgressGraph() {
             data={data}
             margin={{ top: 10, right: 30, left: 20, bottom: 10 }}
           >
-            <XAxis dataKey="name" />
+            <XAxis dataKey="percentRange" />
             <YAxis allowDecimals={false} />
             <Bar dataKey="count" fill="var(--primary)">
               <LabelList dataKey="count" position="top" />
