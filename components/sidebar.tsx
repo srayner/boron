@@ -45,8 +45,8 @@ const items = [
     icon: Home,
   },
   {
-    title: "Inbox",
-    url: "/",
+    title: "Due Items",
+    url: "/due-items",
     icon: Inbox,
   },
   {
