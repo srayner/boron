@@ -133,7 +133,7 @@ const MilestoneDetailPage: NextPage<MilestonePageProps> = ({ params }) => {
       <TagsList tags={milestone.tags} />
 
       {/* Info Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <Card className="py-4">
           <CardContent>
             <h3 className="text-muted-foreground flex items-center gap-2">
@@ -192,7 +192,14 @@ const MilestoneDetailPage: NextPage<MilestonePageProps> = ({ params }) => {
         </Card>
       </div>
 
-      <h3 className="mt-4 mb-2">Tasks</h3>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-semibold">Tasks</h2>
+        <Button asChild size="sm">
+          <Link href={`/projects/${milestone.project.id}/tasks/add`}>
+            Create Task
+          </Link>
+        </Button>
+      </div>
       <TasksTable
         tasks={milestone.tasks}
         onDelete={setDeleteInfo}
