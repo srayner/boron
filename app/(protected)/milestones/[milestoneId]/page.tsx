@@ -25,6 +25,7 @@ import { DeleteInfo, DeletableType } from "@/types/ui";
 import { useRecentProjects } from "@/app/context/recent-projects-context";
 import { formatCurrency, titleCase } from "@/lib/utils";
 import { Link } from "@/components/ui/link";
+import { ProgressBar } from "@/components/ui/ProgressBar";
 
 type MilestonePageProps = {
   params: Promise<{ milestoneId: string }>;
@@ -173,7 +174,10 @@ const MilestoneDetailPage: NextPage<MilestonePageProps> = ({ params }) => {
             </h3>
             <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm mt-4">
               <dt className="font-medium text-muted-foreground">Progress:</dt>
-              <dd className="text-forground">{milestone.progress}</dd>
+              <dd className="text-forground">
+                <ProgressBar percent={milestone.progress} />
+                {milestone.progress}
+              </dd>
             </dl>
           </CardContent>
         </Card>

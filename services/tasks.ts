@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { AppError } from "@/lib/api/error";
 import { processTagsForCreate, processTagsForUpdate } from "@/services/tags";
+import { Task } from "@/types/entities";
 
 export const createTask = async (data: any) => {
   if (!data.name) throw new AppError("Task name is required", 422);
@@ -62,6 +63,7 @@ export const updateTask = async (id: string, data: any) => {
       description: data.description || "",
       status: data.status,
       priority: data.priority,
+      progress: calculateProgress(data),
       milestoneId: data.milestoneId,
       startDate: startDate,
       dueDate: dueDate,
@@ -104,4 +106,20 @@ export async function getTasks(params: {
     take: params.pagination.take,
     skip: params.pagination.skip,
   });
+}
+
+function calculateProgress(update: Task): number {
+  if (update.status === "COMPLETED") {
+    return 100;
+  }
+
+  if (update.status === "IN_PROGRESS") {
+    return Math.min(update.progress, 99);
+  }
+
+  if (update.status === "PLANNED") {
+    return 0;
+  }
+
+  return update.progress;
 }

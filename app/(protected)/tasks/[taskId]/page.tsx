@@ -23,8 +23,9 @@ import { useRecentProjects } from "@/app/context/recent-projects-context";
 import { DeletableType, DeleteInfo } from "@/types/ui";
 import { ConfirmationModal } from "@/components/ui/confirmation-modal";
 import { Link } from "@/components/ui/link";
-import { formatCurrency, titleCase, translate } from "@/lib/utils";
+import { formatCurrency, translate } from "@/lib/utils";
 import CostsTable from "@/components/costs/CostsTable";
+import { ProgressBar } from "@/components/ui/ProgressBar";
 
 type taskPageProps = {
   params: Promise<{ taskId: string }>;
@@ -177,7 +178,10 @@ const TaskDetailPage: NextPage<taskPageProps> = ({ params }) => {
             </h3>
             <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm mt-4">
               <dt className="font-medium text-muted-foreground">Progress:</dt>
-              <dd className="text-forground">{task.progress}</dd>
+              <dd className="text-forground">
+                <ProgressBar percent={task.progress} />
+                {task.progress}%
+              </dd>
             </dl>
           </CardContent>
         </Card>

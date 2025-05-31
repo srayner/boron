@@ -28,6 +28,7 @@ import { ProjectTypeIcon } from "@/components/projects/ProjectTypeIcon";
 import { TagsList } from "@/components/tags/TagsList";
 import TasksTable from "@/components/tasks/TasksTable";
 import { DeleteInfo, DeletableType } from "@/types/ui";
+import { ProgressBar } from "@/components/ui/ProgressBar";
 
 type ProjectPageProps = {
   params: Promise<{ projectId: string }>;
@@ -198,7 +199,10 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
             </h3>
             <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm mt-4">
               <dt className="font-medium text-muted-foreground">Progress:</dt>
-              <dd className="text-forground">{project.progress}</dd>
+              <dd className="text-forground">
+                <ProgressBar percent={project.progress} />
+                {project.progress}
+              </dd>
             </dl>
           </CardContent>
         </Card>

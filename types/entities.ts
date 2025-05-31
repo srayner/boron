@@ -1,5 +1,3 @@
-import { string } from "zod";
-
 export type ProjectStatus =
   | "PLANNED"
   | "ACTIVE"
@@ -19,10 +17,11 @@ export type ProjectType =
   | "WRITING"
   | "OTHER";
 export type TaskStatus =
-  | "TODO"
-  | "INPROGRESS"
+  | "PLANNED"
+  | "IN_PROGRESS"
+  | "ON_HOLD"
   | "BLOCKED"
-  | "DONE"
+  | "COMPLETED"
   | "CANCELLED";
 export type TaskPriority = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
 export type CostType =
@@ -54,7 +53,7 @@ export interface Cost {
   type: CostType;
   note: string;
   date: string;
-  projectId: number;
+  projectId: string;
   project: Project;
   tags: Tag[];
   createdAt: string;
@@ -69,7 +68,7 @@ export interface Milestone {
   dueDate: string;
   status: MilestoneStatus;
   progress: number;
-  projectId: number;
+  projectId: string;
   project: Project;
   tasks: Task[];
   tags: Tag[];
@@ -88,7 +87,7 @@ export interface Task {
   startDate: string;
   progress: number;
   completedAt: string;
-  projectId: number;
+  projectId: string;
   project: Project;
   parentTask: Task;
   subTasks: Task[];

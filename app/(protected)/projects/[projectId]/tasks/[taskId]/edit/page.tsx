@@ -32,6 +32,7 @@ import Link from "next/link";
 import { Milestone, Task } from "@/types/entities";
 import { SelectField } from "@/components/ui/form/SelectField";
 import { getReturnUrl } from "@/lib/navigation";
+import { NumberField } from "@/components/ui/form/NumberField";
 
 type TaskEditPageProps = {
   params: Promise<{ projectId: string; taskId: string }>;
@@ -54,6 +55,7 @@ const TaskEditPage: NextPage<TaskEditPageProps> = ({ params }) => {
     description: z.string().nullable(),
     status: z.string(),
     priority: z.string(),
+    progress: z.number().min(0).max(100),
     milestoneId: z.string().optional().nullable(),
     startDate: z.coerce.date().nullable(),
     dueDate: z.coerce.date().nullable(),
@@ -67,6 +69,7 @@ const TaskEditPage: NextPage<TaskEditPageProps> = ({ params }) => {
       description: null,
       status: "PLANNED",
       priority: "MEDIUM",
+      progress: 0,
       milestoneId: null,
       startDate: null,
       dueDate: null,
@@ -134,6 +137,7 @@ const TaskEditPage: NextPage<TaskEditPageProps> = ({ params }) => {
           description: task.description,
           status: task.status,
           priority: task.priority,
+          progress: Number(task.progress),
           milestoneId: task.milestone?.id,
           startDate: task.startDate ? new Date(task.startDate) : null,
           dueDate: task.dueDate ? new Date(task.dueDate) : null,
@@ -238,6 +242,20 @@ const TaskEditPage: NextPage<TaskEditPageProps> = ({ params }) => {
                 </FormControl>
                 <FormMessage />
               </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="progress"
+            render={({ field }) => (
+              <NumberField
+                field={field}
+                className="w-[240px]"
+                label="Progress"
+                min={0}
+                max={100}
+              />
             )}
           />
 
