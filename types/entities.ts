@@ -85,7 +85,7 @@ export interface Task {
   startDate: string;
   progress: number;
   completedAt: string;
-  projectId: string;
+  project: Project;
   parentTask: Task;
   subTasks: Task[];
   archived: boolean;

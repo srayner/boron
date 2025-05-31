@@ -74,6 +74,7 @@ export const getTask = async (id: string) => {
   return await prisma.task.findUnique({
     where: { id },
     include: {
+      project: true,
       subTasks: true,
       costs: true,
       milestone: true,
@@ -89,6 +90,7 @@ export async function getTasks(params: {
 }) {
   return prisma.task.findMany({
     include: {
+      project: true,
       subTasks: true,
       costs: true,
       milestone: true,

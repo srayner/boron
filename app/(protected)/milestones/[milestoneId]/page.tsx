@@ -143,7 +143,7 @@ const MilestoneDetailPage: NextPage<MilestonePageProps> = ({ params }) => {
               <dt className="font-medium text-muted-foreground">Project:</dt>
               <dd className="text-foreground">
                 <Link href={`/projects/${milestone.project.id}`}>
-                  {titleCase(milestone.project.name)}
+                  {milestone.project.name}
                 </Link>
               </dd>
               <dt className="font-medium text-muted-foreground">Status:</dt>
