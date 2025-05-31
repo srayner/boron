@@ -24,6 +24,7 @@ import { DeletableType, DeleteInfo } from "@/types/ui";
 import { ConfirmationModal } from "@/components/ui/confirmation-modal";
 import { Link } from "@/components/ui/link";
 import { formatCurrency, titleCase, translate } from "@/lib/utils";
+import CostsTable from "@/components/costs/CostsTable";
 
 type taskPageProps = {
   params: Promise<{ taskId: string }>;
@@ -194,6 +195,20 @@ const TaskDetailPage: NextPage<taskPageProps> = ({ params }) => {
           </CardContent>
         </Card>
       </div>
+
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-semibold">Costs</h2>
+        <Button asChild size="sm">
+          <Link href={`/projects/${task.project.id}/costs/add?returnTo=task`}>
+            Create Cost
+          </Link>
+        </Button>
+      </div>
+      <CostsTable
+        costs={task.costs}
+        onDelete={setDeleteInfo}
+        returnTo={"task"}
+      />
 
       <ConfirmationModal
         open={isConfirmOpen}

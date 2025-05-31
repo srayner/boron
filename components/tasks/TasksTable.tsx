@@ -37,7 +37,7 @@ const TasksTable = ({ tasks, onDelete, returnTo }: TaskTableProps) => {
             <td className="p-2">{formatDate(task.dueDate)}</td>
             <td className="p-2 flex gap-2">
               <Link
-                href={`/projects/${task.project.id}/tasks/${task.id}/edit?returnTo=${returnTo}`}
+                href={`/projects/${task.projectId}/tasks/${task.id}/edit?returnTo=${returnTo}`}
                 className="text-forground"
               >
                 <Pencil className="w-4 h-4 hover:text-primary" />
@@ -52,6 +52,13 @@ const TasksTable = ({ tasks, onDelete, returnTo }: TaskTableProps) => {
             </td>
           </tr>
         ))}
+        {tasks.length === 0 && (
+          <tr>
+            <td colSpan={5} className="text-center text-muted-foreground py-4">
+              No tasks exist yet.
+            </td>
+          </tr>
+        )}
       </tbody>
     </table>
   );

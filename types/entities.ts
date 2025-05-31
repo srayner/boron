@@ -54,6 +54,8 @@ export interface Cost {
   type: CostType;
   note: string;
   date: string;
+  projectId: number;
+  project: Project;
   tags: Tag[];
   createdAt: string;
   updatedAt: string;
@@ -67,6 +69,7 @@ export interface Milestone {
   dueDate: string;
   status: MilestoneStatus;
   progress: number;
+  projectId: number;
   project: Project;
   tasks: Task[];
   tags: Tag[];
@@ -85,6 +88,7 @@ export interface Task {
   startDate: string;
   progress: number;
   completedAt: string;
+  projectId: number;
   project: Project;
   parentTask: Task;
   subTasks: Task[];
