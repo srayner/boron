@@ -136,3 +136,50 @@ export async function getProjectProgress() {
     count: Number(r.count),
   }));
 }
+
+export async function updateProjectProgress(projectId: string) {
+  const project = await prisma.project.findUnique({
+    where: { id: projectId },
+    select: { status: true },
+  });
+
+  if (!project) return;
+
+  const tasks = await prisma.task.findMany({
+    where: { projectId },
+    select: { progress: true },
+  });
+
+  const total = tasks.reduce((sum, t) => sum + t.progress.toNumber(), 0);
+  const progress = tasks.length > 0 ? Math.floor(total / tasks.length) : 0;
+
+  let newStatus = project.status;
+  if (project.status !== "ON_HOLD" && project.status !== "CANCELLED") {
+    newStatus = "IN_PROGRESS";
+    if (progress === 100) {
+      newStatus = "COMPLETED";
+    }
+    if (progress === 0) {
+      newStatus = "PLANNED";
+    }
+  }
+
+  await prisma.project.update({
+    where: { id: projectId },
+    data: { progress, status: newStatus, updatedAt: new Date() },
+  });
+}
+
+export async function updateProjectCost(projectId: string) {
+  const costs = await prisma.cost.findMany({
+    where: { projectId },
+    select: { amount: true },
+  });
+
+  const total = costs.reduce((sum, t) => sum + t.amount.toNumber(), 0);
+
+  await prisma.project.update({
+    where: { id: projectId },
+    data: { actualCost: total, updatedAt: new Date() },
+  });
+}

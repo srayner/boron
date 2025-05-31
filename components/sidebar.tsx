@@ -76,8 +76,7 @@ const SideBar = () => {
           <SidebarMenuItem className="h-[28px]">
             <SidebarMenuButton asChild>
               <Link href="/dashboard">
-                <Image alt="logo" src="/logo.svg" width={24} height={24} />
-                <span>Boron</span>
+                <Image alt="logo" src="/boron.png" width={102} height={40} />
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

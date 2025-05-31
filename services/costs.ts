@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { AppError } from "@/lib/api/error";
 import { z } from "zod";
 import { processTagsForCreate, processTagsForUpdate } from "@/services/tags";
+import { updateProjectCost } from "./projects";
 
 const CostSchema = z.object({
   amount: z.coerce.number().min(0),
@@ -53,7 +54,7 @@ export const createCost = async (data: any) => {
     ? await processTagsForCreate(data.tags)
     : { connect: [] };
 
-  return prisma.cost.create({
+  const newCost = await prisma.cost.create({
     data: {
       amount: validated.amount,
       type: validated.type,
@@ -64,12 +65,20 @@ export const createCost = async (data: any) => {
       tags,
     },
   });
+
+  await updateProjectCost(newCost.projectId);
+
+  return newCost;
 };
 
 export const deleteCost = async (id: string) => {
-  return await prisma.cost.delete({
+  const deletedCost = await prisma.cost.delete({
     where: { id },
   });
+
+  await updateProjectCost(deletedCost.projectId);
+
+  return deletedCost;
 };
 
 export const updateCost = async (id: string, data: any) => {
@@ -77,7 +86,7 @@ export const updateCost = async (id: string, data: any) => {
 
   const tags = data.tags ? await processTagsForUpdate(data.tags) : { set: [] };
 
-  return prisma.cost.update({
+  const updatedCost = await prisma.cost.update({
     where: { id },
     data: {
       amount: validated.amount,
@@ -89,6 +98,10 @@ export const updateCost = async (id: string, data: any) => {
       tags,
     },
   });
+
+  await updateProjectCost(updatedCost.projectId);
+
+  return updatedCost;
 };
 
 export const getCost = async (id: string) => {

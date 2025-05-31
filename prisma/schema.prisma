@@ -11,7 +11,7 @@ datasource db {
 
 enum ProjectStatus {
   PLANNED
-  ACTIVE
+  IN_PROGRESS
   ON_HOLD
   COMPLETED
   CANCELLED

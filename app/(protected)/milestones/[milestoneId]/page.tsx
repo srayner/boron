@@ -176,7 +176,7 @@ const MilestoneDetailPage: NextPage<MilestonePageProps> = ({ params }) => {
               <dt className="font-medium text-muted-foreground">Progress:</dt>
               <dd className="text-forground">
                 <ProgressBar percent={milestone.progress} />
-                {milestone.progress}
+                {milestone.progress}%
               </dd>
             </dl>
           </CardContent>

@@ -21,7 +21,7 @@ import {
 import { Project } from "@/types/entities";
 import { ProjectStatusBadge } from "@/components/projects/project-status";
 import { format, formatDistanceToNow } from "date-fns";
-import { formatCurrency, formatDate, titleCase, translate } from "@/lib/utils";
+import { formatCurrency, formatDate, translate } from "@/lib/utils";
 import { ConfirmationModal } from "@/components/ui/confirmation-modal";
 import { useRecentProjects } from "@/app/context/recent-projects-context";
 import { ProjectTypeIcon } from "@/components/projects/ProjectTypeIcon";
@@ -160,11 +160,11 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
             </h3>
             <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm mt-4">
               <dt className="font-medium text-muted-foreground">Type:</dt>
-              <dd className="text-foreground">{titleCase(project.type)}</dd>
+              <dd className="text-foreground">{translate(project.type)}</dd>
               <dt className="font-medium text-muted-foreground">Priority:</dt>
-              <dd className="text-foreground">{titleCase(project.priority)}</dd>
+              <dd className="text-foreground">{translate(project.priority)}</dd>
               <dt className="font-medium text-muted-foreground">Status:</dt>
-              <dd className="text-foreground">{titleCase(project.status)}</dd>
+              <dd className="text-foreground">{translate(project.status)}</dd>
             </dl>
           </CardContent>
         </Card>
@@ -201,7 +201,7 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
               <dt className="font-medium text-muted-foreground">Progress:</dt>
               <dd className="text-forground">
                 <ProgressBar percent={project.progress} />
-                {project.progress}
+                {project.progress}%
               </dd>
             </dl>
           </CardContent>

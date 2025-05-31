@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma";
 import { AppError } from "@/lib/api/error";
 import { processTagsForCreate, processTagsForUpdate } from "@/services/tags";
 import { Task } from "@/types/entities";
+import TaskAddPage from "@/app/(protected)/projects/[projectId]/tasks/add/page";
+import { updateProjectProgress } from "./projects";
 
 export const createTask = async (data: any) => {
   if (!data.name) throw new AppError("Task name is required", 422);
@@ -20,7 +22,7 @@ export const createTask = async (data: any) => {
     ? await processTagsForCreate(data.tags)
     : { connect: [] };
 
-  return prisma.task.create({
+  const newTask = await prisma.task.create({
     data: {
       projectId: data.projectId,
       name: data.name,
@@ -33,12 +35,20 @@ export const createTask = async (data: any) => {
       tags,
     },
   });
+
+  await updateProjectProgress(newTask.projectId);
+
+  return newTask;
 };
 
 export const deleteTask = async (id: string) => {
-  return await prisma.task.delete({
+  const deletedTask = await prisma.task.delete({
     where: { id },
   });
+
+  updateProjectProgress(deletedTask.projectId);
+
+  return deletedTask;
 };
 
 export const updateTask = async (id: string, data: any) => {
@@ -56,7 +66,7 @@ export const updateTask = async (id: string, data: any) => {
 
   const tags = data.tags ? await processTagsForUpdate(data.tags) : { set: [] };
 
-  return prisma.task.update({
+  const updatedTask = await prisma.task.update({
     where: { id },
     data: {
       name: data.name,
@@ -70,6 +80,10 @@ export const updateTask = async (id: string, data: any) => {
       tags,
     },
   });
+
+  await updateProjectProgress(updatedTask.projectId);
+
+  return updatedTask;
 };
 
 export const getTask = async (id: string) => {
