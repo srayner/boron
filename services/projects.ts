@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { AppError } from "@/lib/api/error";
 import { processTagsForCreate, processTagsForUpdate } from "@/services/tags";
+import type { Prisma } from "@prisma/client";
+import { resourceUsage } from "process";
 
 export const createProject = async (data: any) => {
   if (!data.name) throw new AppError("Project name is required", 422);
@@ -182,4 +184,18 @@ export async function updateProjectCost(projectId: string) {
     where: { id: projectId },
     data: { actualCost: total, updatedAt: new Date() },
   });
+}
+
+export async function getProjectCountsBy(field: Prisma.ProjectScalarFieldEnum) {
+  const result = await prisma.project.groupBy({
+    by: [field],
+    _count: {
+      _all: true,
+    },
+  });
+
+  return result.map((item) => ({
+    ...item,
+    count: item._count._all,
+  }));
 }
