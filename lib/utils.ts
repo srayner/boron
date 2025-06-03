@@ -2,9 +2,10 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { format, isValid } from "date-fns";
 
-const translations: Record<string, string> = {
-  EXAMPLE: "Example Translation",
+const translations: Record<string, { full: string; short?: string }> = {
+  WEBAPP: { full: "Web Application", short: "Web App" },
 };
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -20,14 +21,16 @@ export function titleCase(text: string) {
   return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
 }
 
-export function translate(key: string): string {
-  return (
-    translations[key] ??
-    key
-      .replace(/_/g, " ")
-      .toLowerCase()
-      .replace(/\b\w/g, (c) => c.toUpperCase())
-  );
+export function translate(key: string, options?: { short?: boolean }): string {
+  const entry = translations[key];
+  const value = options?.short ? entry?.short : entry?.full;
+
+  if (value) return value;
+
+  return key
+    .replace(/_/g, " ")
+    .toLowerCase()
+    .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 export function formatDate(date: string): string {
