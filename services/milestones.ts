@@ -142,3 +142,36 @@ export async function getSummary() {
     },
   };
 }
+
+export async function updateMilestoneProgress(milestoneId: string) {
+  const milestone = await prisma.milestone.findUnique({
+    where: { id: milestoneId },
+    select: { status: true },
+  });
+
+  if (!milestone) return;
+
+  const tasks = await prisma.task.findMany({
+    where: { milestoneId },
+    select: { progress: true },
+  });
+
+  const total = tasks.reduce((sum, t) => sum + t.progress.toNumber(), 0);
+  const progress = tasks.length > 0 ? Math.floor(total / tasks.length) : 0;
+
+  let newStatus = milestone.status;
+  if (milestone.status !== "ON_HOLD" && milestone.status !== "CANCELLED") {
+    newStatus = "IN_PROGRESS";
+    if (progress === 100) {
+      newStatus = "COMPLETED";
+    }
+    if (progress === 0) {
+      newStatus = "PLANNED";
+    }
+  }
+
+  await prisma.milestone.update({
+    where: { id: milestoneId },
+    data: { progress, status: newStatus, updatedAt: new Date() },
+  });
+}

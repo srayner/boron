@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { AppError } from "@/lib/api/error";
 import { processTagsForCreate, processTagsForUpdate } from "@/services/tags";
 import { Task } from "@/types/entities";
-import TaskAddPage from "@/app/(protected)/projects/[projectId]/tasks/add/page";
+import { updateMilestoneProgress } from "./milestones";
 import { updateProjectProgress } from "./projects";
 
 export const createTask = async (data: any) => {
@@ -29,6 +29,7 @@ export const createTask = async (data: any) => {
       description: data.description || "",
       status: data.status,
       priority: data.priority,
+      progress: calculateProgress(data),
       milestoneId: data.milestoneId,
       startDate: startDate,
       dueDate: dueDate,
@@ -36,6 +37,7 @@ export const createTask = async (data: any) => {
     },
   });
 
+  await updateMilestoneProgress(newTask.projectId);
   await updateProjectProgress(newTask.projectId);
 
   return newTask;
@@ -81,6 +83,7 @@ export const updateTask = async (id: string, data: any) => {
     },
   });
 
+  await updateMilestoneProgress(updatedTask.projectId);
   await updateProjectProgress(updatedTask.projectId);
 
   return updatedTask;
