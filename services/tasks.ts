@@ -37,7 +37,9 @@ export const createTask = async (data: any) => {
     },
   });
 
-  await updateMilestoneProgress(newTask.projectId);
+  if (newTask.milestoneId) {
+    await updateMilestoneProgress(newTask.milestoneId);
+  }
   await updateProjectProgress(newTask.projectId);
 
   return newTask;
@@ -48,7 +50,10 @@ export const deleteTask = async (id: string) => {
     where: { id },
   });
 
-  updateProjectProgress(deletedTask.projectId);
+  if (deletedTask.milestoneId) {
+    await updateMilestoneProgress(deletedTask.milestoneId);
+  }
+  await updateProjectProgress(deletedTask.projectId);
 
   return deletedTask;
 };
@@ -83,7 +88,9 @@ export const updateTask = async (id: string, data: any) => {
     },
   });
 
-  await updateMilestoneProgress(updatedTask.projectId);
+  if (updatedTask.milestoneId) {
+    await updateMilestoneProgress(updatedTask.milestoneId);
+  }
   await updateProjectProgress(updatedTask.projectId);
 
   return updatedTask;
