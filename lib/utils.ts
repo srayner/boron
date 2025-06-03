@@ -3,7 +3,7 @@ import { twMerge } from "tailwind-merge";
 import { format, isValid } from "date-fns";
 
 const translations: Record<string, string> = {
-  ON_HOLD: "On HOLD!",
+  EXAMPLE: "Example Translation",
 };
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
