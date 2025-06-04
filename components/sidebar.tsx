@@ -3,20 +3,18 @@
 import { useRecentProjects } from "@/app/context/recent-projects-context";
 import {
   Calendar,
-  ChevronUp,
+  CheckSquare,
   Home,
   Inbox,
   Plus,
   Projector,
   Search,
   Settings,
-  User2,
 } from "lucide-react";
 import React from "react";
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarGroupAction,
   SidebarGroupContent,
@@ -30,12 +28,6 @@ import {
 } from "./ui/sidebar";
 import Link from "next/link";
 import Image from "next/image";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
 import { ProjectTypeIcon } from "./projects/ProjectTypeIcon";
 
 const items = [
@@ -63,6 +55,40 @@ const items = [
     title: "Settings",
     url: "/",
     icon: Settings,
+  },
+];
+
+const milestoneItems = [
+  {
+    title: "Due Milestones",
+    url: "/milestones?due",
+    icon: CheckSquare,
+  },
+  {
+    title: "All Milestones",
+    url: "/milestones",
+    icon: CheckSquare,
+  },
+];
+
+const taskItems = [
+  {
+    title: "Due Tasks",
+    url: "/tasks?due",
+    icon: CheckSquare,
+  },
+  {
+    title: "All Tasks",
+    url: "/tasks",
+    icon: CheckSquare,
+  },
+];
+
+const costItems = [
+  {
+    title: "All Costs",
+    url: "/costs",
+    icon: CheckSquare,
   },
 ];
 
@@ -96,15 +122,12 @@ const SideBar = () => {
                       <span>{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
-                  {item.title === "Inbox" && (
-                    <SidebarMenuBadge>24</SidebarMenuBadge>
-                  )}
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-        <SidebarGroup>
+        <SidebarGroup className="min-h-[296px]">
           <SidebarGroupLabel>Projects</SidebarGroupLabel>
           <SidebarGroupAction>
             <Link href="/projects/add">
@@ -119,7 +142,9 @@ const SideBar = () => {
                     <SidebarMenuButton asChild>
                       <Link href={`/projects/${project.id}`}>
                         <ProjectTypeIcon type={project.type} />
-                        {project.name}
+                        <span className="truncate overflow-hidden whitespace-nowrap">
+                          {project.name}
+                        </span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -135,27 +160,55 @@ const SideBar = () => {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-      </SidebarContent>
-      <SidebarFooter>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuButton>
-                  <User2 />
-                  Steve Rayner
-                  <ChevronUp className="ml-auto" />
+        <SidebarGroup>
+          <SidebarGroupLabel>Milestones</SidebarGroupLabel>
+          <SidebarMenu>
+            {milestoneItems.map((item) => (
+              <SidebarMenuItem key={item.title}>
+                <SidebarMenuButton asChild>
+                  <Link href={item.url}>
+                    <item.icon />
+                    <span>{item.title}</span>
+                  </Link>
                 </SidebarMenuButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem>Account</DropdownMenuItem>
-                <DropdownMenuItem>Settings</DropdownMenuItem>
-                <DropdownMenuItem>Log Out</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarFooter>
+                {item.title === "Inbox" && (
+                  <SidebarMenuBadge>24</SidebarMenuBadge>
+                )}
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>Tasks</SidebarGroupLabel>
+          <SidebarMenu>
+            {taskItems.map((item) => (
+              <SidebarMenuItem key={item.title}>
+                <SidebarMenuButton asChild>
+                  <Link href={item.url}>
+                    <item.icon />
+                    <span>{item.title}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>Costs</SidebarGroupLabel>
+          <SidebarMenu>
+            {costItems.map((item) => (
+              <SidebarMenuItem key={item.title}>
+                <SidebarMenuButton asChild>
+                  <Link href={item.url}>
+                    <item.icon />
+                    <span>{item.title}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarGroup>
+      </SidebarContent>
     </Sidebar>
   );
 };
