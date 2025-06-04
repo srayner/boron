@@ -79,7 +79,7 @@ export const getProject = async (id: string) => {
     include: {
       tasks: { include: { milestone: true } },
       costs: true,
-      milestones: true,
+      milestones: { orderBy: [{ order: "asc" }, { dueDate: "asc" }] },
       tags: true,
     },
   });

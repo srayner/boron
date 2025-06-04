@@ -26,6 +26,7 @@ import { ConfirmationModal } from "@/components/ui/confirmation-modal";
 import { useRecentProjects } from "@/app/context/recent-projects-context";
 import { ProjectTypeIcon } from "@/components/projects/ProjectTypeIcon";
 import { TagsList } from "@/components/tags/TagsList";
+import MilestonesTable from "@/components/milestones/MilestonesTable";
 import TasksTable from "@/components/tasks/TasksTable";
 import { DeleteInfo, DeletableType } from "@/types/ui";
 import { ProgressBar } from "@/components/ui/ProgressBar";
@@ -231,11 +232,28 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
       {/* Tabs for sub-sections */}
       <Tabs value={activeTab} onValueChange={onTabChange} className="mt-8">
         <TabsList className="justify-start gap-2">
-          <TabsTrigger value="tasks">Tasks</TabsTrigger>
           <TabsTrigger value="milestones">Milestones</TabsTrigger>
+          <TabsTrigger value="tasks">Tasks</TabsTrigger>
           <TabsTrigger value="costs">Costs</TabsTrigger>
           <TabsTrigger value="relationships">Relationships</TabsTrigger>
         </TabsList>
+        <TabsContent value="milestones">
+          <div className="mt-4 text-sm text-muted-foreground">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold">Milestones</h2>
+              <Button asChild size="sm">
+                <Link href={`/projects/${projectId}/milestones/add`}>
+                  Create Milestone
+                </Link>
+              </Button>
+            </div>
+            <MilestonesTable
+              milestones={project.milestones}
+              onDelete={setDeleteInfo}
+              returnTo="project:milestones"
+            />
+          </div>
+        </TabsContent>
         <TabsContent value="tasks">
           <div className="mt-4 text-sm text-muted-foreground">
             <div className="flex justify-between items-center mb-4">
@@ -251,58 +269,6 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
               onDelete={setDeleteInfo}
               returnTo="project:tasks"
             />
-          </div>
-        </TabsContent>
-        <TabsContent value="milestones">
-          <div className="mt-4 text-sm text-muted-foreground">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold">Milestones</h2>
-              <Button asChild size="sm">
-                <Link href={`/projects/${projectId}/milestones/add`}>
-                  Create Milestone
-                </Link>
-              </Button>
-            </div>
-            <table className="w-full text-sm border">
-              <thead>
-                <tr className="bg-muted text-muted-foreground">
-                  <th className="text-left p-2">Name</th>
-                  <th className="text-left p-2">Status</th>
-                  <th className="text-left p-2">Order</th>
-                  <th className="text-left p-2">Due Date</th>
-                  <th className="text-left p-2">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {project.milestones.map((milestone) => (
-                  <tr key={milestone.id} className="border-t">
-                    <td className="p-2">
-                      <Link href={`/milestones/${milestone.id}`}>
-                        {milestone.name}
-                      </Link>
-                    </td>
-                    <td className="p-2">{translate(milestone.status)}</td>
-                    <td className="p-2">{milestone.order}</td>
-                    <td className="p-2">{formatDate(milestone.dueDate)}</td>
-                    <td className="p-2 flex gap-2">
-                      <Link
-                        href={`/projects/${projectId}/milestones/${milestone.id}/edit?returnTo=project:milestones`}
-                        className="text-forground"
-                      >
-                        <Pencil className="w-4 h-4 hover:text-primary" />
-                      </Link>
-                      <button
-                        onClick={() => {
-                          setDeleteInfo({ type: "milestone", item: milestone });
-                        }}
-                      >
-                        <Trash2 className="w-4 h-4 hover:text-destructive" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
           </div>
         </TabsContent>
         <TabsContent value="costs">
