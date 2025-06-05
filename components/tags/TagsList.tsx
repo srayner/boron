@@ -11,7 +11,7 @@ export function TagsList({ tags }: TagsListProps) {
       {tags.map((tag) => (
         <span
           key={tag.id}
-          className="inline-block bg-blue-500 text-primary-foreground text-sm px-3 pt-0.5 pb-1.5 rounded-full mr-2 mb-4"
+          className="inline-block bg-blue-500 text-primary-foreground text-sm leading-tight px-3 pt-[3px] pb-[5px] rounded-full mr-2 mb-4"
           style={{ lineHeight: 1 }}
         >
           {tag.name}
