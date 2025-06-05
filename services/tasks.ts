@@ -111,25 +111,35 @@ export const getTask = async (id: string) => {
 
 export async function getTasks(params: {
   search: string;
+  dueDateFilter?: "with" | "without";
   pagination: { take: number; skip: number };
   ordering: { [key: string]: "asc" | "desc" };
 }) {
-  return prisma.task.findMany({
-    include: {
-      project: true,
-      subTasks: true,
-      costs: true,
-      milestone: true,
-    },
-    where: {
-      name: {
-        contains: params.search,
+  const where = {
+    name: { contains: params.search },
+    ...(params.dueDateFilter === "with" && { dueDate: { not: null } }),
+    ...(params.dueDateFilter === "without" && { dueDate: null }),
+  };
+
+  const [tasks, totalCount] = await Promise.all([
+    prisma.task.findMany({
+      include: {
+        project: true,
+        subTasks: true,
+        costs: true,
+        milestone: true,
       },
-    },
-    orderBy: params.ordering,
-    take: params.pagination.take,
-    skip: params.pagination.skip,
-  });
+      where,
+      orderBy: params.ordering,
+      take: params.pagination.take,
+      skip: params.pagination.skip,
+    }),
+    prisma.task.count({
+      where,
+    }),
+  ]);
+
+  return { tasks, totalCount };
 }
 
 function calculateProgress(update: Task): number {

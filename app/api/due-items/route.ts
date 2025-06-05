@@ -4,7 +4,8 @@ import { parseQueryParams } from "@/lib/api/query";
 import { getDueItems } from "@/services/due-items";
 
 export const GET = withErrorHandling(async (req: NextRequest) => {
-  const { search, pagination, ordering } = parseQueryParams(req);
+  const url = new URL(req.url);
+  const { search, pagination, ordering } = parseQueryParams(url);
   const data = await getDueItems({ search, pagination, ordering });
 
   return data;

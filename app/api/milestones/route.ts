@@ -4,7 +4,8 @@ import { parseQueryParams } from "@/lib/api/query";
 import { createMilestone, getMilestones } from "@/services/milestones";
 
 export const GET = withErrorHandling(async (req: NextRequest) => {
-  const { search, pagination, ordering } = parseQueryParams(req);
+  const url = new URL(req.url);
+  const { search, pagination, ordering } = parseQueryParams(url);
   const projectId = req.nextUrl.searchParams.get("projectId") ?? undefined;
   const milestones = await getMilestones({
     search,

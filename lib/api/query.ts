@@ -1,6 +1,4 @@
-export function parseQueryParams(req: Request) {
-  const url = new URL(req.url);
-
+export function parseQueryParams(url: URL) {
   const search = url.searchParams.get("search") || "";
   const orderBy = url.searchParams.get("orderBy") || "createdAt";
   const orderDir = url.searchParams.get("orderDir") === "desc" ? "desc" : "asc";

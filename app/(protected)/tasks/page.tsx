@@ -29,9 +29,16 @@ const TasksListPage: NextPage = () => {
 
   const fetchTasks = async () => {
     try {
-      const res = await fetch(
-        `/api/tasks?limit=${limit}&skip=${skip}&orderBy=dueDate&orderDir=desc&search=${search}`
-      );
+      const params = new URLSearchParams({
+        limit: String(limit),
+        skip: String(skip),
+        orderBy: "dueDate",
+        orderDir: "desc",
+        search,
+      });
+      console.log("isDue", isDue);
+      if (isDue === true) params.set("dueDateFilter", "with");
+      const res = await fetch(`/api/tasks?${params.toString()}`);
       if (!res.ok) throw new Error("Failed to fetch tasks");
       const { tasks, totalCount } = await res.json();
       setTasks(tasks);
@@ -43,7 +50,7 @@ const TasksListPage: NextPage = () => {
 
   useEffect(() => {
     fetchTasks();
-  }, [page, search]);
+  }, [page, search, searchParams.toString()]);
 
   return (
     <div className="max-w-4xl mx-auto p-4">
