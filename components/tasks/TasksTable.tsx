@@ -9,9 +9,15 @@ type TaskTableProps = {
   tasks: Task[];
   onDelete: (info: DeleteInfo) => void;
   returnTo: string;
+  emptyMessage?: string;
 };
 
-const TasksTable = ({ tasks, onDelete, returnTo }: TaskTableProps) => {
+const TasksTable = ({
+  tasks,
+  onDelete,
+  returnTo,
+  emptyMessage = "No tasks exist yet.",
+}: TaskTableProps) => {
   return (
     <table className="w-full text-sm border">
       <thead>
@@ -41,7 +47,7 @@ const TasksTable = ({ tasks, onDelete, returnTo }: TaskTableProps) => {
             <td className="p-2">{translate(task.milestone?.name || "")}</td>
             <td className="p-2">{formatDate(task.startDate)}</td>
             <td className="p-2">{formatDate(task.dueDate)}</td>
-            <td className="p2">
+            <td className="p-2">
               <div className="flex gap-2">
                 <Link
                   href={`/projects/${task.projectId}/tasks/${task.id}/edit?returnTo=${returnTo}`}
@@ -62,8 +68,8 @@ const TasksTable = ({ tasks, onDelete, returnTo }: TaskTableProps) => {
         ))}
         {tasks.length === 0 && (
           <tr>
-            <td colSpan={5} className="text-center text-muted-foreground py-4">
-              No tasks exist yet.
+            <td colSpan={8} className="text-center text-muted-foreground py-4">
+              {emptyMessage}
             </td>
           </tr>
         )}

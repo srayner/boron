@@ -30,7 +30,7 @@ const PaginationControls = ({
   };
 
   return (
-    <Pagination>
+    <Pagination className="mt-4">
       <PaginationContent>
         <PaginationItem>
           <PaginationPrevious
