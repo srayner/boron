@@ -134,9 +134,7 @@ export async function getTasks(params: {
       take: params.pagination.take,
       skip: params.pagination.skip,
     }),
-    prisma.task.count({
-      where,
-    }),
+    prisma.task.count({ where }),
   ]);
 
   return { tasks, totalCount };

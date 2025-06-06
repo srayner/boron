@@ -9,9 +9,15 @@ type Props = {
   milestones: Milestone[];
   onDelete: (info: DeleteInfo) => void;
   returnTo: string;
+  emptyMessage?: string;
 };
 
-const MilestonesTable = ({ milestones, onDelete, returnTo }: Props) => {
+const MilestonesTable = ({
+  milestones,
+  onDelete,
+  returnTo,
+  emptyMessage = "No milestones exist yet.",
+}: Props) => {
   return (
     <table className="w-full text-sm border">
       <thead>
@@ -56,6 +62,13 @@ const MilestonesTable = ({ milestones, onDelete, returnTo }: Props) => {
             </td>
           </tr>
         ))}
+        {milestones.length === 0 && (
+          <tr>
+            <td colSpan={6} className="text-center text-muted-foreground py-4">
+              {emptyMessage}
+            </td>
+          </tr>
+        )}
       </tbody>
     </table>
   );

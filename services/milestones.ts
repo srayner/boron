@@ -72,36 +72,44 @@ export const getMilestone = async (id: string) => {
 
 export async function getMilestones(params: {
   search: string;
-  pagination: { take: number; skip: number };
-  ordering: { [key: string]: "asc" | "desc" };
   projectId?: string;
   statuses?: MilestoneStatus[];
   dueDate?: { lt?: Date; gt?: Date };
+  dueDateFilter?: "with" | "without";
+  pagination: { take: number; skip: number };
+  ordering: { [key: string]: "asc" | "desc" };
 }) {
-  return prisma.milestone.findMany({
-    include: {
-      project: true,
-      tasks: true,
-    },
-    where: {
-      name: {
-        contains: params.search,
+  const where = {
+    name: { contains: params.search },
+    ...(params.projectId && { projectId: params.projectId }),
+    ...(params.statuses && { status: { in: params.statuses } }),
+    ...(params.dueDate && { dueDate: params.dueDate }),
+    ...(params.dueDateFilter === "with" && { dueDate: { not: null } }),
+    ...(params.dueDateFilter === "without" && { dueDate: null }),
+  };
+
+  const [milestones, totalCount] = await Promise.all([
+    prisma.milestone.findMany({
+      include: {
+        project: true,
+        tasks: true,
       },
-      ...(params.projectId && { projectId: params.projectId }),
-      ...(params.statuses && { status: { in: params.statuses } }),
-      ...(params.dueDate && { dueDate: params.dueDate }),
-    },
-    orderBy: params.ordering,
-    take: params.pagination.take,
-    skip: params.pagination.skip,
-  });
+      where,
+      orderBy: params.ordering,
+      take: params.pagination.take,
+      skip: params.pagination.skip,
+    }),
+    prisma.task.count({ where }),
+  ]);
+
+  return { milestones, totalCount };
 }
 
 export async function getSummary() {
   const openStatuses: MilestoneStatus[] = ["PLANNED", "IN_PROGRESS", "ON_HOLD"];
   const now = new Date();
 
-  const milestones = await getMilestones({
+  const { milestones } = await getMilestones({
     search: "",
     pagination: { take: 5, skip: 0 },
     ordering: { dueDate: "asc" },

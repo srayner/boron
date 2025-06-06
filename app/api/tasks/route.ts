@@ -1,8 +1,8 @@
 import { NextRequest } from "next/server";
 import { withErrorHandling } from "@/lib/api/handler";
 import { parseQueryParams } from "@/lib/api/query";
-import { createTask, getTasks } from "@/services/tasks";
 import { parseEnumParam } from "@/lib/api/params";
+import { createTask, getTasks } from "@/services/tasks";
 
 export const GET = withErrorHandling(async (req: NextRequest) => {
   const url = new URL(req.url);

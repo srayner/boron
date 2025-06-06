@@ -1,16 +1,16 @@
 "use client";
 
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { Separator } from "@/components/ui/separator";
-import { Flag } from "lucide-react";
 import { NextPage } from "next";
-import TasksTable from "@/components/tasks/TasksTable";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Task } from "@/types/entities";
-import PaginationControls from "@/components/ui/PaginationControls";
-import SearchInput from "@/components/ui/SearchInput";
-import { useDeleteEntity } from "@/hooks/useDeleteEntity";
+import { Separator } from "@/components/ui/separator";
+import { CheckSquare } from "lucide-react";
 import { ConfirmationModal } from "@/components/ui/confirmation-modal";
+import SearchInput from "@/components/ui/SearchInput";
+import TasksTable from "@/components/tasks/TasksTable";
+import PaginationControls from "@/components/ui/PaginationControls";
+import { useDeleteEntity } from "@/hooks/useDeleteEntity";
+import { Task } from "@/types/entities";
 
 const TasksListPage: NextPage = () => {
   const router = useRouter();
@@ -39,7 +39,6 @@ const TasksListPage: NextPage = () => {
         orderDir: "desc",
         search,
       });
-      console.log("isDue", isDue);
       if (isDue === true) params.set("dueDateFilter", "with");
       const res = await fetch(`/api/tasks?${params.toString()}`);
       if (!res.ok) throw new Error("Failed to fetch tasks");
@@ -65,7 +64,7 @@ const TasksListPage: NextPage = () => {
       <div className="flex items-end justify-between">
         {/* Left side*/}
         <div className="flex items-center gap-4">
-          <Flag className="h-12 w-12 text-primary" />
+          <CheckSquare className="h-12 w-12 text-primary" />
           <div className="flex flex-col">
             <h1 className="text-2xl font-semibold text-primary">
               {headerText}
