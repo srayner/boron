@@ -46,7 +46,7 @@ const CostsTable = ({ costs, onDelete, returnTo }: CostTableProps) => {
                     type: "cost",
                     item: {
                       ...cost,
-                      name: `${cost.type} - $${cost.amount}`,
+                      name: `${cost.type} - ${formatCurrency(cost.amount)}`,
                     },
                   });
                 }}

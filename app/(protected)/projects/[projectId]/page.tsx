@@ -11,8 +11,6 @@ import { Separator } from "@/components/ui/separator";
 import {
   CalendarIcon,
   PoundSterlingIcon,
-  PencilIcon,
-  Trash2Icon,
   CircleGaugeIcon,
   InfoIcon,
   Pencil,
@@ -134,7 +132,7 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
             }
             className="flex items-center"
           >
-            <PencilIcon className="w-4 h-4 mr-1" /> Edit
+            <Pencil className="w-4 h-4 mr-1" /> Edit
           </Button>
           <Button
             variant="destructive"
@@ -142,7 +140,7 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
             onClick={() => setDeleteInfo({ type: "project", item: project })}
             className="flex items-center"
           >
-            <Trash2Icon className="w-4 h-4 mr-1" /> Delete
+            <Trash2 className="w-4 h-4 mr-1" /> Delete
           </Button>
         </div>
       </div>
