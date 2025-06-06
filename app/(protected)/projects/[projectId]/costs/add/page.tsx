@@ -73,13 +73,11 @@ const ProjectCostAddPage: NextPage<ProjectCostAddPageProps> = ({ params }) => {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
     const payload = {
       projectId,
       ...values,
       date: values.date ? values.date.toISOString() : null,
     };
-    console.log(payload);
     try {
       const response = await fetch("/api/costs", {
         method: "POST",
