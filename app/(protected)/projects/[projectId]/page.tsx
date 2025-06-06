@@ -30,6 +30,7 @@ import MilestonesTable from "@/components/milestones/MilestonesTable";
 import TasksTable from "@/components/tasks/TasksTable";
 import { DeleteInfo, DeletableType } from "@/types/ui";
 import { ProgressBar } from "@/components/ui/ProgressBar";
+import CostsTable from "@/components/costs/CostsTable";
 
 type ProjectPageProps = {
   params: Promise<{ projectId: string }>;
@@ -281,52 +282,11 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
                 </Link>
               </Button>
             </div>
-            <table className="w-full text-sm border">
-              <thead>
-                <tr className="bg-muted text-muted-foreground">
-                  <th className="text-left p-2">Date</th>
-                  <th className="text-left p-2">Amount</th>
-                  <th className="text-left p-2">Type</th>
-                  <th className="text-left p-2">Note</th>
-                  <th className="text-left p-2">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {project.costs.map((cost) => (
-                  <tr key={cost.id} className="border-t">
-                    <td className="p-2">{formatDate(cost.date)}</td>
-                    <td className="p-2">
-                      <Link className="text-primary" href={`/costs/${cost.id}`}>
-                        {formatCurrency(cost.amount)}
-                      </Link>
-                    </td>
-                    <td className="p-2">{translate(cost.type)}</td>
-                    <td className="p-2">{cost.note}</td>
-                    <td className="p-2 flex gap-2">
-                      <Link
-                        href={`/projects/${projectId}/costs/${cost.id}/edit?returnTo=project:costs`}
-                        className="text-forground"
-                      >
-                        <Pencil className="w-4 h-4 hover:text-primary" />
-                      </Link>
-                      <button
-                        onClick={() => {
-                          setDeleteInfo({
-                            type: "cost",
-                            item: {
-                              ...cost,
-                              name: `${cost.type} - $${cost.amount}`,
-                            },
-                          });
-                        }}
-                      >
-                        <Trash2 className="w-4 h-4 hover:text-destructive" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <CostsTable
+              costs={project.costs}
+              onDelete={setDeleteInfo}
+              returnTo="project:costs"
+            />
           </div>
         </TabsContent>
         <TabsContent value="relationships">

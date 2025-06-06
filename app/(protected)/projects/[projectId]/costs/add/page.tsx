@@ -28,6 +28,8 @@ import {
 import { DatePickerField } from "@/components/ui/form/date-picker-field";
 import { NextPage } from "next";
 import { TagField } from "@/components/ui/form/TagField";
+import { TextField } from "@/components/ui/form/TextField";
+import { TextAreaField } from "@/components/ui/form/TextAreaField";
 
 type ProjectCostAddPageProps = {
   params: Promise<{ projectId: string }>;
@@ -40,6 +42,8 @@ const ProjectCostAddPage: NextPage<ProjectCostAddPageProps> = ({ params }) => {
   const { projectId } = React.use(params);
 
   const formSchema = z.object({
+    name: z.string().max(80).optional(),
+    description: z.string().max(250).optional(),
     amount: z.coerce.number().min(0),
     type: z.enum([
       "PARTS",
@@ -50,7 +54,7 @@ const ProjectCostAddPage: NextPage<ProjectCostAddPageProps> = ({ params }) => {
       "TRAVEL",
       "MISC",
     ]),
-    note: z.string().max(250).optional(),
+
     date: z.coerce.date().optional(),
     taskId: z.string().optional(),
     tags: z.string().nullable(),
@@ -59,20 +63,23 @@ const ProjectCostAddPage: NextPage<ProjectCostAddPageProps> = ({ params }) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      name: "",
+      description: "",
       amount: undefined,
       type: "PARTS",
-      note: "",
       date: undefined,
       tags: null,
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log(values);
     const payload = {
       projectId,
       ...values,
       date: values.date ? values.date.toISOString() : null,
     };
+    console.log(payload);
     try {
       const response = await fetch("/api/costs", {
         method: "POST",
@@ -99,6 +106,31 @@ const ProjectCostAddPage: NextPage<ProjectCostAddPageProps> = ({ params }) => {
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <TextField
+                field={field}
+                label="Name"
+                placeholder="Enter your name"
+              />
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <TextAreaField
+                field={field}
+                label="Description"
+                description="A brief description of what your task involves."
+                className="h-32"
+              />
+            )}
+          />
+
           <FormField
             control={form.control}
             name="amount"
@@ -144,27 +176,6 @@ const ProjectCostAddPage: NextPage<ProjectCostAddPageProps> = ({ params }) => {
                     </SelectContent>
                   </Select>
                 </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="note"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Note</FormLabel>
-                <FormControl>
-                  <Textarea
-                    className="h-32"
-                    {...field}
-                    value={field.value ?? ""}
-                  />
-                </FormControl>
-                <FormDescription>
-                  A brief note of what this cost is for.
-                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}

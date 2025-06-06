@@ -6,9 +6,8 @@ import { createCost, getCosts } from "@/services/costs";
 export const GET = withErrorHandling(async (req: NextRequest) => {
   const url = new URL(req.url);
   const { search, pagination, ordering } = parseQueryParams(url);
-  const costs = await getCosts({ search, pagination, ordering });
 
-  return { costs };
+  return await getCosts({ search, pagination, ordering });
 });
 
 export const POST = withErrorHandling(async (req: NextRequest) => {

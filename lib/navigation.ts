@@ -37,5 +37,7 @@ export function getReturnUrl(
   ctx: ReturnContext
 ): string {
   const key = returnTo as ReturnTarget;
+  console.log(returnTo);
+  console.log(returnMap[key]?.(ctx) ?? "/dashboard");
   return returnMap[key]?.(ctx) ?? "/dashboard";
 }

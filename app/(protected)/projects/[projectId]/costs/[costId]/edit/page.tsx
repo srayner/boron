@@ -2,7 +2,7 @@
 
 import { NextPage } from "next";
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useRecentProjects } from "@/app/context/recent-projects-context";
@@ -30,6 +30,9 @@ import { DatePickerField } from "@/components/ui/form/date-picker-field";
 import Link from "next/link";
 import { TagField } from "@/components/ui/form/TagField";
 import { Cost } from "@/types/entities";
+import { TextAreaField } from "@/components/ui/form/TextAreaField";
+import { TextField } from "@/components/ui/form/TextField";
+import { getReturnUrl } from "@/lib/navigation";
 
 type ProjectCostEditPageProps = {
   params: Promise<{ projectId: string; costId: string }>;
@@ -39,11 +42,16 @@ const ProjectCostEditPage: NextPage<ProjectCostEditPageProps> = ({
   params,
 }) => {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnTo = searchParams.get("returnTo") ?? "";
   const { refreshRecentProjects } = useRecentProjects();
   const { projectId, costId } = React.use(params);
+  const [originalCost, setOriginalCost] = useState<Cost | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const formSchema = z.object({
+    name: z.string().max(250).optional(),
+    description: z.string().max(250).optional(),
     amount: z.coerce.number().min(0),
     type: z.enum([
       "PARTS",
@@ -54,7 +62,7 @@ const ProjectCostEditPage: NextPage<ProjectCostEditPageProps> = ({
       "TRAVEL",
       "MISC",
     ]),
-    note: z.string().max(250).optional(),
+
     date: z.coerce.date().optional(),
     tags: z.string().nullable(),
   });
@@ -64,7 +72,8 @@ const ProjectCostEditPage: NextPage<ProjectCostEditPageProps> = ({
     defaultValues: {
       amount: undefined,
       type: "PARTS",
-      note: "",
+      name: "",
+      description: "",
       date: undefined,
       tags: null,
     },
@@ -90,7 +99,12 @@ const ProjectCostEditPage: NextPage<ProjectCostEditPageProps> = ({
       }
 
       refreshRecentProjects();
-      router.push(`/projects/${projectId}?tab=costs`);
+      router.push(
+        getReturnUrl(returnTo, {
+          projectId: originalCost?.projectId,
+          costId,
+        })
+      );
     } catch (error) {
       console.error("Error updating cost:", error);
     }
@@ -111,10 +125,13 @@ const ProjectCostEditPage: NextPage<ProjectCostEditPageProps> = ({
           cost: Cost;
         };
 
+        setOriginalCost(cost);
+
         const formData = {
           amount: cost.amount,
           type: cost.type,
-          note: cost.note,
+          name: cost.name,
+          description: cost.description,
           date: cost.date ? new Date(cost.date) : undefined,
           tags: cost.tags.map((t) => t.name).join(", "),
         };
@@ -133,10 +150,35 @@ const ProjectCostEditPage: NextPage<ProjectCostEditPageProps> = ({
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-orange-700">Edit Milestone</h1>
+      <h1 className="text-2xl font-semibold text-orange-700">Edit Cost</h1>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <TextField
+                field={field}
+                label="Name"
+                placeholder="Enter your name"
+              />
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <TextAreaField
+                field={field}
+                label="Description"
+                description="A brief description of what your task involves."
+                className="h-32"
+              />
+            )}
+          />
+
           <FormField
             control={form.control}
             name="amount"
@@ -189,27 +231,6 @@ const ProjectCostEditPage: NextPage<ProjectCostEditPageProps> = ({
 
           <FormField
             control={form.control}
-            name="note"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Note</FormLabel>
-                <FormControl>
-                  <Textarea
-                    className="h-32"
-                    {...field}
-                    value={field.value ?? ""}
-                  />
-                </FormControl>
-                <FormDescription>
-                  A brief note of what this cost is for.
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
             name="date"
             render={({ field }) => (
               <DatePickerField field={field} label="Date" />
@@ -225,7 +246,14 @@ const ProjectCostEditPage: NextPage<ProjectCostEditPageProps> = ({
           <div className="flex gap-x-2">
             <Button type="submit">Save</Button>
             <Button asChild type="button" variant="outline">
-              <Link href={`/projects/${projectId}?tab=costs`}>Cancel</Link>
+              <Link
+                href={getReturnUrl(returnTo, {
+                  projectId: originalCost?.projectId,
+                  costId,
+                })}
+              >
+                Cancel
+              </Link>
             </Button>
           </div>
         </form>

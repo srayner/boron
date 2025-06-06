@@ -15,7 +15,8 @@ const CostSchema = z.object({
     "TRAVEL",
     "MISC",
   ]),
-  note: z.string().max(250).optional(),
+  name: z.string().max(80).optional(),
+  description: z.string().max(2000).optional(),
   date: z.coerce.date().optional(),
   projectId: z.string().min(1),
   taskId: z.string().optional(),
@@ -58,7 +59,8 @@ export const createCost = async (data: any) => {
     data: {
       amount: validated.amount,
       type: validated.type,
-      note: validated.note,
+      name: validated.name,
+      description: validated.description,
       date: validated.date,
       projectId: validated.projectId,
       taskId: validated.taskId,
@@ -91,7 +93,8 @@ export const updateCost = async (id: string, data: any) => {
     data: {
       amount: validated.amount,
       type: validated.type,
-      note: validated.note,
+      name: validated.name,
+      description: validated.description,
       date: validated.date,
       projectId: validated.projectId,
       taskId: validated.taskId,
@@ -120,18 +123,23 @@ export async function getCosts(params: {
   pagination: { take: number; skip: number };
   ordering: { [key: string]: "asc" | "desc" };
 }) {
-  return prisma.cost.findMany({
-    include: {
-      project: true,
-      task: true,
-    },
-    where: {
-      note: {
-        contains: params.search,
+  const where = {
+    ...(params.search && { name: { contains: params.search } }),
+  };
+
+  const [costs, totalCount] = await Promise.all([
+    prisma.cost.findMany({
+      include: {
+        project: true,
+        task: true,
       },
-    },
-    orderBy: params.ordering,
-    take: params.pagination.take,
-    skip: params.pagination.skip,
-  });
+      where,
+      orderBy: params.ordering,
+      take: params.pagination.take,
+      skip: params.pagination.skip,
+    }),
+    prisma.task.count({ where }),
+  ]);
+
+  return { costs, totalCount };
 }

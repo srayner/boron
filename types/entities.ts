@@ -51,7 +51,8 @@ export interface Cost {
   id: string;
   amount: number;
   type: CostType;
-  note: string;
+  name?: string;
+  description?: string;
   date: string;
   projectId: string;
   project: Project;

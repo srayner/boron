@@ -1,13 +1,16 @@
 "use client";
 
-import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { Separator } from "@/components/ui/separator";
-import { Flag } from "lucide-react";
 import { NextPage } from "next";
-import CostsTable from "@/components/costs/CostsTable";
-import { Cost } from "@/types/entities";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Separator } from "@/components/ui/separator";
+import { PoundSterling } from "lucide-react";
+import { ConfirmationModal } from "@/components/ui/confirmation-modal";
+import SearchInput from "@/components/ui/SearchInput";
+import CostsTable from "@/components/costs/CostsTable";
 import PaginationControls from "@/components/ui/PaginationControls";
+import { useDeleteEntity } from "@/hooks/useDeleteEntity";
+import { Cost } from "@/types/entities";
 
 const CostsListPage: NextPage = () => {
   const router = useRouter();
@@ -19,7 +22,7 @@ const CostsListPage: NextPage = () => {
   const [page, setPage] = useState<number>(initialPage);
 
   const initialSearch = searchParams.get("search") ?? "";
-  const [search] = useState(initialSearch);
+  const [search, setSearch] = useState(initialSearch);
 
   const limit = 10;
   const skip = (page - 1) * limit;
@@ -28,9 +31,14 @@ const CostsListPage: NextPage = () => {
 
   const fetchTasks = async () => {
     try {
-      const res = await fetch(
-        `/api/costs?limit=${limit}&skip=${skip}&orderBy=date&orderDir=desc&search=${search}`
-      );
+      const params = new URLSearchParams({
+        limit: String(limit),
+        skip: String(skip),
+        orderBy: "date",
+        orderDir: "asc",
+        search,
+      });
+      const res = await fetch(`/api/costs?${params.toString()}`);
       if (!res.ok) throw new Error("Failed to fetch costs");
       const { costs, totalCount } = await res.json();
       setCosts(costs);
@@ -42,7 +50,11 @@ const CostsListPage: NextPage = () => {
 
   useEffect(() => {
     fetchTasks();
-  }, [page, search]);
+  }, [page, search, searchParams.toString()]);
+
+  const { deleteInfo, setDeleteInfo, handleConfirmDelete } = useDeleteEntity({
+    refresh: fetchTasks,
+  });
 
   return (
     <div className="max-w-4xl mx-auto p-4">
@@ -50,7 +62,7 @@ const CostsListPage: NextPage = () => {
       <div className="flex items-end justify-between">
         {/* Left side*/}
         <div className="flex items-center gap-4">
-          <Flag className="h-12 w-12 text-primary" />
+          <PoundSterling className="h-12 w-12 text-primary" />
           <div className="flex flex-col">
             <h1 className="text-2xl font-semibold text-primary">
               {headerText}
@@ -58,11 +70,28 @@ const CostsListPage: NextPage = () => {
             <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground"></div>
           </div>
         </div>
+        {/* Right side */}
+        <div className="flex items-center gap-2">
+          <SearchInput
+            search={search}
+            placeholder={`Search ${headerText}...`}
+            onSearchChange={(value) => {
+              setSearch(value);
+              const params = new URLSearchParams(searchParams.toString());
+              params.set("search", value);
+              params.set("page", "1"); // reset to first page on search
+              router.replace(`${pathname}?${params.toString()}`, {
+                scroll: false,
+              });
+              setPage(1);
+            }}
+          />
+        </div>
       </div>
 
       <Separator className="my-3" />
 
-      <CostsTable costs={costs} onDelete={() => {}} returnTo="costs" />
+      <CostsTable costs={costs} onDelete={setDeleteInfo} returnTo="costs" />
 
       <PaginationControls
         currentPage={page}
@@ -74,6 +103,14 @@ const CostsListPage: NextPage = () => {
           params.set("page", newPage.toString());
           router.replace(`${pathname}?${params.toString()}`, { scroll: false });
         }}
+      />
+
+      <ConfirmationModal
+        open={!!deleteInfo}
+        title={`Delete ${deleteInfo?.type ?? ""}`}
+        message={`Are you sure you want to delete ${deleteInfo?.type}: ${deleteInfo?.item.name}?`}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setDeleteInfo(null)}
       />
     </div>
   );
