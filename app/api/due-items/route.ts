@@ -6,6 +6,7 @@ import { getDueItems } from "@/services/due-items";
 export const GET = withErrorHandling(async (req: NextRequest) => {
   const url = new URL(req.url);
   const { search, pagination, ordering } = parseQueryParams(url);
+  console.log(ordering);
   const data = await getDueItems({ search, pagination, ordering });
 
   return data;

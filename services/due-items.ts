@@ -21,7 +21,23 @@ export async function getDueItems(params: {
   const { take, skip } = params.pagination;
   const like = `%${params.search}%`;
 
-  // Count query: count total rows from union
+  // Whitelist allowed fields and directions
+  const allowedOrderFields = ["dueDate", "name"];
+  const allowedDirections = ["asc", "desc"];
+
+  const [orderByField, orderDirection] = Object.entries(params.ordering)[0] ?? [
+    "dueDate",
+    "asc",
+  ];
+
+  const safeOrderBy = allowedOrderFields.includes(orderByField)
+    ? orderByField
+    : "dueDate";
+  const safeOrderDir = allowedDirections.includes(orderDirection.toLowerCase())
+    ? orderDirection.toUpperCase()
+    : "ASC";
+
+  // Count total items
   const countResult = await prisma.$queryRaw<{ count: bigint }[]>`
     SELECT COUNT(*) AS count FROM (
       SELECT id FROM Project WHERE dueDate IS NOT NULL AND name LIKE ${like}
@@ -34,18 +50,28 @@ export async function getDueItems(params: {
 
   const totalCount = Number(countResult[0]?.count ?? 0);
 
-  const dueItems = await prisma.$queryRaw<DueItem[]>`
+  // Build dynamic SQL query string with injected ORDER BY
+  const sql = `
     SELECT * FROM (
-      SELECT id, 'Project' AS type, name, description, dueDate, updatedAt FROM Project WHERE dueDate IS NOT NULL AND name LIKE ${like}
+      SELECT id, 'Project' AS type, name, description, dueDate, updatedAt FROM Project WHERE dueDate IS NOT NULL AND name LIKE ?
       UNION ALL
-      SELECT id, 'Milestone' AS type, name, description, dueDate, updatedAt FROM Milestone WHERE dueDate IS NOT NULL AND name LIKE ${like}
+      SELECT id, 'Milestone' AS type, name, description, dueDate, updatedAt FROM Milestone WHERE dueDate IS NOT NULL AND name LIKE ?
       UNION ALL
-      SELECT id, 'Task' AS type, name, description, dueDate, updatedAt FROM Task WHERE dueDate IS NOT NULL AND name LIKE ${like}
+      SELECT id, 'Task' AS type, name, description, dueDate, updatedAt FROM Task WHERE dueDate IS NOT NULL AND name LIKE ?
     ) AS all_due_items
-    ORDER BY dueDate DESC
-    LIMIT ${take}
-    OFFSET ${skip}
+    ORDER BY ${safeOrderBy} ${safeOrderDir}
+    LIMIT ?
+    OFFSET ?
   `;
+
+  const dueItems = await prisma.$queryRawUnsafe(
+    sql,
+    like,
+    like,
+    like,
+    take,
+    skip
+  );
 
   return { dueItems, totalCount };
 }

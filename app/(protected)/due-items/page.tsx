@@ -38,7 +38,7 @@ export default function DueItemsPage() {
   const fetchDueItems = async () => {
     try {
       const res = await fetch(
-        `/api/due-items?limit=${limit}&skip=${skip}&orderBy=dueDate&orderDir=desc&search=${search}`
+        `/api/due-items?limit=${limit}&skip=${skip}&orderBy=dueDate&orderDir=asc&search=${search}`
       );
       if (!res.ok) throw new Error("Failed to fetch due items");
       const { dueItems, totalCount } = await res.json();
