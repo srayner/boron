@@ -9,33 +9,36 @@ import {
   DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-const typeNames: Record<string, string> = {
-  ALL: "All",
-  PROJECT: "Project",
-  AUTOMATION: "Milestone",
-  DESIGN: "Task",
+const sortNames: Record<string, string> = {
+  dueDate: "Due Date",
+  name: "Name",
 };
 
 type DueItemsListHeaderProps = {
   search: string;
   onSearchChange: (value: string) => void;
+  sort: string;
+  onSortChange: (value: string) => void;
 };
 
 const DueItemsListHeader: React.FC<DueItemsListHeaderProps> = ({
   search,
   onSearchChange,
+  sort,
+  onSortChange,
 }) => {
-  const [selectedType, setSelectedType] = useState<string>("ALL");
   const [selectedSort, setSelectedSort] = useState<string>("name");
 
-  const onSelectType = (newSelectedType: string) => {
-    setSelectedType(newSelectedType);
-  };
+  // Sync local state when props change
+  useEffect(() => {
+    setSelectedSort(sort);
+  }, [sort]);
 
   const onSelectSort = (newSelectedSort: string) => {
     setSelectedSort(newSelectedSort);
+    onSortChange(newSelectedSort);
   };
 
   return (
@@ -51,27 +54,6 @@ const DueItemsListHeader: React.FC<DueItemsListHeaderProps> = ({
 
       {/* Right side: Controls */}
       <div className="flex gap-2 flex-wrap">
-        {/* Type Filter */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline">
-              Type
-              <ChevronDown />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            {Object.entries(typeNames).map(([key, label]) => (
-              <DropdownMenuCheckboxItem
-                key={key}
-                checked={selectedType === key}
-                onCheckedChange={() => onSelectType(key)}
-              >
-                {label}
-              </DropdownMenuCheckboxItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-
         {/* Sort Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -81,20 +63,15 @@ const DueItemsListHeader: React.FC<DueItemsListHeaderProps> = ({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuCheckboxItem
-              checked={selectedSort === "name"}
-              onCheckedChange={() => onSelectSort("name")}
-            >
-              Name
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem
-              checked={selectedSort === "updatedAt"}
-              onCheckedChange={() => onSelectSort("updatedAt")}
-            >
-              Last Updated
-            </DropdownMenuCheckboxItem>
-            {/* Priority can’t be sorted unless it's a separate sortable field */}
-            {/* <DropdownMenuItem>Priority</DropdownMenuItem> */}
+            {Object.entries(sortNames).map(([key, label]) => (
+              <DropdownMenuCheckboxItem
+                key={key}
+                checked={selectedSort === key}
+                onCheckedChange={() => onSelectSort(key)}
+              >
+                {label}
+              </DropdownMenuCheckboxItem>
+            ))}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
