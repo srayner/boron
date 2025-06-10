@@ -19,6 +19,7 @@ RUN npx prisma generate
 RUN npm run build
 
 RUN npm prune --production
+RUN rm -rf /root/.cache/Cypress
 
 # Expose port
 EXPOSE 3000
