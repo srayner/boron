@@ -11,14 +11,12 @@ WORKDIR /app
 COPY . .
 
 # Install dependencies
-RUN npm install
+RUN npm ci --omit=dev
 
 RUN npx prisma generate
 
 # Build the application
 RUN npm run build
-
-RUN npm prune --production
 
 # Expose port
 EXPOSE 3000
