@@ -69,6 +69,9 @@ async function seedProjects() {
             { name: "Delete Manufacturer" },
           ],
         },
+        {
+          name: "Second Milestone",
+        },
       ],
     },
   ];

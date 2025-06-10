@@ -27,6 +27,8 @@ describe("Tests Project CRUD", () => {
   });
 
   it("edits a project", () => {
+    const newType = "Web Application";
+
     cy.contains("a", "New Project").first().click();
     cy.contains("button", "Edit").click();
 
@@ -37,12 +39,12 @@ describe("Tests Project CRUD", () => {
 
     cy.get('[role="listbox"]')
       .should("be.visible")
-      .contains('[role="option"]', "Web Application")
+      .contains('[role="option"]', newType)
       .click();
 
     cy.contains("button", "Submit").click();
 
-    cy.get("dd.text-foreground").contains("Web Application").should("exist");
+    cy.get("dd.text-foreground").contains(newType).should("exist");
   });
 
   it("deletes a project", () => {

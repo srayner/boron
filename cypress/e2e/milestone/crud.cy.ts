@@ -63,5 +63,17 @@ describe("Tests Milesone CRUD", () => {
     // Verify changes
   });
 
-  it("deletes a milestone", () => {});
+  it("deletes a milestone", () => {
+    // Navigate to milestone detail page.
+    cy.contains("a", "Argon - Inventory Management").click();
+    cy.get('[role="tab"]').contains("Milestone").click();
+    cy.contains("a", "Second Milestone").click();
+    cy.url().should("match", /\/milestones\/[a-z0-9]+$/);
+
+    // Click Delete button
+    cy.contains("button", "Delete").click();
+
+    // Confirm by clicking 'Yes' button
+    cy.contains("button", "Yes").click();
+  });
 });
