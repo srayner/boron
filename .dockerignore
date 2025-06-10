@@ -7,4 +7,5 @@ Dockerfile
 .env
 .vscode
 *.log
+cypress
 README.md
