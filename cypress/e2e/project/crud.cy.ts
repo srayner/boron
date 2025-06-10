@@ -1,9 +1,6 @@
 describe("Tests Project CRUD", () => {
   beforeEach(() => {
     cy.login();
-  });
-
-  beforeEach(() => {
     cy.setCookie("sidebar_state", "true");
     cy.visit("/dashboard");
   });

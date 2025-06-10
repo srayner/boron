@@ -67,6 +67,7 @@ async function seedProjects() {
             { name: "List Manufacturers" },
             { name: "Edit Manufacturer" },
             { name: "Delete Manufacturer" },
+            { name: "Task to delete" },
           ],
         },
         {

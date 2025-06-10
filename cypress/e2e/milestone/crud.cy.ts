@@ -1,9 +1,6 @@
 describe("Tests Milesone CRUD", () => {
   beforeEach(() => {
     cy.login();
-  });
-
-  beforeEach(() => {
     cy.setCookie("sidebar_state", "true");
     cy.visit("/dashboard");
   });
@@ -13,7 +10,7 @@ describe("Tests Milesone CRUD", () => {
 
     // Navigate to project 'Milestones' tab.
     cy.contains("a", "Argon - Inventory Management").click();
-    cy.get('[role="tab"]').contains("Milestone").click();
+    cy.get('[role="tab"]').contains("Milestones").click();
 
     // Click 'Create Milestone'
     cy.contains("a", "Create Milestone").click();
@@ -36,7 +33,7 @@ describe("Tests Milesone CRUD", () => {
   it("edits a milestone", () => {
     // Navigate to milestone detail page.
     cy.contains("a", "Argon - Inventory Management").click();
-    cy.get('[role="tab"]').contains("Milestone").click();
+    cy.get('[role="tab"]').contains("Milestones").click();
     cy.contains("a", "Manufacturers CRUD").click();
     cy.url().should("match", /\/milestones\/[a-z0-9]+$/);
 
@@ -66,7 +63,7 @@ describe("Tests Milesone CRUD", () => {
   it("deletes a milestone", () => {
     // Navigate to milestone detail page.
     cy.contains("a", "Argon - Inventory Management").click();
-    cy.get('[role="tab"]').contains("Milestone").click();
+    cy.get('[role="tab"]').contains("Milestones").click();
     cy.contains("a", "Second Milestone").click();
     cy.url().should("match", /\/milestones\/[a-z0-9]+$/);
 

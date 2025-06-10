@@ -204,7 +204,7 @@ const TaskAddPage: NextPage<TaskAddPageProps> = ({ params }) => {
             render={({ field }) => <TagField field={field} label="Tags" />}
           />
 
-          <Button type="submit">Submit</Button>
+          <Button type="submit">Create</Button>
         </form>
       </Form>
     </div>
