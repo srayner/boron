@@ -26,12 +26,12 @@ const CostsTable = ({ costs, onDelete, returnTo }: CostTableProps) => {
         {costs.map((cost) => (
           <tr key={cost.id} className="border-t">
             <td className="p-2">{formatDate(cost.date)}</td>
-            <td className="p-2">{cost.name}</td>
             <td className="p-2">
               <Link className="text-primary" href={`/costs/${cost.id}`}>
-                {formatCurrency(cost.amount)}
+                {cost.name}
               </Link>
             </td>
+            <td className="p-2">{formatCurrency(cost.amount)}</td>
             <td className="p-2">{translate(cost.type)}</td>
             <td className="p-2 flex gap-2">
               <Link
