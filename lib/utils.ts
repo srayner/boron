@@ -33,9 +33,9 @@ export function translate(key: string, options?: { short?: boolean }): string {
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-export function formatDate(date: string): string {
+export function formatDate(date: string, formatStr?: string): string {
   if (!date) return "";
   const parsedDate = new Date(date);
-  if (!isValid(parsedDate)) return "bad date";
-  return format(parsedDate, "dd MMM yyyy");
+  if (!isValid(parsedDate)) return "";
+  return format(parsedDate, formatStr || "dd MMM yyyy");
 }
