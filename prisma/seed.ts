@@ -1,5 +1,9 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { createTask } from "@/services/tasks";
+import { createMilestone } from "@/services/milestones";
+import { createProject } from "@/services/projects";
+import { projects } from "./seedData";
 
 const prisma = new PrismaClient();
 
@@ -54,54 +58,28 @@ async function seedUsers() {
   console.log("Users have been created with hashed passwords!");
 }
 
-async function seedProjects() {
-  const projects = [
-    {
-      name: "Argon - Inventory Management",
-      type: "WEBAPP",
-      milestones: [
-        {
-          name: "Manufacturers CRUD",
-          tasks: [
-            { name: "Create Manufacturer" },
-            { name: "List Manufacturers" },
-            { name: "Edit Manufacturer" },
-            { name: "Delete Manufacturer" },
-            { name: "Task to delete" },
-          ],
-        },
-        {
-          name: "Second Milestone",
-        },
-      ],
-    },
-  ];
-
-  for (const projectData of projects) {
-    const createdProject = await prisma.project.create({
-      data: {
-        name: projectData.name,
-      },
+export async function seedProjects() {
+  for (const project of projects) {
+    const createdProject = await createProject({
+      name: project.name,
+      type: project.type,
     });
-    if (projectData.milestones) {
-      for (const milestoneData of projectData.milestones) {
-        const createdMilestone = await prisma.milestone.create({
-          data: {
-            name: milestoneData.name,
-            projectId: createdProject.id,
-          },
+
+    for (const milestone of project.milestones ?? []) {
+      const createdMilestone = await createMilestone({
+        name: milestone.name,
+        projectId: createdProject.id,
+      });
+
+      for (const task of milestone.tasks ?? []) {
+        await createTask({
+          name: task.name,
+          projectId: createdProject.id,
+          milestoneId: createdMilestone.id,
+          status: task.status ?? "IN_PROGRESS",
+          priority: task.priority ?? "MEDIUM",
+          progress: task.progress ?? 0,
         });
-        if (milestoneData.tasks) {
-          for (const taskData of milestoneData.tasks) {
-            const createdTask = await prisma.task.create({
-              data: {
-                name: taskData.name,
-                projectId: createdProject.id,
-                milestoneId: createdMilestone.id,
-              },
-            });
-          }
-        }
       }
     }
   }

@@ -18,6 +18,11 @@ export const createTask = async (data: any) => {
     throw new AppError("Invalid due date", 422);
   }
 
+  let completedAt = null;
+  if (data.status === "COMPLETED") {
+    completedAt = new Date();
+  }
+
   const tags = data.tags
     ? await processTagsForCreate(data.tags)
     : { connect: [] };
@@ -33,6 +38,7 @@ export const createTask = async (data: any) => {
       milestoneId: data.milestoneId,
       startDate: startDate,
       dueDate: dueDate,
+      completedAt,
       tags,
     },
   });
@@ -59,6 +65,9 @@ export const deleteTask = async (id: string) => {
 };
 
 export const updateTask = async (id: string, data: any) => {
+  const currentTask = await getTask(id);
+  if (!currentTask) throw new AppError("Task not found", 404);
+
   if (!data.name) throw new AppError("Task name is required", 422);
 
   const startDate = data.startDate ? new Date(data.startDate) : null;
@@ -69,6 +78,16 @@ export const updateTask = async (id: string, data: any) => {
   }
   if (dueDate && isNaN(dueDate.getTime())) {
     throw new AppError("Invalid due date", 422);
+  }
+
+  let completedAt = currentTask.completedAt;
+  if (data.status === "COMPLETED" && currentTask.status !== "COMPLETED") {
+    completedAt = new Date();
+  } else if (
+    data.status !== "COMPLETED" &&
+    currentTask.status === "COMPLETED"
+  ) {
+    completedAt = null;
   }
 
   const tags = data.tags ? await processTagsForUpdate(data.tags) : { set: [] };
@@ -84,6 +103,7 @@ export const updateTask = async (id: string, data: any) => {
       milestoneId: data.milestoneId,
       startDate: startDate,
       dueDate: dueDate,
+      completedAt,
       tags,
     },
   });

@@ -23,7 +23,7 @@ import { useRecentProjects } from "@/app/context/recent-projects-context";
 import { DeletableType, DeleteInfo } from "@/types/ui";
 import { ConfirmationModal } from "@/components/ui/confirmation-modal";
 import { Link } from "@/components/ui/link";
-import { formatCurrency, translate } from "@/lib/utils";
+import { formatCurrency, formatDate, translate } from "@/lib/utils";
 import CostsTable from "@/components/costs/CostsTable";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 
@@ -168,6 +168,16 @@ const TaskDetailPage: NextPage<taskPageProps> = ({ params }) => {
                   ? format(new Date(task.dueDate), "dd MMM yyyy")
                   : "No due date"}
               </dd>
+              {task.completedAt && (
+                <>
+                  <dt className="font-medium text-muted-foreground">
+                    Completed at:
+                  </dt>
+                  <dd className="text-foreground">
+                    {formatDate(task.completedAt, "dd MMM yyyy hh:mm")}
+                  </dd>
+                </>
+              )}
             </dl>
           </CardContent>
         </Card>
