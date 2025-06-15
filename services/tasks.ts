@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import { AppError } from "@/lib/api/error";
 import { processTagsForCreate, processTagsForUpdate } from "@/services/tags";
 import { Task } from "@/types/entities";
@@ -158,6 +159,32 @@ export async function getTasks(params: {
   ]);
 
   return { tasks, totalCount };
+}
+
+export async function getCompletedTasksOverTime(
+  groupBy: "day" | "month",
+  startDate: Date,
+  endDate: Date
+) {
+  const format = groupBy === "month" ? "%Y-%m" : "%Y-%m-%d";
+
+  const results = await prisma.$queryRaw<{ date: string; count: bigint }[]>`
+    SELECT
+      DATE_FORMAT(completedAt, ${
+        groupBy === "month" ? "%Y-%m" : "%Y-%m-%d"
+      }) AS date,
+      CAST(COUNT(*) AS UNSIGNED) AS count
+    FROM \`Task\`
+    WHERE completedAt IS NOT NULL
+      AND completedAt BETWEEN ${startDate} AND ${endDate}
+    GROUP BY date
+    ORDER BY date ASC
+  `;
+
+  return results.map((r) => ({
+    date: r.date,
+    count: Number(r.count), // converts BigInt to number
+  }));
 }
 
 function calculateProgress(update: Task): number {

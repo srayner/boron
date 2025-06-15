@@ -39,3 +39,14 @@ export function formatDate(date: string, formatStr?: string): string {
   if (!isValid(parsedDate)) return "";
   return format(parsedDate, formatStr || "dd MMM yyyy");
 }
+
+export function getDateRange(groupBy: "day" | "month") {
+  const endDate = new Date();
+  const startDate = new Date();
+  startDate.setMonth(endDate.getMonth() - (groupBy === "month" ? 6 : 1));
+
+  return {
+    startDate: startDate.toISOString().slice(0, 10),
+    endDate: endDate.toISOString().slice(0, 10),
+  };
+}
