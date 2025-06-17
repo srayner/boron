@@ -204,15 +204,30 @@ export async function getCreatedAndCompletedTasksOverTime(
     getTaskCountOverTime("completedAt", groupBy, startDate, endDate),
   ]);
 
-  const allDates = new Set([...created, ...completed].map((d) => d.date));
+  const allDates = Array.from(
+    new Set([...created, ...completed].map((d) => d.date))
+  ).sort();
 
-  return Array.from(allDates)
-    .sort()
-    .map((date) => ({
-      date,
-      created: created.find((d) => d.date === date)?.count ?? 0,
-      completed: completed.find((d) => d.date === date)?.count ?? 0,
-    }));
+  let current = startDate;
+
+  const result = [];
+  while (current <= endDate) {
+    const dateStr = current.toISOString().slice(0, 10);
+
+    const createdCount = created.find((d) => d.date === dateStr)?.count ?? 0;
+    const completedCount =
+      completed.find((d) => d.date === dateStr)?.count ?? 0;
+
+    result.push({
+      date: dateStr,
+      created: createdCount,
+      completed: completedCount,
+    });
+
+    current.setDate(current.getDate() + 1);
+  }
+
+  return result;
 }
 
 function calculateProgress(update: Task): number {

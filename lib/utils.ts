@@ -40,10 +40,19 @@ export function formatDate(date: string, formatStr?: string): string {
   return format(parsedDate, formatStr || "dd MMM yyyy");
 }
 
-export function getDateRange(groupBy: "day" | "month") {
+export function getDateRange(groupBy: "day" | "month", rangeLength?: number) {
   const endDate = new Date();
   const startDate = new Date();
-  startDate.setMonth(endDate.getMonth() - (groupBy === "month" ? 6 : 1));
+
+  if (rangeLength === undefined) {
+    rangeLength = groupBy === "month" ? 6 : 30;
+  }
+
+  if (groupBy === "month") {
+    startDate.setMonth(endDate.getMonth() - rangeLength);
+  } else {
+    startDate.setDate(endDate.getDate() - rangeLength);
+  }
 
   return {
     startDate: startDate.toISOString().slice(0, 10),

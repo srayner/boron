@@ -10,7 +10,7 @@ import { getDateRange } from "@/lib/utils";
 
 export default function DashboardPage() {
   const { milestones, summary, loading, error } = useDashboardMilestones();
-  const { startDate, endDate } = getDateRange("day");
+  const { startDate, endDate } = getDateRange("day", 14);
 
   if (loading) return <p>Loading milestones...</p>;
   if (error) return <p className="text-red-600">Failed to load: {error}</p>;
