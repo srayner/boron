@@ -45,20 +45,20 @@ export default function ProjectGroupByGraph({ field, title }: Props) {
           <BarChart data={data}>
             <XAxis
               dataKey={field}
-              tick={{ fontSize: 14 }}
+              tick={{ fontSize: 12 }}
               tickFormatter={(value) => translate(value, { short: true })}
             />
             <YAxis
               width={25}
               padding={{ top: 5 }}
               allowDecimals={false}
-              tick={{ fontSize: 14 }}
+              tick={{ fontSize: 12 }}
             />
             <Bar dataKey="count" fill="var(--primary)">
               <LabelList
                 dataKey="count"
                 position="top"
-                style={{ fontSize: 14 }}
+                style={{ fontSize: 12 }}
               />
             </Bar>
           </BarChart>

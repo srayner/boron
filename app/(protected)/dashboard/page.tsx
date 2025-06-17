@@ -4,8 +4,9 @@ import React from "react";
 import { useDashboardMilestones } from "@/hooks/useDashboardMilestones";
 import { MilestoneDashboardWidget } from "@/components/milestones/MilestoneDashboardSummary";
 import ProjectProgressGraph from "@/components/projects/ProjectProgressGraph";
-import ProjectGroupByGraph from "@/components/projects/ProjectGroupByGraph";
+import ProjectGroupByBarGraph from "@/components/projects/ProjectGroupByBarGraph";
 import TasksCompletedOverTime from "@/components/tasks/TasksCompletedOverTime";
+import ProjectGroupByPieChart from "@/components/projects/ProjectByGroupPieChart";
 import { getDateRange } from "@/lib/utils";
 
 export default function DashboardPage() {
@@ -20,8 +21,9 @@ export default function DashboardPage() {
       <h1 className="text-2xl text-primary font-bold mb-6">Dashboard</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <ProjectProgressGraph />
-        <ProjectGroupByGraph field="type" title="Project By Type" />
-        <ProjectGroupByGraph field="status" title="Project By Status" />
+        <ProjectGroupByPieChart field="type" title="Project By Type" />
+        <ProjectGroupByBarGraph field="status" title="Project By Status" />
+
         <TasksCompletedOverTime
           groupBy={"day"}
           startDate={startDate}

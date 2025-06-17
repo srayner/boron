@@ -76,7 +76,7 @@ export default function ProjectProgressGraph() {
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={data}
-            margin={{ top: 10, right: 30, left: 20, bottom: 10 }}
+            margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
           >
             <XAxis dataKey="percentRange" tick={{ fontSize: 12 }} />
             <YAxis
@@ -89,7 +89,7 @@ export default function ProjectProgressGraph() {
               <LabelList
                 dataKey="count"
                 position="top"
-                style={{ fontSize: 14 }}
+                style={{ fontSize: 12 }}
               />
             </Bar>
           </BarChart>
