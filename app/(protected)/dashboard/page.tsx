@@ -24,7 +24,6 @@ export default function DashboardPage() {
         <ProjectGroupByGraph field="status" title="Project By Status" />
         <TasksCompletedOverTime
           groupBy={"day"}
-          title="Tasks Completed"
           startDate={startDate}
           endDate={endDate}
         />

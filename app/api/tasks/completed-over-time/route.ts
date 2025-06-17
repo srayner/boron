@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { withErrorHandling } from "@/lib/api/handler";
-import { getCompletedTasksOverTime } from "@/services/tasks";
+import { getCreatedAndCompletedTasksOverTime } from "@/services/tasks";
 import { z } from "zod";
 
 const querySchema = z.object({
@@ -30,7 +30,7 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
     throw new Error("Start date must be before or equal to end date.");
   }
 
-  const data = await getCompletedTasksOverTime(
+  const data = await getCreatedAndCompletedTasksOverTime(
     parsed.groupBy,
     startDate,
     endDate

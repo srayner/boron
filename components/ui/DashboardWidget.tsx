@@ -16,7 +16,7 @@ export default function DashboardWidget({
   children,
 }: DashboardWidgetProps) {
   return (
-    <Card className={cn("h-[300px] w-full flex flex-col", className)}>
+    <Card className={cn("h-[300px] w-full flex flex-col gap-2", className)}>
       <CardHeader>
         <CardTitle>{title}</CardTitle>
       </CardHeader>

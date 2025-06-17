@@ -8,6 +8,7 @@ import {
   ResponsiveContainer,
   Tooltip,
   CartesianGrid,
+  Legend,
 } from "recharts";
 import DashboardWidget from "../ui/DashboardWidget";
 import { useEffect, useState } from "react";
@@ -56,7 +57,7 @@ export default function TasksCompletedOverTime({
 
   console.log(data);
   return (
-    <DashboardWidget title={title ?? `Tasks Completed Over Time`}>
+    <DashboardWidget title={title ?? `Tasks Created vs Completed`}>
       <div className="h-full w-full">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
@@ -64,16 +65,20 @@ export default function TasksCompletedOverTime({
             height={300}
             data={data}
             margin={{
-              top: 5,
-              right: 30,
-              left: 20,
-              bottom: 5,
+              top: 0,
+              right: 10,
+              left: 10,
+              bottom: 10,
             }}
           >
-            <CartesianGrid strokeDasharray="3 3" />
+            <CartesianGrid
+              stroke="var(--chart-grid)"
+              strokeDasharray=""
+              vertical={false}
+            />
             <XAxis
               dataKey="date"
-              tick={{ fontSize: 14 }}
+              tick={{ fontSize: 12 }}
               tickFormatter={(date) => {
                 const d = new Date(date);
                 return groupBy === "month"
@@ -87,13 +92,39 @@ export default function TasksCompletedOverTime({
                     }); // e.g. "Jun 13"
               }}
             />
-            <YAxis tick={{ fontSize: 14 }} />
-            <Tooltip />
+            <YAxis width={25} tick={{ fontSize: 12 }} />
+            <Tooltip
+              contentStyle={{
+                color: "var(--popover-foreground)",
+                backgroundColor: "var(--popover)",
+                borderRadius: 8,
+                border: "1px solid var(--border)",
+                padding: 10,
+                fontSize: 14,
+              }}
+              cursor={{ stroke: "#8884d8", strokeWidth: 2 }}
+            />
+            <Legend
+              formatter={(value) => (
+                <span style={{ color: "#666", fontSize: "12px" }}>{value}</span>
+              )}
+              verticalAlign="top"
+              height={36}
+              align="right"
+            />
 
             <Line
               type="monotone"
-              dataKey="count"
-              stroke="var(--primary)"
+              dataKey="created"
+              stroke="var(--chart-1)"
+              strokeWidth={3} // increase thickness
+              activeDot={{ r: 6 }}
+            />
+
+            <Line
+              type="monotone"
+              dataKey="completed"
+              stroke="var(--chart-2)"
               strokeWidth={3} // increase thickness
               activeDot={{ r: 6 }}
             />

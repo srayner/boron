@@ -161,30 +161,58 @@ export async function getTasks(params: {
   return { tasks, totalCount };
 }
 
-export async function getCompletedTasksOverTime(
+function getTaskCountOverTime(
+  column: "createdAt" | "completedAt",
   groupBy: "day" | "month",
   startDate: Date,
   endDate: Date
 ) {
   const format = groupBy === "month" ? "%Y-%m" : "%Y-%m-%d";
 
-  const results = await prisma.$queryRaw<{ date: string; count: bigint }[]>`
+  const columnName = column === "createdAt" ? "createdAt" : "completedAt";
+
+  return prisma
+    .$queryRawUnsafe<{ date: string; count: bigint }[]>(
+      `
     SELECT
-      DATE_FORMAT(completedAt, ${
-        groupBy === "month" ? "%Y-%m" : "%Y-%m-%d"
-      }) AS date,
+      DATE_FORMAT(${columnName}, '${format}') AS date,
       CAST(COUNT(*) AS UNSIGNED) AS count
     FROM \`Task\`
-    WHERE completedAt IS NOT NULL
-      AND completedAt BETWEEN ${startDate} AND ${endDate}
+    WHERE ${columnName} IS NOT NULL
+      AND ${columnName} BETWEEN ? AND ?
     GROUP BY date
     ORDER BY date ASC
-  `;
+  `,
+      startDate,
+      endDate
+    )
+    .then((results) =>
+      results.map((r) => ({
+        date: r.date,
+        count: Number(r.count),
+      }))
+    );
+}
 
-  return results.map((r) => ({
-    date: r.date,
-    count: Number(r.count), // converts BigInt to number
-  }));
+export async function getCreatedAndCompletedTasksOverTime(
+  groupBy: "day" | "month",
+  startDate: Date,
+  endDate: Date
+) {
+  const [created, completed] = await Promise.all([
+    getTaskCountOverTime("createdAt", groupBy, startDate, endDate),
+    getTaskCountOverTime("completedAt", groupBy, startDate, endDate),
+  ]);
+
+  const allDates = new Set([...created, ...completed].map((d) => d.date));
+
+  return Array.from(allDates)
+    .sort()
+    .map((date) => ({
+      date,
+      created: created.find((d) => d.date === date)?.count ?? 0,
+      completed: completed.find((d) => d.date === date)?.count ?? 0,
+    }));
 }
 
 function calculateProgress(update: Task): number {
