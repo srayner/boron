@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import DashboardWidget from "../ui/DashboardWidget";
 import { translate } from "@/lib/utils";
+import renderCustomizedLabel from "../ui/PieLabel";
 
 const COLORS = [
   "var(--chart-1)",
@@ -38,6 +39,7 @@ export default function ProjectGroupByPieChart({ field, title }: Props) {
   }, [field]);
 
   if (!data) return null; // or a loading spinner
+  const total = data.reduce((sum, item) => sum + item.count, 0);
 
   return (
     <DashboardWidget title={title ?? `Projects by ${field}`}>
@@ -49,26 +51,9 @@ export default function ProjectGroupByPieChart({ field, title }: Props) {
               cx="50%"
               cy="50%"
               labelLine={false}
-              label={({ cx, cy, midAngle, outerRadius, name, payload }) => {
-                const RADIAN = Math.PI / 180;
-                const radius = outerRadius + 45; // push 40px outside the pie
-                const x = cx + radius * Math.cos(-midAngle * RADIAN);
-                const y = cy + radius * Math.sin(-midAngle * RADIAN);
-
-                return (
-                  <text
-                    x={x}
-                    y={y}
-                    fontSize={14}
-                    fill="#666"
-                    textAnchor="middle"
-                    dominantBaseline="central"
-                  >
-                    {translate(name)}: {payload.count}
-                  </text>
-                );
-              }}
-              outerRadius={90}
+              label={renderCustomizedLabel}
+              innerRadius={50}
+              outerRadius={80}
               fill="#8884d8"
               stroke="#333"
               nameKey={field}
@@ -93,6 +78,26 @@ export default function ProjectGroupByPieChart({ field, title }: Props) {
               }}
               wrapperStyle={{ color: "var(--popover-foreground)" }}
             />
+            <text
+              x="50%"
+              y="44%"
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fill="#666"
+            >
+              Total
+            </text>
+            <text
+              x="50%"
+              y="56%"
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fontSize={20}
+              fontWeight="bold"
+              fill="#666"
+            >
+              {total}
+            </text>
           </PieChart>
         </ResponsiveContainer>
       </div>

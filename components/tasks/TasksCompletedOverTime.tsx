@@ -55,7 +55,6 @@ export default function TasksCompletedOverTime({
 
   if (!data) return null; // Or a loading spinner
 
-  console.log(data);
   return (
     <DashboardWidget title={title ?? `Tasks Created vs Completed`}>
       <div className="h-full w-full">
