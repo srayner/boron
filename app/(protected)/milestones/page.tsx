@@ -36,7 +36,7 @@ const MilestonesListPage: NextPage = () => {
         limit: String(limit),
         skip: String(skip),
         orderBy: "dueDate",
-        orderDir: "desc",
+        orderDir: "asc",
         search,
       });
       if (isDue === true) params.set("dueDateFilter", "with");
