@@ -1,9 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import DashboardWidget from "../ui/DashboardWidget";
-import { useEffect, useState } from "react";
 import { translate } from "@/lib/utils";
 
 const COLORS = [
@@ -50,17 +49,7 @@ export default function ProjectGroupByPieChart({ field, title }: Props) {
               cx="50%"
               cy="50%"
               labelLine={false}
-              label={({
-                cx,
-                cy,
-                midAngle,
-                innerRadius,
-                outerRadius,
-                percent,
-                index,
-                name,
-                payload,
-              }) => {
+              label={({ cx, cy, midAngle, outerRadius, name, payload }) => {
                 const RADIAN = Math.PI / 180;
                 const radius = outerRadius + 45; // push 40px outside the pie
                 const x = cx + radius * Math.cos(-midAngle * RADIAN);
