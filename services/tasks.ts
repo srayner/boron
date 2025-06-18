@@ -5,6 +5,7 @@ import { processTagsForCreate, processTagsForUpdate } from "@/services/tags";
 import { Task } from "@/types/entities";
 import { updateMilestoneProgress } from "./milestones";
 import { updateProjectProgress } from "./projects";
+import { formatISO, addDays } from "date-fns";
 
 export const createTask = async (data: any) => {
   if (!data.name) throw new AppError("Task name is required", 422);
@@ -212,7 +213,7 @@ export async function getCreatedAndCompletedTasksOverTime(
 
   const result = [];
   while (current <= endDate) {
-    const dateStr = current.toISOString().slice(0, 10);
+    const dateStr = formatISO(current, { representation: "date" }); // → "2025-06-18"
 
     const createdCount = created.find((d) => d.date === dateStr)?.count ?? 0;
     const completedCount =
@@ -224,7 +225,7 @@ export async function getCreatedAndCompletedTasksOverTime(
       completed: completedCount,
     });
 
-    current.setDate(current.getDate() + 1);
+    current = addDays(current, 1);
   }
 
   return result;

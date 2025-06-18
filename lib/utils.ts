@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { format, isValid } from "date-fns";
+import { startOfDay, endOfDay, subDays, subMonths, formatISO } from "date-fns";
 
 const translations: Record<string, { full: string; short?: string }> = {
   WEBAPP: { full: "Web Application", short: "Web App" },
@@ -41,21 +42,22 @@ export function formatDate(date: string, formatStr?: string): string {
 }
 
 export function getDateRange(groupBy: "day" | "month", rangeLength?: number) {
-  const endDate = new Date();
-  const startDate = new Date();
+  const now = new Date();
 
   if (rangeLength === undefined) {
     rangeLength = groupBy === "month" ? 6 : 30;
   }
 
+  let startDate: Date;
+
   if (groupBy === "month") {
-    startDate.setMonth(endDate.getMonth() - rangeLength);
+    startDate = subMonths(now, rangeLength);
   } else {
-    startDate.setDate(endDate.getDate() - rangeLength);
+    startDate = subDays(now, rangeLength);
   }
 
   return {
-    startDate: startDate.toISOString().slice(0, 10),
-    endDate: endDate.toISOString().slice(0, 10),
+    startDate: formatISO(startOfDay(startDate)),
+    endDate: formatISO(endOfDay(now)),
   };
 }
