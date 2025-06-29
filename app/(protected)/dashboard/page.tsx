@@ -17,8 +17,8 @@ export default function DashboardPage() {
   if (error) return <p className="text-red-600">Failed to load: {error}</p>;
 
   return (
-    <main className="p-6">
-      <h1 className="text-2xl text-primary font-bold mb-6">Dashboard</h1>
+    <main className="p-4">
+      <h1 className="text-2xl text-primary font-semibold mb-6">Dashboard</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <ProjectProgressGraph />
         <ProjectGroupByPieChart field="type" title="Project By Type" />
