@@ -39,7 +39,10 @@ const TasksListPage: NextPage = () => {
         orderDir: "asc",
         search,
       });
-      if (isDue === true) params.set("dueDateFilter", "with");
+      if (isDue === true) {
+        params.set("dueDateFilter", "with");
+        params.set("statusFilter", "open");
+      }
       const res = await fetch(`/api/tasks?${params.toString()}`);
       if (!res.ok) throw new Error("Failed to fetch tasks");
       const { tasks, totalCount } = await res.json();

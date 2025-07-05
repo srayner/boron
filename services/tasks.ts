@@ -1,11 +1,19 @@
 import { prisma } from "@/lib/prisma";
-import { Prisma } from "@prisma/client";
+import { TaskStatus } from "@prisma/client";
 import { AppError } from "@/lib/api/error";
 import { processTagsForCreate, processTagsForUpdate } from "@/services/tags";
 import { Task } from "@/types/entities";
 import { updateMilestoneProgress } from "./milestones";
 import { updateProjectProgress } from "./projects";
 import { formatISO, addDays } from "date-fns";
+
+const openStatuses: TaskStatus[] = [
+  "PLANNED",
+  "IN_PROGRESS",
+  "ON_HOLD",
+  "BLOCKED",
+];
+const closeStatuses: TaskStatus[] = ["COMPLETED", "CANCELLED"];
 
 export const createTask = async (data: any) => {
   if (!data.name) throw new AppError("Task name is required", 422);
@@ -133,12 +141,15 @@ export const getTask = async (id: string) => {
 
 export async function getTasks(params: {
   search: string;
+  statusFilter?: "open" | "closed";
   dueDateFilter?: "with" | "without";
   pagination: { take: number; skip: number };
   ordering: { [key: string]: "asc" | "desc" };
 }) {
   const where = {
     name: { contains: params.search },
+    ...(params.statusFilter === "open" && { status: { in: openStatuses } }),
+    ...(params.statusFilter === "closed" && { status: { in: closeStatuses } }),
     ...(params.dueDateFilter === "with" && { dueDate: { not: null } }),
     ...(params.dueDateFilter === "without" && { dueDate: null }),
   };
