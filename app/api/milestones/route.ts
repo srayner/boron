@@ -7,6 +7,10 @@ import { createMilestone, getMilestones } from "@/services/milestones";
 export const GET = withErrorHandling(async (req: NextRequest) => {
   const url = new URL(req.url);
   const { search, pagination, ordering } = parseQueryParams(url);
+  const statusFilter = parseEnumParam(url.searchParams.get("statusFilter"), [
+    "open",
+    "closed",
+  ]);
   const dueDateFilter = parseEnumParam(url.searchParams.get("dueDateFilter"), [
     "with",
     "without",
@@ -17,6 +21,7 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
     pagination,
     ordering,
     projectId,
+    statusFilter,
     dueDateFilter,
   });
 });

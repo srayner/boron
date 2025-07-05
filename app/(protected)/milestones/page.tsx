@@ -39,7 +39,10 @@ const MilestonesListPage: NextPage = () => {
         orderDir: "asc",
         search,
       });
-      if (isDue === true) params.set("dueDateFilter", "with");
+      if (isDue === true) {
+        params.set("dueDateFilter", "with");
+        params.set("statusFilter", "open");
+      }
       const res = await fetch(`/api/milestones?${params.toString()}`);
       if (!res.ok) throw new Error("Failed to fetch tasks");
       const { milestones, totalCount } = await res.json();

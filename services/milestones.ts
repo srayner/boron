@@ -1,7 +1,10 @@
 import { prisma } from "@/lib/prisma";
+import { MilestoneStatus } from "@prisma/client";
 import { AppError } from "@/lib/api/error";
-import { MilestoneStatus } from "@/types/entities";
 import { processTagsForCreate, processTagsForUpdate } from "@/services/tags";
+
+const openStatuses: MilestoneStatus[] = ["PLANNED", "IN_PROGRESS", "ON_HOLD"];
+const closeStatuses: MilestoneStatus[] = ["COMPLETED", "CANCELLED"];
 
 export const createMilestone = async (data: any) => {
   if (!data.name) throw new AppError("Milestone name is required", 422);
@@ -73,19 +76,20 @@ export const getMilestone = async (id: string) => {
 export async function getMilestones(params: {
   search: string;
   projectId?: string;
-  statuses?: MilestoneStatus[];
   dueDate?: { lt?: Date; gt?: Date };
   dueDateFilter?: "with" | "without";
+  statusFilter?: "open" | "closed";
   pagination: { take: number; skip: number };
   ordering: { [key: string]: "asc" | "desc" };
 }) {
   const where = {
     name: { contains: params.search },
     ...(params.projectId && { projectId: params.projectId }),
-    ...(params.statuses && { status: { in: params.statuses } }),
     ...(params.dueDate && { dueDate: params.dueDate }),
     ...(params.dueDateFilter === "with" && { dueDate: { not: null } }),
     ...(params.dueDateFilter === "without" && { dueDate: null }),
+    ...(params.statusFilter === "open" && { status: { in: openStatuses } }),
+    ...(params.statusFilter === "closed" && { status: { in: closeStatuses } }),
   };
 
   const [milestones, totalCount] = await Promise.all([
@@ -106,14 +110,13 @@ export async function getMilestones(params: {
 }
 
 export async function getSummary() {
-  const openStatuses: MilestoneStatus[] = ["PLANNED", "IN_PROGRESS", "ON_HOLD"];
   const now = new Date();
 
   const { milestones } = await getMilestones({
     search: "",
     pagination: { take: 5, skip: 0 },
     ordering: { dueDate: "asc" },
-    statuses: openStatuses,
+    statusFilter: "open",
     dueDate: { gt: now },
   });
 
