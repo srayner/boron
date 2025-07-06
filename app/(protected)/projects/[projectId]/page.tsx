@@ -37,7 +37,7 @@ type ProjectPageProps = {
 const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const tab = searchParams.get("tab") ?? "tasks";
+  const tab = searchParams.get("tab") ?? "milestones";
 
   const { refreshRecentProjects } = useRecentProjects();
   const [activeTab, setActiveTab] = React.useState(tab);
