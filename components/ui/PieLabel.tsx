@@ -54,7 +54,7 @@ function renderCustomizedLabel({
   const textAnchor = labelX > cx ? "start" : "end";
   const connectorColor = "#666";
 
-  if (percent < 0.05) return null;
+  if (percent < 0.02) return null;
 
   return (
     <g>
