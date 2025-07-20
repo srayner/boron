@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { AppError } from "@/lib/api/error";
 import { processTagsForCreate, processTagsForUpdate } from "@/services/tags";
 import type { Prisma } from "@prisma/client";
-import { resourceUsage } from "process";
+import { updateSearchIndex, deleteSearchIndex } from "./search";
 
 export const createProject = async (data: any) => {
   if (!data.name) throw new AppError("Project name is required", 422);
@@ -21,7 +21,7 @@ export const createProject = async (data: any) => {
     ? await processTagsForCreate(data.tags)
     : { connect: [] };
 
-  return prisma.project.create({
+  const newProject = await prisma.project.create({
     data: {
       name: data.name,
       description: data.description || "",
@@ -33,13 +33,22 @@ export const createProject = async (data: any) => {
       budget: data.budget,
       tags,
     },
+    include: { tags: true },
   });
+
+  updateSearchIndex("project", newProject);
+
+  return newProject;
 };
 
 export const deleteProject = async (id: string) => {
-  return await prisma.project.delete({
+  const deletedEntity = await prisma.project.delete({
     where: { id },
   });
+
+  deleteSearchIndex("project", id);
+
+  return deletedEntity;
 };
 
 export const updateProject = async (id: string, data: any) => {
@@ -57,7 +66,7 @@ export const updateProject = async (id: string, data: any) => {
 
   const tags = data.tags ? await processTagsForUpdate(data.tags) : { set: [] };
 
-  return prisma.project.update({
+  const updatedProject = await prisma.project.update({
     where: { id },
     data: {
       name: data.name,
@@ -70,7 +79,12 @@ export const updateProject = async (id: string, data: any) => {
       budget: data.budget,
       tags,
     },
+    include: { tags: true },
   });
+
+  updateSearchIndex("project", updatedProject);
+
+  return updatedProject;
 };
 
 export const getProject = async (id: string) => {
