@@ -8,6 +8,7 @@ import Link from "next/link";
 import ProjectListHeader from "@/components/projects/ProjectListHeader";
 import PaginationControls from "@/components/ui/PaginationControls";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { ProgressBar } from "@/components/ui/ProgressBar";
 
 export default function ProjectPage() {
   const router = useRouter();
@@ -62,12 +63,18 @@ export default function ProjectPage() {
             key={project.id}
             className="flex flex-col gap-4 my-4 max-w-4xl mx-auto"
           >
-            <Link
-              href={`/projects/${project.id}`}
-              className="text-2xl text-primary"
-            >
-              {project.name}
-            </Link>
+            <div>
+              <Link
+                href={`/projects/${project.id}`}
+                className="text-2xl text-primary"
+              >
+                {project.name}
+              </Link>
+              <div className="w-32">
+                {`${project.progress}%`}
+                <ProgressBar percent={project.progress} height={8} />
+              </div>
+            </div>
             <div className="text-muted-foreground">{project.description}</div>
             <div className="flex gap-4 text-muted-foreground">
               <ProjectTypeWithIcon type={project.type} />
