@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { MilestoneStatus } from "@prisma/client";
 import { AppError } from "@/lib/api/error";
 import { processTagsForCreate, processTagsForUpdate } from "@/services/tags";
+import { updateSearchIndex, deleteSearchIndex } from "./search";
 
 const openStatuses: MilestoneStatus[] = ["PLANNED", "IN_PROGRESS", "ON_HOLD"];
 const closeStatuses: MilestoneStatus[] = ["COMPLETED", "CANCELLED"];
@@ -19,7 +20,7 @@ export const createMilestone = async (data: any) => {
     ? await processTagsForCreate(data.tags)
     : { connect: [] };
 
-  return prisma.milestone.create({
+  const newMilestone = await prisma.milestone.create({
     data: {
       projectId: data.projectId,
       name: data.name,
@@ -29,13 +30,22 @@ export const createMilestone = async (data: any) => {
       dueDate: dueDate,
       tags,
     },
+    include: { tags: true },
   });
+
+  updateSearchIndex("milestone", newMilestone);
+
+  return newMilestone;
 };
 
 export const deleteMilestone = async (id: string) => {
-  return await prisma.milestone.delete({
+  const deletedMilestone = await prisma.milestone.delete({
     where: { id },
   });
+
+  deleteSearchIndex("milestone", id);
+
+  return deletedMilestone;
 };
 
 export const updateMilestone = async (id: string, data: any) => {
@@ -49,7 +59,7 @@ export const updateMilestone = async (id: string, data: any) => {
 
   const tags = data.tags ? await processTagsForUpdate(data.tags) : { set: [] };
 
-  return prisma.milestone.update({
+  const updatedMilestone = await prisma.milestone.update({
     where: { id },
     data: {
       name: data.name,
@@ -59,7 +69,12 @@ export const updateMilestone = async (id: string, data: any) => {
       dueDate: dueDate,
       tags,
     },
+    include: { tags: true },
   });
+
+  updateSearchIndex("milestone", updatedMilestone);
+
+  return updatedMilestone;
 };
 
 export const getMilestone = async (id: string) => {
