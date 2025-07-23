@@ -6,6 +6,7 @@ import { Task } from "@/types/entities";
 import { updateMilestoneProgress } from "./milestones";
 import { updateProjectProgress } from "./projects";
 import { formatISO, addDays } from "date-fns";
+import { updateSearchIndex, deleteSearchIndex } from "./search";
 
 const openStatuses: TaskStatus[] = [
   "PLANNED",
@@ -51,12 +52,15 @@ export const createTask = async (data: any) => {
       completedAt,
       tags,
     },
+    include: { tags: true },
   });
 
   if (newTask.milestoneId) {
     await updateMilestoneProgress(newTask.milestoneId);
   }
   await updateProjectProgress(newTask.projectId);
+
+  updateSearchIndex("task", newTask);
 
   return newTask;
 };
@@ -70,6 +74,8 @@ export const deleteTask = async (id: string) => {
     await updateMilestoneProgress(deletedTask.milestoneId);
   }
   await updateProjectProgress(deletedTask.projectId);
+
+  deleteSearchIndex("task", id);
 
   return deletedTask;
 };
@@ -116,12 +122,15 @@ export const updateTask = async (id: string, data: any) => {
       completedAt,
       tags,
     },
+    include: { tags: true },
   });
 
   if (updatedTask.milestoneId) {
     await updateMilestoneProgress(updatedTask.milestoneId);
   }
   await updateProjectProgress(updatedTask.projectId);
+
+  updateSearchIndex("project", updatedTask);
 
   return updatedTask;
 };
