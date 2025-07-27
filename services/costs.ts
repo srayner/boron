@@ -1,8 +1,8 @@
 import { prisma } from "@/lib/prisma";
-import { AppError } from "@/lib/api/error";
 import { z } from "zod";
 import { processTagsForCreate, processTagsForUpdate } from "@/services/tags";
 import { updateProjectCost } from "./projects";
+import { updateSearchIndex, deleteSearchIndex } from "./search";
 
 const CostSchema = z.object({
   amount: z.coerce.number().min(0),
@@ -66,9 +66,11 @@ export const createCost = async (data: any) => {
       taskId: validated.taskId,
       tags,
     },
+    include: { tags: true },
   });
 
-  await updateProjectCost(newCost.projectId);
+  updateProjectCost(newCost.projectId);
+  updateSearchIndex("cost", newCost);
 
   return newCost;
 };
@@ -78,7 +80,8 @@ export const deleteCost = async (id: string) => {
     where: { id },
   });
 
-  await updateProjectCost(deletedCost.projectId);
+  updateProjectCost(deletedCost.projectId);
+  deleteSearchIndex("cost", id);
 
   return deletedCost;
 };
@@ -102,7 +105,8 @@ export const updateCost = async (id: string, data: any) => {
     },
   });
 
-  await updateProjectCost(updatedCost.projectId);
+  updateProjectCost(updatedCost.projectId);
+  updateSearchIndex("cost", updatedCost);
 
   return updatedCost;
 };
