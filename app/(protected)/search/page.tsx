@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import PaginationControls from "@/components/ui/PaginationControls";
 import { Folders, Flag, CheckSquare } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 type SearchEntityType = "project" | "milestone" | "task" | "cost";
 
@@ -105,12 +106,12 @@ export default function SearchPage() {
 
   return (
     <div className="max-w-4xl mx-auto my-4">
-      <input
+      <Input
         type="search"
-        placeholder="Search projects, tasks, milestones, costs..."
+        placeholder="Search for anything..."
+        className="flex-1"
         value={input}
         onChange={(e) => handleInputChange(e.target.value)}
-        className="w-full px-4 py-2 border rounded mb-4"
       />
 
       {results.map((result) => (
