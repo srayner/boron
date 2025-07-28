@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import PaginationControls from "@/components/ui/PaginationControls";
-import { Folders, Flag, CheckSquare } from "lucide-react";
+import { Folders, Flag, CheckSquare, PoundSterling } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 type SearchEntityType = "project" | "milestone" | "task" | "cost";
@@ -98,7 +98,7 @@ export default function SearchPage() {
       case "task":
         return <CheckSquare className="w-5 h-5" />;
       case "cost":
-        return <></>; // optionally add an icon for costs
+        return <PoundSterling className="w-5 h-5" />;
       default:
         return <></>;
     }
