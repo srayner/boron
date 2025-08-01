@@ -42,8 +42,8 @@ const items = [
     icon: Inbox,
   },
   {
-    title: "Calendar",
-    url: "/",
+    title: "Chat",
+    url: "/chat",
     icon: Calendar,
   },
   {
