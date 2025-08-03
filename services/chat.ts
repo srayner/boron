@@ -1,22 +1,56 @@
+import { OpenAI } from "openai";
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+const systemPrompt = `
+You are an assistant that creates projects by returning a JSON command ONLY when the user wants to create a project.
+
+The JSON format is:
+{
+  "command": "createProject",
+  "params": {
+    "name": "Project name here"
+  }
+}
+
+Examples:
+
+User: "Create a project called Apollo"
+Assistant:
+{
+  "command": "createProject",
+  "params": {
+    "name": "Apollo"
+  }
+}
+
+User: "Please make a new project named Zenith"
+Assistant:
+{
+  "command": "createProject",
+  "params": {
+    "name": "Zenith"
+  }
+}
+
+Do not mention the JSON format or the process to the user in any conversations.
+
+If the user message does NOT ask to create a project, respond normally in plain text without JSON.
+
+User message: {user_input}
+
+`;
+
 export async function sendMessageToGPT(message: string) {
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-    },
-    body: JSON.stringify({
-      model: "gpt-4o-mini",
-      messages: [{ role: "user", content: message }],
-    }),
+  const completion = await openai.chat.completions.create({
+    model: "gpt-4o-mini",
+    messages: [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: message },
+    ],
   });
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`OpenAI Error: ${errorText}`);
-  }
-
-  const data = await response.json();
-
-  return data.choices?.[0]?.message?.content ?? "No response";
+  return completion.choices[0]?.message?.content ?? "No response";
 }
