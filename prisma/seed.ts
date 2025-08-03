@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { createTask } from "@/services/tasks";
 import { createMilestone } from "@/services/milestones";
 import { createProject } from "@/services/projects";
+import { createUser } from "@/services/user";
 import { projects } from "./seedData";
 
 const prisma = new PrismaClient();
@@ -14,6 +15,7 @@ async function clearData() {
     "task",
     "milestone",
     "project",
+    "userPreference",
     "user",
     "account",
   ];
@@ -36,23 +38,21 @@ async function seedUsers() {
   );
 
   const now = new Date();
-  await prisma.user.createMany({
-    data: [
-      {
-        name: "Example User",
-        email: "user@example.com",
-        emailVerified: now,
-        password: hashedUserPassword,
-        role: "USER",
-      },
-      {
-        name: "Admin User",
-        email: "admin@example.com",
-        emailVerified: now,
-        password: hashedAdminPassword,
-        role: "ADMIN",
-      },
-    ],
+
+  await createUser({
+    name: "Example User",
+    email: "user@example.com",
+    emailVerified: now,
+    password: hashedUserPassword,
+    role: "USER",
+  });
+
+  await createUser({
+    name: "Admin User",
+    email: "admin@example.com",
+    emailVerified: now,
+    password: hashedAdminPassword,
+    role: "ADMIN",
   });
 
   console.log("Users have been created with hashed passwords!");
