@@ -5,6 +5,7 @@ import { startOfDay, endOfDay, subDays, subMonths, formatISO } from "date-fns";
 
 const translations: Record<string, { full: string; short?: string }> = {
   WEBAPP: { full: "Web Application", short: "Web App" },
+  currencySymbol: { full: "Currency Symbol" },
 };
 
 export function cn(...inputs: ClassValue[]) {

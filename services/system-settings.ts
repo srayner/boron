@@ -10,7 +10,19 @@ const validateSystemSetting = (key: string, value: unknown) => {
   if (!schema) throw new Error(`Invalid system setting key: ${key}`);
   const result = schema.safeParse(value);
   if (!result.success) throw new Error(`Invalid value for ${key}`);
-  return true;
+};
+
+export const createSystemSetting = async (data: any) => {
+  const validated = await validateSystemSetting(data.key, data.value);
+
+  const newSystemSetting = await prisma.systemSetting.create({
+    data: {
+      key: data.key,
+      value: data.value,
+    },
+  });
+
+  return newSystemSetting;
 };
 
 export const updateSystemSetting = async (id: string, data: any) => {

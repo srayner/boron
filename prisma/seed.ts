@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { createSystemSetting } from "@/services/system-settings";
 import { createTask } from "@/services/tasks";
 import { createMilestone } from "@/services/milestones";
 import { createProject } from "@/services/projects";
@@ -18,6 +19,7 @@ async function clearData() {
     "userPreference",
     "user",
     "account",
+    "systemSetting",
   ];
 
   for (const model of models) {
@@ -25,6 +27,15 @@ async function clearData() {
   }
 
   console.log("Data has been cleared!");
+}
+
+async function seedSystemSettings() {
+  await createSystemSetting({
+    key: "currencySymbol",
+    value: "£",
+  });
+
+  console.log("System Settings have been seeded!");
 }
 
 async function seedUsers() {
@@ -89,6 +100,7 @@ export async function seedProjects() {
 
 async function main() {
   await clearData();
+  await seedSystemSettings();
   await seedProjects();
   await seedUsers();
 

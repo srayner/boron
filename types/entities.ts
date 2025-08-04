@@ -129,3 +129,8 @@ export interface MilestoneSummary {
   hasUpcomingMilestones: boolean;
   overdueCount: number;
 }
+
+export interface SystemSetting {
+  key: string;
+  value: number | string;
+}
