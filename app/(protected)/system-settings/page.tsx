@@ -6,6 +6,7 @@ import { SettingsIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { translate } from "@/lib/utils";
 import { SystemSetting } from "@/types/entities";
+import { SystemSettingEditModal } from "@/components/systemSettings/SystemSetinngEditModal";
 
 export default function ProjectPage() {
   const [settings, setSettings] = useState<SystemSetting[]>([]);

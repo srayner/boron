@@ -134,3 +134,8 @@ export interface SystemSetting {
   key: string;
   value: number | string;
 }
+
+export interface UserPreference {
+  key: string;
+  value: number | string;
+}

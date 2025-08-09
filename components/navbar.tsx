@@ -1,6 +1,6 @@
 "use client";
 
-import { LogOut, Moon, Settings, Sun, User } from "lucide-react";
+import { LogOut, Moon, SlidersHorizontal, Sun, User } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
@@ -65,10 +65,10 @@ const NavBar = () => {
                 Profile
               </DropdownMenuItem>
             </Link>
-            <Link href="/user/settings">
+            <Link href="/user/preferences">
               <DropdownMenuItem>
-                <Settings className="h-[1.2rem] w-[1.2rem] mr-2" />
-                Settings
+                <SlidersHorizontal className="h-[1.2rem] w-[1.2rem] mr-2" />
+                Preferences
               </DropdownMenuItem>
             </Link>
             <DropdownMenuItem variant="destructive" onClick={handleSignOut}>
