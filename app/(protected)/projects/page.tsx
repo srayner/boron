@@ -9,6 +9,8 @@ import ProjectListHeader from "@/components/projects/ProjectListHeader";
 import PaginationControls from "@/components/ui/PaginationControls";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { ProgressBar } from "@/components/ui/ProgressBar";
+import { projectTypes, ProjectType } from "@/types/entities";
+import { ProjectStatusBadge } from "@/components/projects/project-status";
 
 export default function ProjectPage() {
   const router = useRouter();
@@ -21,6 +23,25 @@ export default function ProjectPage() {
   const initialSearch = searchParams.get("search") ?? "";
   const [search, setSearch] = useState(initialSearch);
 
+  const initialTypeRaw = searchParams.get("type");
+  const initialType: ProjectType | "ALL" = projectTypes.includes(
+    initialTypeRaw as ProjectType
+  )
+    ? (initialTypeRaw as ProjectType)
+    : "ALL";
+  const [type, setType] = useState<ProjectType | "ALL">(initialType);
+
+  const sortOptions = ["name", "updatedAt", "priority"] as const;
+  const initialOrderByRaw = searchParams.get("orderBy");
+  const initialOrderBy: "name" | "updatedAt" | "priority" = (
+    sortOptions.includes(initialOrderByRaw as any)
+      ? initialOrderByRaw
+      : "updatedAt"
+  ) as "name" | "updatedAt" | "priority";
+  const [orderBy, setOrderBy] = useState<"name" | "updatedAt" | "priority">(
+    initialOrderBy
+  );
+
   const limit = 10;
   const skip = (page - 1) * limit;
   const [projects, setProjects] = useState<Project[]>([]);
@@ -29,7 +50,7 @@ export default function ProjectPage() {
   const fetchProjects = async () => {
     try {
       const res = await fetch(
-        `/api/projects?limit=${limit}&skip=${skip}&orderBy=updatedAt&orderDir=desc&search=${search}`
+        `/api/projects?limit=${limit}&skip=${skip}&orderBy=${orderBy}&orderDir=desc&search=${search}&typeFilter=${type}`
       );
       if (!res.ok) throw new Error("Failed to fetch recent projects");
       const { projects, totalCount } = await res.json();
@@ -42,16 +63,22 @@ export default function ProjectPage() {
 
   useEffect(() => {
     fetchProjects();
-  }, [page, search]);
+  }, [page, search, orderBy, type]);
 
   return (
     <div className="max-w-4xl mx-auto my-4">
       <ProjectListHeader
         search={search}
-        onSearchChange={(value) => {
-          setSearch(value);
+        type={type}
+        sort={orderBy}
+        onSearchChange={(newText, newType, newOrder) => {
+          setSearch(newText);
+          setType(newType);
+          setOrderBy(newOrder);
           const params = new URLSearchParams(searchParams.toString());
-          params.set("search", value);
+          params.set("search", newText);
+          params.set("type", newType);
+          params.set("orderBy", newOrder);
           params.set("page", "1"); // reset to first page on search
           router.replace(`${pathname}?${params.toString()}`, { scroll: false });
           setPage(1);
@@ -63,16 +90,19 @@ export default function ProjectPage() {
             key={project.id}
             className="flex flex-col gap-4 my-4 max-w-4xl mx-auto"
           >
-            <div>
+            <div className="flex flex-col gap-1">
               <Link
                 href={`/projects/${project.id}`}
                 className="text-2xl text-primary"
               >
                 {project.name}
               </Link>
-              <div className="w-32">
-                {`${project.progress}%`}
-                <ProgressBar percent={project.progress} height={8} />
+              <div className="flex gap-4 items-center">
+                <ProjectStatusBadge status={project.status} />
+                <div className="w-32">
+                  {`${project.progress}%`}
+                  <ProgressBar percent={project.progress} height={8} />
+                </div>
               </div>
             </div>
             <div className="text-muted-foreground">{project.description}</div>

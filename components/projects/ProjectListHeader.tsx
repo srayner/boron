@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
-import { ProjectType } from "@/types/entities";
+import { projectTypes, ProjectType } from "@/types/entities";
 
 const projectTypeNames: Record<ProjectType | "ALL", string> = {
   ALL: "All",
@@ -28,22 +28,37 @@ const projectTypeNames: Record<ProjectType | "ALL", string> = {
 
 type ProjectListHeaderProps = {
   search: string;
-  onSearchChange: (value: string) => void;
+  type: ProjectType | "ALL";
+  sort: "name" | "updatedAt" | "priority";
+  onSearchChange: (
+    value: string,
+    type: ProjectType | "ALL",
+    sort: "name" | "updatedAt" | "priority"
+  ) => void;
 };
+
+const typeOptions: (ProjectType | "ALL")[] = ["ALL", ...projectTypes];
+const sortOptions = ["name", "updatedAt", "priority"];
 
 const ProjectListHeader: React.FC<ProjectListHeaderProps> = ({
   search,
+  type,
+  sort,
   onSearchChange,
 }) => {
-  const [selectedType, setSelectedType] = useState<string>("ALL");
-  const [selectedSort, setSelectedSort] = useState<string>("name");
+  const [text, setText] = useState<string>(search);
 
-  const onSelectType = (newSelectedType: string) => {
-    setSelectedType(newSelectedType);
+  const onSearchTextChange = (newText: string) => {
+    setText(newText);
+    onSearchChange(newText, type, sort);
   };
 
-  const onSelectSort = (newSelectedSort: string) => {
-    setSelectedSort(newSelectedSort);
+  const onSelectType = (newType: string) => {
+    onSearchChange(text, newType, sort);
+  };
+
+  const onSelectSort = (newSort: string) => {
+    onSearchChange(text, type, newSort);
   };
 
   return (
@@ -53,8 +68,8 @@ const ProjectListHeader: React.FC<ProjectListHeaderProps> = ({
         type="search"
         placeholder="Search projects..."
         className="flex-1"
-        value={search}
-        onChange={(e) => onSearchChange(e.target.value)}
+        value={text}
+        onChange={(e) => onSearchTextChange(e.target.value)}
       />
 
       {/* Right side: Controls */}
@@ -67,11 +82,11 @@ const ProjectListHeader: React.FC<ProjectListHeaderProps> = ({
               <ChevronDown />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent>
+          <DropdownMenuContent align="end">
             {Object.entries(projectTypeNames).map(([key, label]) => (
               <DropdownMenuCheckboxItem
                 key={key}
-                checked={selectedType === key}
+                checked={type === key}
                 onCheckedChange={() => onSelectType(key)}
               >
                 {label}
@@ -90,19 +105,23 @@ const ProjectListHeader: React.FC<ProjectListHeaderProps> = ({
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuCheckboxItem
-              checked={selectedSort === "name"}
+              checked={sort === "name"}
               onCheckedChange={() => onSelectSort("name")}
             >
               Name
             </DropdownMenuCheckboxItem>
             <DropdownMenuCheckboxItem
-              checked={selectedSort === "updatedAt"}
+              checked={sort === "priority"}
+              onCheckedChange={() => onSelectSort("priority")}
+            >
+              Priority
+            </DropdownMenuCheckboxItem>
+            <DropdownMenuCheckboxItem
+              checked={sort === "updatedAt"}
               onCheckedChange={() => onSelectSort("updatedAt")}
             >
               Last Updated
             </DropdownMenuCheckboxItem>
-            {/* Priority can’t be sorted unless it's a separate sortable field */}
-            {/* <DropdownMenuItem>Priority</DropdownMenuItem> */}
           </DropdownMenuContent>
         </DropdownMenu>
 

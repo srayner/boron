@@ -5,17 +5,21 @@ export type ProjectStatus =
   | "COMPLETED"
   | "CANCELLED";
 export type ProjectPriority = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
-export type ProjectType =
-  | "AUTOMATION"
-  | "DESIGN"
-  | "GENERAL"
-  | "ELECTRONICS"
-  | "MAKER"
-  | "REPAIR"
-  | "WEBAPP"
-  | "WEBSITE"
-  | "WRITING"
-  | "OTHER";
+
+export const projectTypes = [
+  "AUTOMATION",
+  "DESIGN",
+  "GENERAL",
+  "ELECTRONICS",
+  "MAKER",
+  "REPAIR",
+  "WEBAPP",
+  "WEBSITE",
+  "WRITING",
+  "OTHER",
+] as const;
+export type ProjectType = (typeof projectTypes)[number];
+
 export type TaskStatus =
   | "PLANNED"
   | "IN_PROGRESS"

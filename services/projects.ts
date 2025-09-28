@@ -3,6 +3,7 @@ import { AppError } from "@/lib/api/error";
 import { processTagsForCreate, processTagsForUpdate } from "@/services/tags";
 import type { Prisma } from "@prisma/client";
 import { updateSearchIndex, deleteSearchIndex } from "./search";
+import { ProjectType } from "@/types/entities";
 
 export const createProject = async (data: any) => {
   if (!data.name) throw new AppError("Project name is required", 422);
@@ -103,7 +104,13 @@ export async function getProjects(params: {
   search: string;
   pagination: { take: number; skip: number };
   ordering: { [key: string]: "asc" | "desc" };
+  typeFilter?: ProjectType;
 }) {
+  const where = {
+    name: { contains: params.search },
+    ...(params.typeFilter && { type: params.typeFilter }),
+  };
+
   const [projects, totalCount] = await Promise.all([
     prisma.project.findMany({
       include: {
@@ -111,17 +118,13 @@ export async function getProjects(params: {
         costs: true,
         milestones: true,
       },
-      where: {
-        name: { contains: params.search },
-      },
+      where,
       take: params.pagination.take,
       skip: params.pagination.skip,
       orderBy: params.ordering,
     }),
     prisma.project.count({
-      where: {
-        name: { contains: params.search },
-      },
+      where,
     }),
   ]);
 

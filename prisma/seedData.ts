@@ -51,4 +51,24 @@ export const projects: SeedProject[] = [
       },
     ],
   },
+  {
+    name: "Project Two",
+    type: "AUTOMATION",
+  },
+  {
+    name: "Project Three",
+    type: "DESIGN",
+  },
+  {
+    name: "Project Four",
+    type: "ELECTRONICS",
+  },
+  {
+    name: "Project Five",
+    type: "MAKER",
+  },
+  {
+    name: "Project Six",
+    type: "MAKER",
+  },
 ];
