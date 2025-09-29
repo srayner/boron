@@ -1,9 +1,5 @@
 import { OpenAI } from "openai";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
 const systemPrompt = `
 You are an assistant that creates projects by returning a JSON command ONLY when the user wants to create a project.
 
@@ -44,6 +40,10 @@ User message: {user_input}
 `;
 
 export async function sendMessageToGPT(message: string) {
+  const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+
   const completion = await openai.chat.completions.create({
     model: "gpt-4o-mini",
     messages: [
