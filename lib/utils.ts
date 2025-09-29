@@ -62,3 +62,11 @@ export function getDateRange(groupBy: "day" | "month", rangeLength?: number) {
     endDate: formatISO(endOfDay(now)),
   };
 }
+
+export function getUrlParam<T extends string>(
+  param: string | null,
+  options: readonly T[],
+  defaultValue?: T
+): T | null {
+  return options.includes(param as T) ? (param as T) : defaultValue ?? null;
+}

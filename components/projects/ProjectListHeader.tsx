@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
-import { projectTypes, ProjectType } from "@/types/entities";
+import { ProjectType } from "@/types/entities";
 
 const projectTypeNames: Record<ProjectType | "ALL", string> = {
   ALL: "All",
@@ -37,9 +37,6 @@ type ProjectListHeaderProps = {
   ) => void;
 };
 
-const typeOptions: (ProjectType | "ALL")[] = ["ALL", ...projectTypes];
-const sortOptions = ["name", "updatedAt", "priority"];
-
 const ProjectListHeader: React.FC<ProjectListHeaderProps> = ({
   search,
   type,
@@ -53,11 +50,11 @@ const ProjectListHeader: React.FC<ProjectListHeaderProps> = ({
     onSearchChange(newText, type, sort);
   };
 
-  const onSelectType = (newType: string) => {
+  const onSelectType = (newType: ProjectType | "ALL") => {
     onSearchChange(text, newType, sort);
   };
 
-  const onSelectSort = (newSort: string) => {
+  const onSelectSort = (newSort: "name" | "updatedAt" | "priority") => {
     onSearchChange(text, type, newSort);
   };
 
@@ -83,15 +80,17 @@ const ProjectListHeader: React.FC<ProjectListHeaderProps> = ({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            {Object.entries(projectTypeNames).map(([key, label]) => (
-              <DropdownMenuCheckboxItem
-                key={key}
-                checked={type === key}
-                onCheckedChange={() => onSelectType(key)}
-              >
-                {label}
-              </DropdownMenuCheckboxItem>
-            ))}
+            {(Object.keys(projectTypeNames) as (ProjectType | "ALL")[]).map(
+              (key) => (
+                <DropdownMenuCheckboxItem
+                  key={key}
+                  checked={type === key}
+                  onCheckedChange={() => onSelectType(key)}
+                >
+                  {projectTypeNames[key]}
+                </DropdownMenuCheckboxItem>
+              )
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
 

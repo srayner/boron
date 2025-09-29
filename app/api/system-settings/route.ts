@@ -1,7 +1,6 @@
-import { NextRequest } from "next/server";
 import { withErrorHandling } from "@/lib/api/handler";
 import { getAllSystemSettings } from "@/services/system-settings";
 
-export const GET = withErrorHandling(async (req: NextRequest) => {
+export const GET = withErrorHandling(async () => {
   return await getAllSystemSettings();
 });

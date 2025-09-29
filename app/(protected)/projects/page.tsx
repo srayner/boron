@@ -9,8 +9,14 @@ import ProjectListHeader from "@/components/projects/ProjectListHeader";
 import PaginationControls from "@/components/ui/PaginationControls";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { ProgressBar } from "@/components/ui/ProgressBar";
-import { projectTypes, ProjectType } from "@/types/entities";
+import {
+  projectSortOptions,
+  ProjectSortOption,
+  projectTypes,
+  ProjectType,
+} from "@/types/entities";
 import { ProjectStatusBadge } from "@/components/projects/project-status";
+import { getUrlParam } from "@/lib/utils";
 
 export default function ProjectPage() {
   const router = useRouter();
@@ -23,24 +29,15 @@ export default function ProjectPage() {
   const initialSearch = searchParams.get("search") ?? "";
   const [search, setSearch] = useState(initialSearch);
 
-  const initialTypeRaw = searchParams.get("type");
-  const initialType: ProjectType | "ALL" = projectTypes.includes(
-    initialTypeRaw as ProjectType
-  )
-    ? (initialTypeRaw as ProjectType)
-    : "ALL";
-  const [type, setType] = useState<ProjectType | "ALL">(initialType);
+  const initialType = getUrlParam(searchParams.get("type"), projectTypes);
+  const [type, setType] = useState<ProjectType | null>(initialType);
 
-  const sortOptions = ["name", "updatedAt", "priority"] as const;
-  const initialOrderByRaw = searchParams.get("orderBy");
-  const initialOrderBy: "name" | "updatedAt" | "priority" = (
-    sortOptions.includes(initialOrderByRaw as any)
-      ? initialOrderByRaw
-      : "updatedAt"
-  ) as "name" | "updatedAt" | "priority";
-  const [orderBy, setOrderBy] = useState<"name" | "updatedAt" | "priority">(
-    initialOrderBy
-  );
+  const initialOrderBy = getUrlParam(
+    searchParams.get("orderBy"),
+    projectSortOptions,
+    "updatedAt"
+  ) as ProjectSortOption;
+  const [orderBy, setOrderBy] = useState<ProjectSortOption>(initialOrderBy);
 
   const limit = 10;
   const skip = (page - 1) * limit;
@@ -69,15 +66,15 @@ export default function ProjectPage() {
     <div className="max-w-4xl mx-auto my-4">
       <ProjectListHeader
         search={search}
-        type={type}
+        type={type || "ALL"}
         sort={orderBy}
         onSearchChange={(newText, newType, newOrder) => {
           setSearch(newText);
-          setType(newType);
+          setType(newType === "ALL" ? null : newType);
           setOrderBy(newOrder);
           const params = new URLSearchParams(searchParams.toString());
           params.set("search", newText);
-          params.set("type", newType);
+          params.set("type", String(newType));
           params.set("orderBy", newOrder);
           params.set("page", "1"); // reset to first page on search
           router.replace(`${pathname}?${params.toString()}`, { scroll: false });

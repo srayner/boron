@@ -12,8 +12,8 @@ import { Input } from "@/components/ui/input";
 
 interface SystemSettingEditModalProps {
   open: boolean;
-  setting: { key: string; value: any } | null;
-  onSave: (key: string, value: any) => void;
+  setting: { key: string; value: unknown } | null;
+  onSave: (key: string, value: unknown) => void;
   onCancel: () => void;
 }
 
@@ -23,20 +23,27 @@ export function SystemSettingEditModal({
   onSave,
   onCancel,
 }: SystemSettingEditModalProps) {
-  const [value, setValue] = useState(
+  const [value, setValue] = useState<string>(
     setting && typeof setting.value === "object"
       ? JSON.stringify(setting.value)
-      : setting?.value ?? ""
+      : String(setting?.value ?? "")
   );
 
   const handleSave = () => {
-    let parsed: any = value;
+    if (!setting) return;
+
+    let parsed: unknown = value;
     try {
-      parsed = JSON.parse(value);
+      // if original value was an object, try parsing JSON back
+      if (typeof setting.value === "object") {
+        parsed = JSON.parse(value as string);
+      }
     } catch {
-      // keep string
+      // fallback to raw string if parse fails
+      parsed = value;
     }
-    if (setting) onSave(setting.key, parsed);
+
+    onSave(setting.key, parsed);
   };
 
   return (

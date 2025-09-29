@@ -20,6 +20,9 @@ export const projectTypes = [
 ] as const;
 export type ProjectType = (typeof projectTypes)[number];
 
+export const projectSortOptions = ["name", "updatedAt", "priority"] as const;
+export type ProjectSortOption = (typeof projectSortOptions)[number];
+
 export type TaskStatus =
   | "PLANNED"
   | "IN_PROGRESS"

@@ -12,7 +12,7 @@ import { translate } from "@/lib/utils";
 const ProfilePage = () => {
   const [preferences, setPreferences] = useState<UserPreference[]>([]);
 
-  const edit = (setting: any) => {
+  const edit = (setting: UserPreference) => {
     void setting;
   };
 
