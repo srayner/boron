@@ -15,6 +15,7 @@ import {
   projectTypes,
   ProjectType,
 } from "@/types/entities";
+import { ProjectPriorityBadge } from "@/components/projects/project-priority";
 import { ProjectStatusBadge } from "@/components/projects/project-status";
 import { getUrlParam } from "@/lib/utils";
 
@@ -46,8 +47,9 @@ export default function ProjectPage() {
 
   const fetchProjects = async () => {
     try {
+      const orderDir = orderBy === "name" ? "asc" : "desc";
       const res = await fetch(
-        `/api/projects?limit=${limit}&skip=${skip}&orderBy=${orderBy}&orderDir=desc&search=${search}&typeFilter=${type}`
+        `/api/projects?limit=${limit}&skip=${skip}&orderBy=${orderBy}&orderDir=${orderDir}&search=${search}&typeFilter=${type}`
       );
       if (!res.ok) throw new Error("Failed to fetch recent projects");
       const { projects, totalCount } = await res.json();
@@ -95,7 +97,12 @@ export default function ProjectPage() {
                 {project.name}
               </Link>
               <div className="flex gap-4 items-center">
-                <ProjectStatusBadge status={project.status} />
+                {orderBy !== "priority" && (
+                  <ProjectStatusBadge status={project.status} />
+                )}
+                {orderBy === "priority" && (
+                  <ProjectPriorityBadge priority={project.priority} />
+                )}
                 <div className="w-32">
                   {`${project.progress}%`}
                   <ProgressBar percent={project.progress} height={8} />
