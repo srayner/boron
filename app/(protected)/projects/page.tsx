@@ -97,12 +97,7 @@ export default function ProjectPage() {
                 {project.name}
               </Link>
               <div className="flex gap-4 items-center">
-                {orderBy !== "priority" && (
-                  <ProjectStatusBadge status={project.status} />
-                )}
-                {orderBy === "priority" && (
-                  <ProjectPriorityBadge priority={project.priority} />
-                )}
+                <ProjectStatusBadge status={project.status} />
                 <div className="w-32">
                   {`${project.progress}%`}
                   <ProgressBar percent={project.progress} height={8} />
@@ -110,7 +105,7 @@ export default function ProjectPage() {
               </div>
             </div>
             <div className="text-muted-foreground">{project.description}</div>
-            <div className="flex gap-4 text-muted-foreground">
+            <div className="flex gap-4 text-muted-foreground align-center">
               <ProjectTypeWithIcon type={project.type} />
 
               <span>
@@ -119,6 +114,8 @@ export default function ProjectPage() {
                   addSuffix: true,
                 })}
               </span>
+
+              <ProjectPriorityBadge priority={project.priority} />
             </div>
             <hr className="mt-4" />
           </div>
