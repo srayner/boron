@@ -137,6 +137,14 @@ export interface MilestoneSummary {
   overdueCount: number;
 }
 
+export interface TaskSummary {
+  hasAnyTasks: boolean;
+  hasCompletedTasks: boolean;
+  hasUndatedOpenTasks: boolean;
+  hasUpcomingTasks: boolean;
+  overdueCount: number;
+}
+
 export interface SystemSetting {
   key: string;
   value: number | string;

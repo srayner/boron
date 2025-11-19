@@ -151,6 +151,7 @@ export const getTask = async (id: string) => {
 export async function getTasks(params: {
   search: string;
   statusFilter?: "open" | "closed";
+  dueDate?: { lt?: Date; gt?: Date };
   dueDateFilter?: "with" | "without";
   pagination: { take: number; skip: number };
   ordering: { [key: string]: "asc" | "desc" };
@@ -159,6 +160,7 @@ export async function getTasks(params: {
     name: { contains: params.search },
     ...(params.statusFilter === "open" && { status: { in: openStatuses } }),
     ...(params.statusFilter === "closed" && { status: { in: closeStatuses } }),
+    ...(params.dueDate && { dueDate: params.dueDate }),
     ...(params.dueDateFilter === "with" && { dueDate: { not: null } }),
     ...(params.dueDateFilter === "without" && { dueDate: null }),
   };
@@ -249,6 +251,52 @@ export async function getCreatedAndCompletedTasksOverTime(
   }
 
   return result;
+}
+
+export async function getTaskSummary() {
+  const now = new Date();
+
+  const { tasks } = await getTasks({
+    search: "",
+    pagination: { take: 5, skip: 0 },
+    ordering: { dueDate: "asc" },
+    statusFilter: "open",
+    dueDate: { gt: now },
+  });
+
+  const [hasAny, hasCompleted, hasUndatedOpen, overdueCount] = await Promise.all(
+    [
+      prisma.task.count().then((c) => c > 0),
+      prisma.task
+        .count({ where: { status: "COMPLETED" } })
+        .then((c) => c > 0),
+      prisma.task
+        .count({
+          where: {
+            status: { in: openStatuses },
+            dueDate: null,
+          },
+        })
+        .then((c) => c > 0),
+      prisma.task.count({
+        where: {
+          status: { in: openStatuses },
+          dueDate: { lt: now },
+        },
+      }),
+    ]
+  );
+
+  return {
+    tasks,
+    summary: {
+      hasAnyTasks: hasAny,
+      hasCompletedTasks: hasCompleted,
+      hasUndatedOpenTasks: hasUndatedOpen,
+      hasUpcomingTasks: tasks.length > 0,
+      overdueCount,
+    },
+  };
 }
 
 function calculateProgress(update: Task): number {
