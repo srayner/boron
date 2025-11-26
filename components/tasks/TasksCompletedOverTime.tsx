@@ -35,10 +35,12 @@ export default function TasksCompletedOverTime({
 
   useEffect(() => {
     async function fetchData() {
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       const params = new URLSearchParams({
         groupBy,
         start: startDate,
         end: endDate,
+        timezone,
       });
       const res = await fetch(
         `/api/tasks/completed-over-time?${params.toString()}`

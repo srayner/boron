@@ -11,6 +11,7 @@ const querySchema = z.object({
   end: z.string().refine((val) => !isNaN(Date.parse(val)), {
     message: "Invalid end date format, expected YYYY-MM-DD",
   }),
+  timezone: z.string().optional().default("UTC"),
 });
 
 export const GET = withErrorHandling(async (req: NextRequest) => {
@@ -19,6 +20,7 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
     groupBy: url.searchParams.get("groupBy") ?? undefined,
     start: url.searchParams.get("start") ?? "",
     end: url.searchParams.get("end") ?? "",
+    timezone: url.searchParams.get("timezone") ?? undefined,
   };
 
   const parsed = querySchema.parse(queryParams);
@@ -33,7 +35,8 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
   const data = await getCreatedAndCompletedTasksOverTime(
     parsed.groupBy,
     startDate,
-    endDate
+    endDate,
+    parsed.timezone
   );
 
   return { data };

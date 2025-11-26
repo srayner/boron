@@ -188,17 +188,19 @@ function getTaskCountOverTime(
   column: "createdAt" | "completedAt",
   groupBy: "day" | "month",
   startDate: Date,
-  endDate: Date
+  endDate: Date,
+  timezone: string = "UTC"
 ) {
   const format = groupBy === "month" ? "%Y-%m" : "%Y-%m-%d";
-
   const columnName = column === "createdAt" ? "createdAt" : "completedAt";
+
+  console.log("Timezone: ", timezone);
 
   return prisma
     .$queryRawUnsafe<{ date: string; count: bigint }[]>(
       `
     SELECT
-      DATE_FORMAT(${columnName}, '${format}') AS date,
+      DATE_FORMAT(CONVERT_TZ(${columnName}, 'UTC', ?), '${format}') AS date,
       CAST(COUNT(*) AS UNSIGNED) AS count
     FROM \`Task\`
     WHERE ${columnName} IS NOT NULL
@@ -206,6 +208,7 @@ function getTaskCountOverTime(
     GROUP BY date
     ORDER BY date ASC
   `,
+      timezone,
       startDate,
       endDate
     )
@@ -220,11 +223,12 @@ function getTaskCountOverTime(
 export async function getCreatedAndCompletedTasksOverTime(
   groupBy: "day" | "month",
   startDate: Date,
-  endDate: Date
+  endDate: Date,
+  timezone: string = "UTC"
 ) {
   const [created, completed] = await Promise.all([
-    getTaskCountOverTime("createdAt", groupBy, startDate, endDate),
-    getTaskCountOverTime("completedAt", groupBy, startDate, endDate),
+    getTaskCountOverTime("createdAt", groupBy, startDate, endDate, timezone),
+    getTaskCountOverTime("completedAt", groupBy, startDate, endDate, timezone),
   ]);
 
   const allDates = Array.from(
@@ -235,7 +239,7 @@ export async function getCreatedAndCompletedTasksOverTime(
 
   const result = [];
   while (current <= endDate) {
-    const dateStr = formatISO(current, { representation: "date" }); // → "2025-06-18"
+    const dateStr = formatISO(current, { representation: "date" });
 
     const createdCount = created.find((d) => d.date === dateStr)?.count ?? 0;
     const completedCount =
@@ -264,12 +268,10 @@ export async function getTaskSummary() {
     dueDate: { gt: now },
   });
 
-  const [hasAny, hasCompleted, hasUndatedOpen, overdueCount] = await Promise.all(
-    [
+  const [hasAny, hasCompleted, hasUndatedOpen, overdueCount] =
+    await Promise.all([
       prisma.task.count().then((c) => c > 0),
-      prisma.task
-        .count({ where: { status: "COMPLETED" } })
-        .then((c) => c > 0),
+      prisma.task.count({ where: { status: "COMPLETED" } }).then((c) => c > 0),
       prisma.task
         .count({
           where: {
@@ -284,8 +286,7 @@ export async function getTaskSummary() {
           dueDate: { lt: now },
         },
       }),
-    ]
-  );
+    ]);
 
   return {
     tasks,
