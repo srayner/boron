@@ -3,7 +3,7 @@ import { AppError } from "@/lib/api/error";
 import { processTagsForCreate, processTagsForUpdate } from "@/services/tags";
 import type { Prisma } from "@prisma/client";
 import { updateSearchIndex, deleteSearchIndex } from "./search";
-import { ProjectType } from "@/types/entities";
+import { ProjectStatus, ProjectType } from "@/types/entities";
 
 export const createProject = async (data: any) => {
   if (!data.name) throw new AppError("Project name is required", 422);
@@ -104,10 +104,12 @@ export async function getProjects(params: {
   search: string;
   pagination: { take: number; skip: number };
   ordering: { [key: string]: "asc" | "desc" };
+  statusFilter?: ProjectStatus;
   typeFilter?: ProjectType;
 }) {
   const where = {
     name: { contains: params.search },
+    ...(params.statusFilter && { status: params.statusFilter }),
     ...(params.typeFilter && { type: params.typeFilter }),
   };
 

@@ -3,16 +3,26 @@ import { withErrorHandling } from "@/lib/api/handler";
 import { parseQueryParams } from "@/lib/api/query";
 import { parseEnumParam } from "@/lib/api/params";
 import { createProject, getProjects } from "@/services/projects";
-import { projectTypes } from "@/types/entities";
+import { projectStatuses, projectTypes } from "@/types/entities";
 
 export const GET = withErrorHandling(async (req: NextRequest) => {
   const url = new URL(req.url);
   const { search, pagination, ordering } = parseQueryParams(url);
+  const statusFilter = parseEnumParam(
+    url.searchParams.get("statusFilter"),
+    projectStatuses,
+  );
   const typeFilter = parseEnumParam(
     url.searchParams.get("typeFilter"),
-    projectTypes
+    projectTypes,
   );
-  const data = await getProjects({ search, pagination, ordering, typeFilter });
+  const data = await getProjects({
+    search,
+    pagination,
+    ordering,
+    statusFilter,
+    typeFilter,
+  });
 
   return data;
 });

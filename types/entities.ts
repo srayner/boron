@@ -1,9 +1,12 @@
-export type ProjectStatus =
-  | "PLANNED"
-  | "ACTIVE"
-  | "ON_HOLD"
-  | "COMPLETED"
-  | "CANCELLED";
+export const projectStatuses = [
+  "PLANNED",
+  "IN_PROGRESS",
+  "ON_HOLD",
+  "COMPLETED",
+  "CANCELLED",
+] as const;
+export type ProjectStatus = (typeof projectStatuses)[number];
+
 export type ProjectPriority = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
 
 export const projectTypes = [

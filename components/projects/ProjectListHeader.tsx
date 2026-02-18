@@ -10,7 +10,16 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
-import { ProjectType } from "@/types/entities";
+import { ProjectStatus, ProjectType } from "@/types/entities";
+
+const projectStatusNames: Record<ProjectStatus | "ALL", string> = {
+  ALL: "All",
+  PLANNED: "Planned",
+  IN_PROGRESS: "In Progress",
+  ON_HOLD: "On Hold",
+  COMPLETED: "Completed",
+  CANCELLED: "Cancelled",
+};
 
 const projectTypeNames: Record<ProjectType | "ALL", string> = {
   ALL: "All",
@@ -28,17 +37,20 @@ const projectTypeNames: Record<ProjectType | "ALL", string> = {
 
 type ProjectListHeaderProps = {
   search: string;
+  status: ProjectStatus | "ALL";
   type: ProjectType | "ALL";
   sort: "name" | "updatedAt" | "priority";
   onSearchChange: (
     value: string,
+    status: ProjectStatus | "ALL",
     type: ProjectType | "ALL",
-    sort: "name" | "updatedAt" | "priority"
+    sort: "name" | "updatedAt" | "priority",
   ) => void;
 };
 
 const ProjectListHeader: React.FC<ProjectListHeaderProps> = ({
   search,
+  status,
   type,
   sort,
   onSearchChange,
@@ -47,15 +59,19 @@ const ProjectListHeader: React.FC<ProjectListHeaderProps> = ({
 
   const onSearchTextChange = (newText: string) => {
     setText(newText);
-    onSearchChange(newText, type, sort);
+    onSearchChange(newText, status, type, sort);
+  };
+
+  const onSelectStatus = (newStatus: ProjectStatus | "ALL") => {
+    onSearchChange(text, newStatus, type, sort);
   };
 
   const onSelectType = (newType: ProjectType | "ALL") => {
-    onSearchChange(text, newType, sort);
+    onSearchChange(text, status, newType, sort);
   };
 
   const onSelectSort = (newSort: "name" | "updatedAt" | "priority") => {
-    onSearchChange(text, type, newSort);
+    onSearchChange(text, status, type, newSort);
   };
 
   return (
@@ -71,6 +87,29 @@ const ProjectListHeader: React.FC<ProjectListHeaderProps> = ({
 
       {/* Right side: Controls */}
       <div className="flex gap-2 flex-wrap">
+        {/* Status Filter */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline">
+              Status
+              <ChevronDown />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {(Object.keys(projectStatusNames) as (ProjectStatus | "ALL")[]).map(
+              (key) => (
+                <DropdownMenuCheckboxItem
+                  key={key}
+                  checked={status === key}
+                  onCheckedChange={() => onSelectStatus(key)}
+                >
+                  {projectStatusNames[key]}
+                </DropdownMenuCheckboxItem>
+              ),
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
+
         {/* Type Filter */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -89,7 +128,7 @@ const ProjectListHeader: React.FC<ProjectListHeaderProps> = ({
                 >
                   {projectTypeNames[key]}
                 </DropdownMenuCheckboxItem>
-              )
+              ),
             )}
           </DropdownMenuContent>
         </DropdownMenu>

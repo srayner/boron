@@ -12,6 +12,8 @@ import { ProgressBar } from "@/components/ui/ProgressBar";
 import {
   projectSortOptions,
   ProjectSortOption,
+  ProjectStatus,
+  projectStatuses,
   projectTypes,
   ProjectType,
 } from "@/types/entities";
@@ -30,13 +32,19 @@ export default function ProjectPage() {
   const initialSearch = searchParams.get("search") ?? "";
   const [search, setSearch] = useState(initialSearch);
 
+  const initialStatus = getUrlParam(
+    searchParams.get("status"),
+    Object.values(projectStatuses),
+  );
+  const [status, setStatus] = useState<ProjectStatus | null>(initialStatus);
+
   const initialType = getUrlParam(searchParams.get("type"), projectTypes);
   const [type, setType] = useState<ProjectType | null>(initialType);
 
   const initialOrderBy = getUrlParam(
     searchParams.get("orderBy"),
     projectSortOptions,
-    "updatedAt"
+    "updatedAt",
   ) as ProjectSortOption;
   const [orderBy, setOrderBy] = useState<ProjectSortOption>(initialOrderBy);
 
@@ -49,7 +57,7 @@ export default function ProjectPage() {
     try {
       const orderDir = orderBy === "name" ? "asc" : "desc";
       const res = await fetch(
-        `/api/projects?limit=${limit}&skip=${skip}&orderBy=${orderBy}&orderDir=${orderDir}&search=${search}&typeFilter=${type}`
+        `/api/projects?limit=${limit}&skip=${skip}&orderBy=${orderBy}&orderDir=${orderDir}&search=${search}&typeFilter=${type}&statusFilter=${status}`,
       );
       if (!res.ok) throw new Error("Failed to fetch recent projects");
       const { projects, totalCount } = await res.json();
@@ -62,20 +70,23 @@ export default function ProjectPage() {
 
   useEffect(() => {
     fetchProjects();
-  }, [page, search, orderBy, type]);
+  }, [page, search, orderBy, type, status]);
 
   return (
     <div className="max-w-4xl mx-auto my-4">
       <ProjectListHeader
         search={search}
+        status={status || "ALL"}
         type={type || "ALL"}
         sort={orderBy}
-        onSearchChange={(newText, newType, newOrder) => {
+        onSearchChange={(newText, newStatus, newType, newOrder) => {
           setSearch(newText);
+          setStatus(newStatus === "ALL" ? null : newStatus);
           setType(newType === "ALL" ? null : newType);
           setOrderBy(newOrder);
           const params = new URLSearchParams(searchParams.toString());
           params.set("search", newText);
+          params.set("status", String(newStatus));
           params.set("type", String(newType));
           params.set("orderBy", newOrder);
           params.set("page", "1"); // reset to first page on search
