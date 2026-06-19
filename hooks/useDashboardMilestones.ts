@@ -15,7 +15,9 @@ export function useDashboardMilestones() {
     async function fetchMilestones() {
       try {
         const localDate = formatLocalDate(new Date()) ?? "";
-        const res = await fetch(`/api/milestones/summary?localDate=${localDate}`);
+        const res = await fetch(
+          `/api/milestones/summary?localDate=${localDate}`,
+        );
         if (!res.ok) throw new Error(`Error: ${res.statusText}`);
         const data = await res.json();
         setMilestones(data.milestones || []);

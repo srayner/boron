@@ -77,7 +77,7 @@ export function getDateRange(groupBy: "day" | "month", rangeLength?: number) {
 export function getUrlParam<T extends string>(
   param: string | null,
   options: readonly T[],
-  defaultValue?: T
+  defaultValue?: T,
 ): T | null {
-  return options.includes(param as T) ? (param as T) : defaultValue ?? null;
+  return options.includes(param as T) ? (param as T) : (defaultValue ?? null);
 }

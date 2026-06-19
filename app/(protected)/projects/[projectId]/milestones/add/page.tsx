@@ -171,7 +171,7 @@ const MilestoneAddPage: NextPage<MilestoneAddPageProps> = ({ params }) => {
                     onChange={(e) => {
                       const val = e.target.value;
                       field.onChange(
-                        val === "" ? undefined : parseInt(val, 10)
+                        val === "" ? undefined : parseInt(val, 10),
                       );
                     }}
                   />

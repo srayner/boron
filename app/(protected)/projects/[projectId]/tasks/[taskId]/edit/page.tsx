@@ -105,7 +105,7 @@ const TaskEditPage: NextPage<TaskEditPageProps> = ({ params }) => {
           projectId: originalTask?.projectId,
           milestoneId: originalTask?.milestone?.id,
           taskId,
-        })
+        }),
       );
     } catch (error) {
       console.error("Error updating task:", error);

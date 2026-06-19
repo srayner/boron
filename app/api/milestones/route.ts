@@ -19,7 +19,9 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
   const projectId = req.nextUrl.searchParams.get("projectId") ?? undefined;
   const overdue = url.searchParams.get("overdue") === "true";
   const localDate = url.searchParams.get("localDate");
-  const dueDate = overdue ? { lt: parseLocalDate(localDate) ?? new Date() } : undefined;
+  const dueDate = overdue
+    ? { lt: parseLocalDate(localDate) ?? new Date() }
+    : undefined;
   return await getMilestones({
     search,
     pagination,

@@ -18,7 +18,9 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
   ]);
   const overdue = url.searchParams.get("overdue") === "true";
   const localDate = url.searchParams.get("localDate");
-  const dueDate = overdue ? { lt: parseLocalDate(localDate) ?? new Date() } : undefined;
+  const dueDate = overdue
+    ? { lt: parseLocalDate(localDate) ?? new Date() }
+    : undefined;
 
   return await getTasks({
     search,

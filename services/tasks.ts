@@ -190,7 +190,7 @@ function getTaskCountOverTime(
   groupBy: "day" | "month",
   startDate: Date,
   endDate: Date,
-  timezone: string = "UTC"
+  timezone: string = "UTC",
 ) {
   const format = groupBy === "month" ? "%Y-%m" : "%Y-%m-%d";
   const columnName = column === "createdAt" ? "createdAt" : "completedAt";
@@ -211,13 +211,13 @@ function getTaskCountOverTime(
   `,
       timezone,
       startDate,
-      endDate
+      endDate,
     )
     .then((results) =>
       results.map((r) => ({
         date: r.date,
         count: Number(r.count),
-      }))
+      })),
     );
 }
 
@@ -225,7 +225,7 @@ export async function getCreatedAndCompletedTasksOverTime(
   groupBy: "day" | "month",
   startDate: Date,
   endDate: Date,
-  timezone: string = "UTC"
+  timezone: string = "UTC",
 ) {
   const [created, completed] = await Promise.all([
     getTaskCountOverTime("createdAt", groupBy, startDate, endDate, timezone),
@@ -233,7 +233,7 @@ export async function getCreatedAndCompletedTasksOverTime(
   ]);
 
   const allDates = Array.from(
-    new Set([...created, ...completed].map((d) => d.date))
+    new Set([...created, ...completed].map((d) => d.date)),
   ).sort();
 
   let current = startDate;
