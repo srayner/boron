@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/select";
 import { DatePickerField } from "@/components/ui/form/date-picker-field";
 import { TagField } from "@/components/ui/form/TagField";
+import { formatLocalDate } from "@/lib/utils";
 import { useRecentProjects } from "@/app/context/recent-projects-context";
 import { Project } from "@/types/entities";
 import { getReturnUrl } from "@/lib/navigation";
@@ -69,7 +70,7 @@ const ProjectEditPage: NextPage<ProjectEditPageProps> = ({ params }) => {
     const payload = {
       ...values,
       startDate: values.startDate ? values.startDate.toISOString() : null,
-      dueDate: values.dueDate ? values.dueDate.toISOString() : null,
+      dueDate: values.dueDate ? formatLocalDate(values.dueDate) : null,
     };
     await fetch(`/api/projects/${projectId}`, {
       method: "PUT",

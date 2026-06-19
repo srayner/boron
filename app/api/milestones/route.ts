@@ -3,6 +3,7 @@ import { withErrorHandling } from "@/lib/api/handler";
 import { parseQueryParams } from "@/lib/api/query";
 import { parseEnumParam } from "@/lib/api/params";
 import { createMilestone, getMilestones } from "@/services/milestones";
+import { parseLocalDate } from "@/lib/utils";
 
 export const GET = withErrorHandling(async (req: NextRequest) => {
   const url = new URL(req.url);
@@ -16,13 +17,17 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
     "without",
   ]);
   const projectId = req.nextUrl.searchParams.get("projectId") ?? undefined;
+  const overdue = url.searchParams.get("overdue") === "true";
+  const localDate = url.searchParams.get("localDate");
+  const dueDate = overdue ? { lt: parseLocalDate(localDate) ?? new Date() } : undefined;
   return await getMilestones({
     search,
     pagination,
     ordering,
     projectId,
-    statusFilter,
-    dueDateFilter,
+    statusFilter: overdue ? "open" : statusFilter,
+    dueDate,
+    dueDateFilter: overdue ? undefined : dueDateFilter,
   });
 });
 

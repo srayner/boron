@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/select";
 import { DatePickerField } from "@/components/ui/form/date-picker-field";
 import { TagField } from "@/components/ui/form/TagField";
+import { formatLocalDate } from "@/lib/utils";
 
 export default function AddProjectPage() {
   const router = useRouter();
@@ -65,7 +66,7 @@ export default function AddProjectPage() {
     const payload = {
       ...values,
       startDate: values.startDate ? values.startDate.toISOString() : null,
-      dueDate: values.dueDate ? values.dueDate.toISOString() : null,
+      dueDate: values.dueDate ? formatLocalDate(values.dueDate) : null,
     };
     try {
       const response = await fetch("/api/projects", {

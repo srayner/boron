@@ -1,7 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { format, isValid } from "date-fns";
-import { startOfDay, endOfDay, subDays, subMonths, formatISO } from "date-fns";
+import { format, formatISO, isValid, parseISO } from "date-fns";
+import { startOfDay, endOfDay, subDays, subMonths } from "date-fns";
 
 const translations: Record<string, { full: string; short?: string }> = {
   WEBAPP: { full: "Web Application", short: "Web App" },
@@ -40,6 +40,17 @@ export function formatDate(date: string, formatStr?: string): string {
   const parsedDate = new Date(date);
   if (!isValid(parsedDate)) return "";
   return format(parsedDate, formatStr || "dd MMM yyyy");
+}
+
+export function formatLocalDate(date?: Date | null): string | null {
+  if (!date) return null;
+  return formatISO(date, { representation: "date" });
+}
+
+export function parseLocalDate(date: string | null | undefined): Date | null {
+  if (!date) return null;
+  const parsedDate = parseISO(date);
+  return isValid(parsedDate) ? parsedDate : null;
 }
 
 export function getDateRange(groupBy: "day" | "month", rangeLength?: number) {

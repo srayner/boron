@@ -13,6 +13,7 @@ import { SelectField } from "@/components/ui/form/SelectField";
 import { TextAreaField } from "@/components/ui/form/TextAreaField";
 import { TextField } from "@/components/ui/form/TextField";
 import { TagField } from "@/components/ui/form/TagField";
+import { formatLocalDate } from "@/lib/utils";
 import { NextPage } from "next";
 import { Milestone } from "@/types/entities";
 
@@ -83,7 +84,7 @@ const TaskAddPage: NextPage<TaskAddPageProps> = ({ params }) => {
       projectId,
       ...values,
       startDate: values.startDate ? values.startDate.toISOString() : null,
-      dueDate: values.dueDate ? values.dueDate.toISOString() : null,
+      dueDate: values.dueDate ? formatLocalDate(values.dueDate) : null,
     };
     try {
       const response = await fetch("/api/tasks", {

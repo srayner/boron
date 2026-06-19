@@ -28,6 +28,7 @@ import {
 import { TextField } from "@/components/ui/form/TextField";
 import { TagField } from "@/components/ui/form/TagField";
 import { DatePickerField } from "@/components/ui/form/date-picker-field";
+import { formatLocalDate } from "@/lib/utils";
 import Link from "next/link";
 import { Milestone, Task } from "@/types/entities";
 import { SelectField } from "@/components/ui/form/SelectField";
@@ -82,7 +83,7 @@ const TaskEditPage: NextPage<TaskEditPageProps> = ({ params }) => {
       projectId,
       ...values,
       startDate: values.startDate ? values.startDate.toISOString() : null,
-      dueDate: values.dueDate ? values.dueDate.toISOString() : null,
+      dueDate: values.dueDate ? formatLocalDate(values.dueDate) : null,
     };
     try {
       const response = await fetch(`/api/tasks/${taskId}`, {

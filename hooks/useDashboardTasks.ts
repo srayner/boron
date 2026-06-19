@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import type { Task } from "@/types/entities";
 import { TaskSummary } from "@/types/entities";
+import { formatLocalDate } from "@/lib/utils";
 
 export function useDashboardTasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -13,7 +14,8 @@ export function useDashboardTasks() {
   useEffect(() => {
     async function fetchTasks() {
       try {
-        const res = await fetch("/api/tasks/summary");
+        const localDate = formatLocalDate(new Date()) ?? "";
+        const res = await fetch(`/api/tasks/summary?localDate=${localDate}`);
         if (!res.ok) throw new Error(`Error: ${res.statusText}`);
         const data = await res.json();
         setTasks(data.tasks || []);

@@ -11,13 +11,16 @@ import MilestonesTable from "@/components/milestones/MilestonesTable";
 import PaginationControls from "@/components/ui/PaginationControls";
 import { useDeleteEntity } from "@/hooks/useDeleteEntity";
 import { Milestone } from "@/types/entities";
+import { formatLocalDate } from "@/lib/utils";
 
 const MilestonesListPage: NextPage = () => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const isDue = searchParams.has("due");
-  const headerText = isDue ? "Due Milestones" : "All Milestones";
+  const isOverdue = searchParams.get("overdue") === "true";
+  const localDate =
+    searchParams.get("localDate") ?? formatLocalDate(new Date()) ?? "";
+  const headerText = isOverdue ? "Overdue Milestones" : "All Milestones";
 
   const initialPage = Number(searchParams.get("page") ?? "1");
   const [page, setPage] = useState<number>(initialPage);
@@ -39,9 +42,10 @@ const MilestonesListPage: NextPage = () => {
         orderDir: "asc",
         search,
       });
-      if (isDue === true) {
-        params.set("dueDateFilter", "with");
+      if (isOverdue) {
+        params.set("overdue", "true");
         params.set("statusFilter", "open");
+        params.set("localDate", localDate);
       }
       const res = await fetch(`/api/milestones?${params.toString()}`);
       if (!res.ok) throw new Error("Failed to fetch tasks");
@@ -85,6 +89,10 @@ const MilestonesListPage: NextPage = () => {
               const params = new URLSearchParams(searchParams.toString());
               params.set("search", value);
               params.set("page", "1"); // reset to first page on search
+              if (isOverdue) {
+                params.set("overdue", "true");
+                params.set("localDate", localDate);
+              }
               router.replace(`${pathname}?${params.toString()}`, {
                 scroll: false,
               });
@@ -111,6 +119,10 @@ const MilestonesListPage: NextPage = () => {
           setPage(newPage);
           const params = new URLSearchParams(searchParams.toString());
           params.set("page", newPage.toString());
+          if (isOverdue) {
+            params.set("overdue", "true");
+            params.set("localDate", localDate);
+          }
           router.replace(`${pathname}?${params.toString()}`, { scroll: false });
         }}
       />

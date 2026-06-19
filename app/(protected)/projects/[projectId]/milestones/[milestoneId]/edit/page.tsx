@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/select";
 import { DatePickerField } from "@/components/ui/form/date-picker-field";
 import { TagField } from "@/components/ui/form/TagField";
+import { formatLocalDate } from "@/lib/utils";
 import Link from "next/link";
 import { Milestone } from "@/types/entities";
 import { getReturnUrl } from "@/lib/navigation";
@@ -71,7 +72,7 @@ const MilestoneEditPage: NextPage<MilestoneEditPageProps> = ({ params }) => {
     const payload = {
       projectId,
       ...values,
-      dueDate: values.dueDate ? values.dueDate.toISOString() : null,
+      dueDate: values.dueDate ? formatLocalDate(values.dueDate) : null,
     };
     try {
       const response = await fetch(`/api/milestones/${milestoneId}`, {

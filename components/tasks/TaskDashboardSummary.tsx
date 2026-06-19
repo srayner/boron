@@ -1,5 +1,7 @@
 import React from "react";
+import Link from "next/link";
 import { Task, TaskSummary } from "@/types/entities";
+import { formatLocalDate } from "@/lib/utils";
 
 interface TaskDashboardWidgetProps {
   tasks: Task[];
@@ -10,6 +12,8 @@ export function TaskDashboardWidget({
   tasks,
   summary,
 }: TaskDashboardWidgetProps) {
+  const localDate = formatLocalDate(new Date()) ?? "";
+
   return (
     <section
       className="p-4 rounded-md"
@@ -28,10 +32,13 @@ export function TaskDashboardWidget({
 
       {summary && summary?.overdueCount > 0 && (
         <div className="mb-4 p-3 border border-red-500 rounded-md bg-red-50 dark:bg-red-900">
-          <p className="text-red-700 dark:text-red-300 font-semibold cursor-pointer">
+          <Link
+            className="text-red-700 dark:text-red-300 font-semibold hover:underline"
+            href={`/tasks?overdue=true&localDate=${localDate}`}
+          >
             {summary.overdueCount} overdue task
             {summary.overdueCount > 1 ? "s" : ""}
-          </p>
+          </Link>
         </div>
       )}
 

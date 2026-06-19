@@ -3,6 +3,7 @@ import { MilestoneStatus } from "@prisma/client";
 import { AppError } from "@/lib/api/error";
 import { processTagsForCreate, processTagsForUpdate } from "@/services/tags";
 import { updateSearchIndex, deleteSearchIndex } from "./search";
+import { parseLocalDate } from "@/lib/utils";
 
 const openStatuses: MilestoneStatus[] = ["PLANNED", "IN_PROGRESS", "ON_HOLD"];
 const closeStatuses: MilestoneStatus[] = ["COMPLETED", "CANCELLED"];
@@ -91,7 +92,7 @@ export const getMilestone = async (id: string) => {
 export async function getMilestones(params: {
   search: string;
   projectId?: string;
-  dueDate?: { lt?: Date; gt?: Date };
+  dueDate?: { lt?: Date; gt?: Date; lte?: Date; gte?: Date };
   dueDateFilter?: "with" | "without";
   statusFilter?: "open" | "closed";
   pagination: { take: number; skip: number };
@@ -124,15 +125,15 @@ export async function getMilestones(params: {
   return { milestones, totalCount };
 }
 
-export async function getSummary() {
-  const now = new Date();
+export async function getSummary(localDate?: string | null) {
+  const currentLocalDate = parseLocalDate(localDate) ?? new Date();
 
   const { milestones } = await getMilestones({
     search: "",
     pagination: { take: 5, skip: 0 },
     ordering: { dueDate: "asc" },
     statusFilter: "open",
-    dueDate: { gt: now },
+    dueDate: { gte: currentLocalDate },
   });
 
   const [hasAny, hasCompleted, hasUndatedOpen, overdueCount] =
@@ -152,7 +153,7 @@ export async function getSummary() {
       prisma.milestone.count({
         where: {
           status: { in: openStatuses },
-          dueDate: { lt: now },
+          dueDate: { lt: currentLocalDate },
         },
       }),
     ]);

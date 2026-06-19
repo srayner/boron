@@ -7,6 +7,7 @@ import { updateMilestoneProgress } from "./milestones";
 import { updateProjectProgress } from "./projects";
 import { formatISO, addDays } from "date-fns";
 import { updateSearchIndex, deleteSearchIndex } from "./search";
+import { parseLocalDate } from "@/lib/utils";
 
 const openStatuses: TaskStatus[] = [
   "PLANNED",
@@ -151,7 +152,7 @@ export const getTask = async (id: string) => {
 export async function getTasks(params: {
   search: string;
   statusFilter?: "open" | "closed";
-  dueDate?: { lt?: Date; gt?: Date };
+  dueDate?: { lt?: Date; gt?: Date; lte?: Date; gte?: Date };
   dueDateFilter?: "with" | "without";
   pagination: { take: number; skip: number };
   ordering: { [key: string]: "asc" | "desc" };
@@ -257,15 +258,15 @@ export async function getCreatedAndCompletedTasksOverTime(
   return result;
 }
 
-export async function getTaskSummary() {
-  const now = new Date();
+export async function getTaskSummary(localDate?: string | null) {
+  const currentLocalDate = parseLocalDate(localDate) ?? new Date();
 
   const { tasks } = await getTasks({
     search: "",
     pagination: { take: 5, skip: 0 },
     ordering: { dueDate: "asc" },
     statusFilter: "open",
-    dueDate: { gt: now },
+    dueDate: { gte: currentLocalDate },
   });
 
   const [hasAny, hasCompleted, hasUndatedOpen, overdueCount] =
@@ -283,7 +284,7 @@ export async function getTaskSummary() {
       prisma.task.count({
         where: {
           status: { in: openStatuses },
-          dueDate: { lt: now },
+          dueDate: { lt: currentLocalDate },
         },
       }),
     ]);

@@ -3,6 +3,7 @@ import { withErrorHandling } from "@/lib/api/handler";
 import { parseQueryParams } from "@/lib/api/query";
 import { parseEnumParam } from "@/lib/api/params";
 import { createTask, getTasks } from "@/services/tasks";
+import { parseLocalDate } from "@/lib/utils";
 
 export const GET = withErrorHandling(async (req: NextRequest) => {
   const url = new URL(req.url);
@@ -15,13 +16,17 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
     "with",
     "without",
   ]);
+  const overdue = url.searchParams.get("overdue") === "true";
+  const localDate = url.searchParams.get("localDate");
+  const dueDate = overdue ? { lt: parseLocalDate(localDate) ?? new Date() } : undefined;
 
   return await getTasks({
     search,
     pagination,
     ordering,
-    statusFilter,
-    dueDateFilter,
+    statusFilter: overdue ? "open" : statusFilter,
+    dueDate,
+    dueDateFilter: overdue ? undefined : dueDateFilter,
   });
 });
 
