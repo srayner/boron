@@ -131,7 +131,7 @@ export const updateTask = async (id: string, data: any) => {
   }
   await updateProjectProgress(updatedTask.projectId);
 
-  updateSearchIndex("project", updatedTask);
+  updateSearchIndex("task", updatedTask);
 
   return updatedTask;
 };
