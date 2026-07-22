@@ -19,13 +19,17 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
     return { error: "Email already in use!" };
   }
 
-  createUser({
-    name,
-    email,
-    emailVerified: null,
-    password: hashedPassword,
-    role: "USER",
-  });
+  try {
+    await createUser({
+      name,
+      email,
+      emailVerified: null,
+      password: hashedPassword,
+      role: "USER",
+    });
+  } catch {
+    return { error: "Something went wrong!" };
+  }
 
   // todo: send verification email
 
