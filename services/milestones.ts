@@ -119,7 +119,7 @@ export async function getMilestones(params: {
       take: params.pagination.take,
       skip: params.pagination.skip,
     }),
-    prisma.task.count({ where }),
+    prisma.milestone.count({ where }),
   ]);
 
   return { milestones, totalCount };
