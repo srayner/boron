@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm audit*)",
+      "Bash(npm run test:unit*)",
+      "Bash(git status*)",
+      "Bash(git log*)",
+      "Bash(grep*)",
+      "Bash(find*)",
+      "Read",
+      "Grep",
+      "Glob",
+      "Agent",
+      "Write(audit/AUDIT.md)",
+      "Write(audit/AUDIT_HISTORY.md)",
+      "Edit(audit/AUDIT.md)",
+      "Edit(audit/AUDIT_HISTORY.md)"
+    ]
+  }
+}

@@ -140,3 +140,12 @@ npm run test:e2e
 ```
 
 Note this reseeds the database as a side effect, wiping any existing data.
+
+## Project health / audit report
+
+This repo tracks a periodic quality and security self-audit under [`audit/`](audit/):
+
+- [`audit/AUDIT.md`](audit/AUDIT.md) — the current snapshot: scores across security, tests, docs and code structure, plus prioritized findings. Regenerated fresh each run (gitignored, so it isn't committed).
+- [`audit/AUDIT_HISTORY.md`](audit/AUDIT_HISTORY.md) — an append-only log of scores from every run, so progress over time stays visible.
+
+Regenerate the audit with `npm run audit:report`.

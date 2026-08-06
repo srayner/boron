@@ -12,7 +12,8 @@
     "test:unit": "vitest run",
     "test:unit:watch": "vitest",
     "test:unit:coverage": "vitest run --coverage",
-    "index": "tsx scripts/backfill-search.ts"
+    "index": "tsx scripts/backfill-search.ts",
+    "audit:report": "claude -p \"/audit\" --permission-mode acceptEdits"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.9.1",
