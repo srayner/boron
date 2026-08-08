@@ -1,6 +1,6 @@
 import { withErrorHandling } from "@/lib/api/handler";
 import { getAllUserPreferences } from "@/services/user-preferences";
-import { auth } from "@/auth";
+import { auth } from "@/lib/auth";
 
 export const GET = withErrorHandling(async () => {
   const session = await auth();

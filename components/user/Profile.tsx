@@ -1,4 +1,4 @@
-import { auth } from "@/auth";
+import { auth } from "@/lib/auth";
 import { translate } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 
