@@ -1,34 +1,39 @@
 import { NextRequest } from "next/server";
 import { withErrorHandling } from "@/lib/api/handler";
+import { withAuth } from "@/lib/api/with-auth";
 import { parseQueryParams } from "@/lib/api/query";
 import { parseEnumParam } from "@/lib/api/params";
 import { createProject, getProjects } from "@/services/projects";
 import { projectStatuses, projectTypes } from "@/types/entities";
 
-export const GET = withErrorHandling(async (req: NextRequest) => {
-  const url = new URL(req.url);
-  const { search, pagination, ordering } = parseQueryParams(url);
-  const statusFilter = parseEnumParam(
-    url.searchParams.get("statusFilter"),
-    projectStatuses,
-  );
-  const typeFilter = parseEnumParam(
-    url.searchParams.get("typeFilter"),
-    projectTypes,
-  );
-  const data = await getProjects({
-    search,
-    pagination,
-    ordering,
-    statusFilter,
-    typeFilter,
-  });
+export const GET = withErrorHandling(
+  withAuth(async (req: NextRequest) => {
+    const url = new URL(req.url);
+    const { search, pagination, ordering } = parseQueryParams(url);
+    const statusFilter = parseEnumParam(
+      url.searchParams.get("statusFilter"),
+      projectStatuses,
+    );
+    const typeFilter = parseEnumParam(
+      url.searchParams.get("typeFilter"),
+      projectTypes,
+    );
+    const data = await getProjects({
+      search,
+      pagination,
+      ordering,
+      statusFilter,
+      typeFilter,
+    });
 
-  return data;
-});
+    return data;
+  })
+);
 
-export const POST = withErrorHandling(async (req: NextRequest) => {
-  const body = await req.json();
-  const project = await createProject(body);
-  return { project, status: 201 };
-});
+export const POST = withErrorHandling(
+  withAuth(async (req: NextRequest) => {
+    const body = await req.json();
+    const project = await createProject(body);
+    return { project, status: 201 };
+  })
+);

@@ -1,4 +1,8 @@
-const AuthLayout = ({ children }: { children: React.ReactNode }) => {
+import { requireGuest } from "@/lib/auth/guards";
+
+const AuthLayout = async ({ children }: { children: React.ReactNode }) => {
+  await requireGuest();
+
   return (
     <div
       className="h-full flex items-center justify-center

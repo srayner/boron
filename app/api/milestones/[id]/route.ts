@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { withErrorHandling } from "@/lib/api/handler";
+import { withAuth } from "@/lib/api/with-auth";
 import {
   getMilestone,
   deleteMilestone,
@@ -8,34 +9,40 @@ import {
 import { AppError } from "@/lib/api/error";
 
 export const GET = withErrorHandling(
-  async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
-    const { id: milestoneId } = await params;
-    const milestone = await getMilestone(milestoneId);
+  withAuth(
+    async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
+      const { id: milestoneId } = await params;
+      const milestone = await getMilestone(milestoneId);
 
-    if (!milestone) {
-      throw new AppError(`Milestone with id ${milestoneId} not found`, 404);
+      if (!milestone) {
+        throw new AppError(`Milestone with id ${milestoneId} not found`, 404);
+      }
+
+      return { milestone };
     }
-
-    return { milestone };
-  }
+  )
 );
 
 export const DELETE = withErrorHandling(
-  async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
-    const { id: milestoneId } = await params;
-    const deletedMilestone = await deleteMilestone(milestoneId);
+  withAuth(
+    async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
+      const { id: milestoneId } = await params;
+      const deletedMilestone = await deleteMilestone(milestoneId);
 
-    return { milestone: deletedMilestone };
-  }
+      return { milestone: deletedMilestone };
+    }
+  )
 );
 
 export const PUT = withErrorHandling(
-  async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
-    const { id: milestoneId } = await params;
-    const data = await req.json();
+  withAuth(
+    async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
+      const { id: milestoneId } = await params;
+      const data = await req.json();
 
-    const updatedMilestone = await updateMilestone(milestoneId, data);
+      const updatedMilestone = await updateMilestone(milestoneId, data);
 
-    return { milestone: updatedMilestone };
-  }
+      return { milestone: updatedMilestone };
+    }
+  )
 );

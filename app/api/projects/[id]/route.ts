@@ -1,37 +1,44 @@
 import { NextRequest } from "next/server";
 import { withErrorHandling } from "@/lib/api/handler";
+import { withAuth } from "@/lib/api/with-auth";
 import { getProject, deleteProject, updateProject } from "@/services/projects";
 import { AppError } from "@/lib/api/error";
 
 export const GET = withErrorHandling(
-  async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
-    const { id: projectId } = await params;
-    const project = await getProject(projectId);
+  withAuth(
+    async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
+      const { id: projectId } = await params;
+      const project = await getProject(projectId);
 
-    if (!project) {
-      throw new AppError(`Project with id ${projectId} not found`, 404);
+      if (!project) {
+        throw new AppError(`Project with id ${projectId} not found`, 404);
+      }
+
+      return { project };
     }
-
-    return { project };
-  }
+  )
 );
 
 export const DELETE = withErrorHandling(
-  async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
-    const { id: projectId } = await params;
-    const deletedProject = await deleteProject(projectId);
+  withAuth(
+    async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
+      const { id: projectId } = await params;
+      const deletedProject = await deleteProject(projectId);
 
-    return { project: deletedProject };
-  }
+      return { project: deletedProject };
+    }
+  )
 );
 
 export const PUT = withErrorHandling(
-  async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
-    const { id: projectId } = await params;
-    const data = await req.json();
+  withAuth(
+    async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
+      const { id: projectId } = await params;
+      const data = await req.json();
 
-    const updatedProject = await updateProject(projectId, data);
+      const updatedProject = await updateProject(projectId, data);
 
-    return { project: updatedProject };
-  }
+      return { project: updatedProject };
+    }
+  )
 );

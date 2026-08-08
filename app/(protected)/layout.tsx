@@ -4,12 +4,15 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import SideBar from "@/components/sidebar";
 import NavBar from "@/components/navbar";
 import { cookies } from "next/headers";
+import { requireAuth } from "@/lib/auth/guards";
 
 export default async function ProtectedLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  await requireAuth();
+
   const cookieStore = await cookies();
   const defaultOpen = cookieStore.get("sidebar_state")?.value === "true";
 

@@ -1,12 +1,11 @@
 import { withErrorHandling } from "@/lib/api/handler";
+import { withAuth } from "@/lib/api/with-auth";
 import { getAllUserPreferences } from "@/services/user-preferences";
-import { auth } from "@/lib/auth";
 
-export const GET = withErrorHandling(async () => {
-  const session = await auth();
-  const userId = session?.user.id ?? "";
+export const GET = withErrorHandling(
+  withAuth(async (req, context, session) => {
+    const userId = session.user.id ?? "";
 
-  console.log("userId: ", userId);
-
-  return await getAllUserPreferences(userId);
-});
+    return await getAllUserPreferences(userId);
+  })
+);

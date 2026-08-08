@@ -12,7 +12,6 @@ export const coverageInclude = [
   'app/api/**',
   'schemas/**',
   'components/**',
-  'middleware.ts',
   'routes.ts',
 ]
 
@@ -37,6 +36,5 @@ export const e2eSourceInclude = [
   'actions/**',
   'hooks/**',
   'schemas/**',
-  'middleware.ts',
   'routes.ts',
 ]

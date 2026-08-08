@@ -1,37 +1,44 @@
 import { NextRequest } from "next/server";
 import { withErrorHandling } from "@/lib/api/handler";
+import { withAuth } from "@/lib/api/with-auth";
 import { getTask, deleteTask, updateTask } from "@/services/tasks";
 import { AppError } from "@/lib/api/error";
 
 export const GET = withErrorHandling(
-  async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
-    const { id: taskId } = await params;
-    const task = await getTask(taskId);
+  withAuth(
+    async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
+      const { id: taskId } = await params;
+      const task = await getTask(taskId);
 
-    if (!task) {
-      throw new AppError(`Task with id ${taskId} not found`, 404);
+      if (!task) {
+        throw new AppError(`Task with id ${taskId} not found`, 404);
+      }
+
+      return { task };
     }
-
-    return { task };
-  }
+  )
 );
 
 export const DELETE = withErrorHandling(
-  async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
-    const { id: taskId } = await params;
-    const deletedTask = await deleteTask(taskId);
+  withAuth(
+    async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
+      const { id: taskId } = await params;
+      const deletedTask = await deleteTask(taskId);
 
-    return { task: deletedTask };
-  }
+      return { task: deletedTask };
+    }
+  )
 );
 
 export const PUT = withErrorHandling(
-  async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
-    const { id: taskId } = await params;
-    const data = await req.json();
+  withAuth(
+    async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
+      const { id: taskId } = await params;
+      const data = await req.json();
 
-    const updatedTask = await updateTask(taskId, data);
+      const updatedTask = await updateTask(taskId, data);
 
-    return { task: updatedTask };
-  }
+      return { task: updatedTask };
+    }
+  )
 );
