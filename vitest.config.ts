@@ -1,7 +1,23 @@
 import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import path from 'path'
-import { coverageInclude, coverageExclude } from './coverage.shared'
+import minimatch from 'minimatch'
+import { coverageInclude, coverageExclude, unitAllOption } from './coverage.shared'
+
+// vitest-monocart-coverage only consults `coverage.include`/`exclude` when
+// running the istanbul provider path (it's checked in `onFileTransform`,
+// which no-ops for the default `v8` provider this project uses). So
+// filtering has to happen at the monocart report level instead, the same way
+// scripts/merge-coverage.ts already does for the e2e side.
+const sourceFilter = (sourcePath: string) => {
+  if (minimatch(sourcePath, '**/node_modules/**')) {
+    return false
+  }
+  if (!coverageInclude.some((pattern) => minimatch(sourcePath, pattern))) {
+    return false
+  }
+  return !coverageExclude.some((pattern) => minimatch(sourcePath, pattern))
+}
 
 export default defineConfig({
   plugins: [react()],
@@ -18,10 +34,10 @@ export default defineConfig({
         name: 'Boron Unit/Component Coverage',
         outputDir: './coverage/vitest',
         reports: ['v8', ['raw', { outputDir: 'raw' }]],
+        sourceFilter,
+        all: unitAllOption,
       },
       reportOnFailure: true,
-      include: coverageInclude,
-      exclude: coverageExclude,
     } as any,
     projects: [
       {
