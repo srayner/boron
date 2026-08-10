@@ -26,6 +26,18 @@ export const sourceFilter = (sourcePath: string) => {
   return e2eSourceInclude.some((pattern) => minimatch(sourcePath, pattern));
 };
 
+// Next's webpack build always names its module namespace "_N_E" (visible as
+// the sourceRoot host in "webpack://_N_E/./lib/utils.ts", and as the global
+// `_N_E` export in every chunk). Monocart normalizes that sourcemap entry to
+// "_N_E/lib/utils.ts" before sourceFilter ever sees it — without stripping
+// this prefix, sourceFilter's patterns (e.g. "lib/**") never match anything,
+// so every real source file was silently dropped and only the `all` option's
+// synthetic 0%-coverage placeholders were making it into the report.
+export const sourcePathResolver = (filePath: string) => {
+  const prefix = "_N_E/";
+  return filePath.startsWith(prefix) ? filePath.slice(prefix.length) : filePath;
+};
+
 // Next injects inline hydration <script> payloads on every page navigation
 // (no .js file, entry.url is just the page URL); they have no sourcemap to
 // unpack so sourceFilter never sees them. Drop non-.js entries so they
@@ -42,5 +54,6 @@ export const e2eCoverageOptions: Parameters<typeof MCR>[0] = {
   reports: ["v8", "console-details", ["raw", { outputDir: "raw" }]],
   entryFilter,
   sourceFilter,
+  sourcePath: sourcePathResolver,
   all: e2eAllOption,
 };
