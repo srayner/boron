@@ -78,7 +78,7 @@ jobs:
       - name: Upload coverage report to Atlas
         if: always()
         run: |
-          curl -sf -X POST http://atlas.civrays.com/coverage-reports/upload \
+          curl -sf -X POST http://atlas.civrays.com/api/coverage-reports/upload \
             -H "Authorization: Bearer ${{ secrets.ATLAS_UPLOAD_TOKEN }}" \
             -F "file=@coverage-report.zip"
 
