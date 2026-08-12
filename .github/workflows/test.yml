@@ -71,6 +71,17 @@ jobs:
           path: coverage/merged
           retention-days: 14
 
+      - name: Zip coverage report
+        if: always()
+        run: zip -r coverage-report.zip coverage/merged
+
+      - name: Upload coverage report to Atlas
+        if: always()
+        run: |
+          curl -sf -X POST http://atlas.civrays.com/coverage-reports/upload \
+            -H "Authorization: Bearer ${{ secrets.ATLAS_UPLOAD_TOKEN }}" \
+            -F "file=@coverage-report.zip"
+
       - name: Upload Playwright report
         if: failure()
         uses: actions/upload-artifact@v4

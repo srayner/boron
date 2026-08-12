@@ -184,12 +184,13 @@ A few things worth knowing:
 
 ## Continuous Integration
 
-`.github/workflows/test.yml` runs on every push to `main` and every pull request: it spins up a MySQL service container, runs unit/component tests with coverage, seeds the database, builds the app, runs the Playwright e2e suite, merges both into the unified coverage report, and uploads it as a downloadable build artifact (`coverage-report`). On e2e failure it also uploads the Playwright HTML report (`playwright-report`) for debugging.
+`.github/workflows/test.yml` runs on every push to `main` and every pull request: it spins up a MySQL service container, runs unit/component tests with coverage, seeds the database, builds the app, runs the Playwright e2e suite, merges both into the unified coverage report, uploads it as a downloadable build artifact (`coverage-report`), and zips and uploads it to Atlas (`http://atlas.civrays.com/coverage-reports/upload`). On e2e failure it also uploads the Playwright HTML report (`playwright-report`) for debugging.
 
-The workflow needs these repository secrets (Settings → Secrets and variables → Actions) — all optional, since the workflow falls back to safe dummy values for its throwaway CI database if they're unset:
+The workflow needs these repository secrets (Settings → Secrets and variables → Actions):
 
-- `AUTH_SECRET_CI` — a real generated secret (`npx auth secret`), separate from any production value.
-- `CI_USER_PASSWORD` / `CI_ADMIN_PASSWORD` — passwords for the seeded demo accounts in CI's ephemeral database.
+- `AUTH_SECRET_CI` — a real generated secret (`npx auth secret`), separate from any production value. Optional; falls back to a safe dummy value for the throwaway CI database if unset.
+- `CI_USER_PASSWORD` / `CI_ADMIN_PASSWORD` — passwords for the seeded demo accounts in CI's ephemeral database. Optional; falls back to a safe dummy value if unset.
+- `ATLAS_UPLOAD_TOKEN` — bearer token authorizing the coverage report upload to Atlas. Required; there's no safe default for an external upload credential, so the upload step fails without it.
 
 No coverage thresholds are enforced yet — the workflow reports coverage, it doesn't gate on it.
 
