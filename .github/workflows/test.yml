@@ -73,7 +73,7 @@ jobs:
 
       - name: Zip coverage report
         if: always()
-        run: zip -r coverage-report.zip coverage/merged
+        run: cd coverage/merged && zip -r ../../coverage-report.zip .
 
       - name: Upload coverage report to Atlas
         if: always()
