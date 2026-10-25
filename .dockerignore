@@ -9,3 +9,7 @@ Dockerfile
 *.log
 cypress
 README.md
+coverage
+test-results
+.swc
+*.tsbuildinfo
