@@ -26,7 +26,7 @@ jobs:
       AUTH_SECRET: ${{ secrets.AUTH_SECRET_CI || 'ci-dummy-secret-not-for-real-use-only-for-tests' }}
       # Fixed canonical URL so Auth.js doesn't need to trust the request's
       # Host header at all (safer than AUTH_TRUST_HOST for a known-fixed URL).
-      AUTH_URL: http://localhost:3000
+      AUTH_URL: http://localhost:3002
       USER_PASSWORD_USER: ${{ secrets.CI_USER_PASSWORD || 'TestPassword123!' }}
       USER_PASSWORD_ADMIN: ${{ secrets.CI_ADMIN_PASSWORD || 'TestPassword123!' }}
       # GOOGLE_*/GITHUB_*/OPENAI_API_KEY intentionally omitted — the app must
@@ -47,13 +47,8 @@ jobs:
 
       - run: npm run test:unit:coverage
 
-      - run: npm run seed
-
-      - name: Build (with browser sourcemaps for e2e coverage)
-        run: npm run build
-        env:
-          COVERAGE: "true"
-
+      # Playwright's webServer seeds, builds (with COVERAGE=true, so browser
+      # sourcemaps are emitted) and starts the production server itself.
       - name: Run e2e tests
         run: npm run test:e2e
         env:

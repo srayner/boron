@@ -97,7 +97,7 @@ This **wipes all existing data** and reseeds it, including sample projects, mile
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3002](http://localhost:3002). Locally, `npm run dev` and `npm start` use port 3002; the Docker image listens on 3000.
 
 ### 6. Run in production
 
@@ -125,18 +125,17 @@ The Docker image does **not** run migrations on startup — apply `npx prisma mi
 
 | Script | Command | Description |
 | --- | --- | --- |
-| `npm run dev` | `next dev` | Start the development server with hot reload |
+| `npm run dev` | `next dev -p 3002` | Start the development server with hot reload |
 | `npm run build` | `next build` | Build the app for production |
-| `npm start` | `next start` | Run the production build (run `build` first) |
+| `npm start` | `next start -p ${PORT:-3002}` | Run the production build (run `build` first) |
 | `npm run lint` | `next lint` | Lint the codebase |
 | `npm run seed` | `tsx prisma/seed.ts` | Wipe and reseed the database with sample data and demo accounts |
 | `npm run index` | `tsx scripts/backfill-search.ts` | Rebuild/backfill the search index |
 | `npm run test:unit` | `vitest run` | Run unit and component tests once |
 | `npm run test:unit:watch` | `vitest` | Run unit and component tests in watch mode |
 | `npm run test:unit:coverage` | `vitest run --coverage` | Run unit/component tests with a coverage report |
-| `npm run test:e2e` | `playwright test` | Run Playwright end-to-end tests against whatever's already at `http://localhost:3000` (or auto-starts one, see below) |
-| `npm run test:e2e:seeded` | `npm run seed && npm run test:e2e` | Reseed the database, then run the e2e tests |
-| `npm run test:coverage` | see `package.json` | Full pipeline: unit coverage, a production build, seeded e2e coverage, then merges both into one HTML report |
+| `npm run test:e2e` | `playwright test --project=chromium` | Run the Playwright end-to-end tests (see below) |
+| `npm run test:coverage` | see `package.json` | Full pipeline: unit coverage, seeded e2e coverage against a production build, then merges both into one HTML report |
 | `npm run test:coverage:merge` | `tsx scripts/merge-coverage.ts` | Merge already-generated unit + e2e coverage data into `coverage/merged/` (assumes both already ran) |
 
 ## Testing
@@ -157,13 +156,13 @@ End-to-end tests use [Playwright](https://playwright.dev/) (migrated from Cypres
 npx playwright install
 ```
 
-Then run the suite. `playwright.config.ts`'s `webServer` starts the app itself (`npm run dev` locally, or `npm start` in CI/when `COVERAGE=true`), so you don't need to start it manually first:
+Then run the suite:
 
 ```bash
-npm run test:e2e:seeded
+npm run test:e2e
 ```
 
-Note this reseeds the database as a side effect, wiping any existing data.
+If port 3002 is free, Playwright seeds the database, builds, starts a production server, runs the tests and stops it. The seed wipes any existing data. If a server is already running on 3002, Playwright uses it as it is, with no seed and no build.
 
 Tests run against Chromium by default (`npm run test:e2e` = `playwright test --project=chromium`) — it's also the only browser that contributes to the coverage report below. Specs share one seeded database rather than isolated fixtures per test, so running multiple browser projects concurrently causes cross-browser data races; Firefox and WebKit are available for manual spot-checks one at a time, each against a freshly seeded database:
 
