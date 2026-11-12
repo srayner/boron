@@ -38,6 +38,8 @@ RUN apk add --no-cache openssl
 WORKDIR /app
 
 ENV NODE_ENV=production
+# The container keeps listening on 3000; 3002 is only the local dev port
+ENV PORT=3000
 
 COPY --from=prod-deps /app/node_modules ./node_modules
 COPY --from=builder /app/.next ./.next

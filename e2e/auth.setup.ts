@@ -2,7 +2,7 @@ import { test as setup } from "@playwright/test";
 
 const authFile = "playwright/.auth/user.json";
 
-setup("authenticate", async ({ page }) => {
+setup("authenticate", async ({ page, baseURL }) => {
   await page.goto("/auth/login");
   await page.locator('input[name="email"]').fill("user@example.com");
   await page.locator('input[name="password"]').fill(process.env.USER_PASSWORD_USER ?? "");
@@ -15,7 +15,7 @@ setup("authenticate", async ({ page }) => {
     {
       name: "sidebar_state",
       value: "true",
-      url: "http://localhost:3000",
+      url: baseURL,
     },
   ]);
 

@@ -12,20 +12,19 @@ export default defineConfig({
   globalSetup: "./e2e/global-setup.ts",
   reporter: [["html", { outputFolder: "playwright-report" }], ["list"]],
   use: {
-    baseURL: "http://localhost:3000",
+    baseURL: "http://localhost:3002",
     trace: "on-first-retry",
   },
+  // With port 3002 free: seed, build and start a production server, run the
+  // tests, then stop it. With a server already running there, use it as it is
+  // (no seed, no build). See "End-to-end tests" in README.md.
+  // For coverage, run with COVERAGE=true: the build inherits it and emits the
+  // browser sourcemaps the report needs (see next.config.ts).
   webServer: {
-    // A production server is required whenever we're collecting coverage
-    // (npm run build must run separately first, with COVERAGE=true so
-    // browser sourcemaps are emitted — see next.config.ts) — the dev server
-    // always inlines sourcemaps but its per-request chunk URLs churn on every
-    // navigation, which fragments the coverage report into near-duplicate
-    // entries per file.
-    command: process.env.COVERAGE === "true" || process.env.CI ? "npm start" : "npm run dev",
-    url: "http://localhost:3000",
-    reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
+    command: "npm run seed && npm run build && npm start",
+    url: "http://localhost:3002",
+    reuseExistingServer: true,
+    timeout: 300_000, // the production build takes a while
   },
   // chromium is the default (npm run test:e2e / CI): it's the only browser
   // that contributes to coverage, and specs share one seeded MySQL database
