@@ -1,13 +1,13 @@
 import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
-import path from 'path'
+import path from 'node:path'
 import minimatch from 'minimatch'
-import { coverageInclude, coverageExclude, unitAllOption } from './coverage.shared'
+import { coverageInclude, coverageExclude, unitAllOption } from './coverage.shared.mts'
 
-// vitest-monocart-coverage only consults `coverage.include`/`exclude` when
-// running the istanbul provider path (it's checked in `onFileTransform`,
-// which no-ops for the default `v8` provider this project uses). So
-// filtering has to happen at the monocart report level instead, the same way
+// vitest-monocart-coverage passes the raw V8 coverage straight to monocart,
+// configured only by `coverageReportOptions`; Vitest's own
+// `coverage.include`/`exclude` never reach the monocart report. So filtering
+// happens at the monocart report level instead, the same way
 // scripts/merge-coverage.ts already does for the e2e side.
 const sourceFilter = (sourcePath: string) => {
   if (minimatch(sourcePath, '**/node_modules/**')) {
@@ -69,6 +69,6 @@ export default defineConfig({
     ],
   },
   resolve: {
-    alias: { '@': path.resolve(__dirname, '.') },
+    alias: { '@': path.resolve(import.meta.dirname, '.') },
   },
 })
