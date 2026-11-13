@@ -1,8 +1,8 @@
 import esbuild from 'esbuild'
-import path from 'path'
+import path from 'node:path'
 
 // Source paths that count as "our app code" for coverage purposes. Shared
-// between vitest.config.ts (unit/component coverage) and
+// between vitest.config.mts (unit/component coverage) and
 // scripts/merge-coverage.ts (the e2e side needs this filter explicitly,
 // since Playwright's browser coverage captures every script the page loads —
 // including Next.js/React/Radix internals bundled in the dev server's output

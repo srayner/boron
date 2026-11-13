@@ -142,7 +142,7 @@ The Docker image does **not** run migrations on startup — apply `npx prisma mi
 
 ### Unit and component tests
 
-[Vitest](https://vitest.dev/) runs two separate test "projects" from a single `vitest.config.ts`: a `node` project for `services/`, `lib/`, `actions/`, `hooks/`, and `app/api/`, and a `components` project (jsdom + [React Testing Library](https://testing-library.com/react)) for React components. Component test coverage is intentionally partial right now — a handful of examples (`components/tasks/__tests__/`, `components/ui/__tests__/`, `hooks/__tests__/use-mobile.test.tsx`) establish the pattern rather than covering all components; that's a deliberate scoping choice, not an oversight.
+[Vitest](https://vitest.dev/) runs two separate test "projects" from a single `vitest.config.mts`: a `node` project for `services/`, `lib/`, `actions/`, `hooks/`, and `app/api/`, and a `components` project (jsdom + [React Testing Library](https://testing-library.com/react)) for React components. Component test coverage is intentionally partial right now — a handful of examples (`components/tasks/__tests__/`, `components/ui/__tests__/`, `hooks/__tests__/use-mobile.test.tsx`) establish the pattern rather than covering all components; that's a deliberate scoping choice, not an oversight.
 
 ```bash
 npm run test:unit

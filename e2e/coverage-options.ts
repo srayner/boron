@@ -1,6 +1,6 @@
 import MCR from "monocart-coverage-reports";
 import minimatch from "minimatch";
-import { e2eSourceInclude, e2eAllOption } from "../coverage.shared";
+import { e2eSourceInclude, e2eAllOption } from "../coverage.shared.mts";
 
 // Playwright's browser coverage captures every script the page loads —
 // Next.js/React/Radix internals from the bundle included — not just our

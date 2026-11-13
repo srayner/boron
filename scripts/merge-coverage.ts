@@ -1,6 +1,6 @@
 import MCR from "monocart-coverage-reports";
 import { e2eCoverageOptions, entryFilter, sourceFilter, sourcePathResolver } from "../e2e/coverage-options";
-import { e2eAllOption } from "../coverage.shared";
+import { e2eAllOption } from "../coverage.shared.mts";
 
 async function main() {
   // Flush Playwright's multi-worker coverage cache (accumulated via add()
