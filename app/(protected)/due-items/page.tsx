@@ -9,6 +9,7 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import DueItemsListHeader from "@/components/dueItems/DueItemsListHeader";
 import { CheckSquare, Flag, Folders } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { markdownToPlainText } from "@/lib/markdown/plain-text";
 
 type DueItemType = "Project" | "Milestone" | "Task";
 interface DueItem {
@@ -122,7 +123,9 @@ export default function DueItemsPage() {
                 {translate(dueItem.status)}
               </Badge>
             </div>
-            <div className="text-foreground">{dueItem.description}</div>
+            <div className="text-foreground line-clamp-3">
+              {markdownToPlainText(dueItem.description)}
+            </div>
             <div className="flex gap-4 text-muted-foreground">
               <span>Due on {formatDate(dueItem.dueDate)}</span>
               <span>

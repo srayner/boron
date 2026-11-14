@@ -26,6 +26,7 @@ import { useRecentProjects } from "@/app/context/recent-projects-context";
 import { formatCurrency, titleCase } from "@/lib/utils";
 import { Link } from "@/components/ui/link";
 import { ProgressBar } from "@/components/ui/ProgressBar";
+import { MarkdownContent } from "@/components/markdown/MarkdownContent";
 
 type MilestonePageProps = {
   params: Promise<{ milestoneId: string }>;
@@ -130,7 +131,11 @@ const MilestoneDetailPage: NextPage<MilestonePageProps> = ({ params }) => {
       <Separator className="my-3" />
 
       {/* Description and tags */}
-      <p className="my-3">{milestone.description || descriptionFallback}</p>
+      {milestone.description ? (
+        <MarkdownContent markdown={milestone.description} className="my-3" />
+      ) : (
+        <p className="my-3">{descriptionFallback}</p>
+      )}
       <TagsList tags={milestone.tags} />
 
       {/* Info Grid */}

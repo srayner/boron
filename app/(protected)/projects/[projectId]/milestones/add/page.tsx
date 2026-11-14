@@ -10,14 +10,12 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -29,6 +27,8 @@ import { DatePickerField } from "@/components/ui/form/date-picker-field";
 import { TagField } from "@/components/ui/form/TagField";
 import { formatLocalDate } from "@/lib/utils";
 import { NextPage } from "next";
+import { MarkdownEditorField } from "@/components/markdown/MarkdownEditorField";
+import { descriptionField } from "@/lib/validation/description";
 
 type MilestoneAddPageProps = {
   params: Promise<{ projectId: string }>;
@@ -44,7 +44,7 @@ const MilestoneAddPage: NextPage<MilestoneAddPageProps> = ({ params }) => {
     name: z.string().min(1, {
       message: "Name is required.",
     }),
-    description: z.string().nullable(),
+    description: descriptionField,
     status: z.string(),
     order: z.number().nullable(),
     dueDate: z.coerce.date<Date>().nullable(),
@@ -115,20 +115,11 @@ const MilestoneAddPage: NextPage<MilestoneAddPageProps> = ({ params }) => {
             control={form.control}
             name="description"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel>Description</FormLabel>
-                <FormControl>
-                  <Textarea
-                    className="h-32"
-                    {...field}
-                    value={field.value ?? ""}
-                  />
-                </FormControl>
-                <FormDescription>
-                  A brief description of what your milestone involves.
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
+              <MarkdownEditorField
+                field={field}
+                label="Description"
+                description="A brief description of what your milestone involves."
+              />
             )}
           />
 

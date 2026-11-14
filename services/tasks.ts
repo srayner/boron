@@ -6,7 +6,8 @@ import { Task } from "@/types/entities";
 import { updateMilestoneProgress } from "./milestones";
 import { updateProjectProgress } from "./projects";
 import { formatISO, addDays } from "date-fns";
-import { updateSearchIndex, deleteSearchIndex } from "./search";
+import { updateSearchIndex } from "./search";
+import { parseDescription } from "@/lib/validation/description";
 import { parseLocalDate } from "@/lib/utils";
 
 const openStatuses: TaskStatus[] = [
@@ -19,6 +20,7 @@ const closeStatuses: TaskStatus[] = ["COMPLETED", "CANCELLED"];
 
 export const createTask = async (data: any) => {
   if (!data.name) throw new AppError("Task name is required", 422);
+  const description = parseDescription(data.description);
 
   const startDate = data.startDate ? new Date(data.startDate) : null;
   const dueDate = data.dueDate ? new Date(data.dueDate) : null;
@@ -39,29 +41,31 @@ export const createTask = async (data: any) => {
     ? await processTagsForCreate(data.tags)
     : { connect: [] };
 
-  const newTask = await prisma.task.create({
-    data: {
-      projectId: data.projectId,
-      name: data.name,
-      description: data.description || "",
-      status: data.status,
-      priority: data.priority,
-      progress: calculateProgress(data),
-      milestoneId: data.milestoneId,
-      startDate: startDate,
-      dueDate: dueDate,
-      completedAt,
-      tags,
-    },
-    include: { tags: true },
+  const newTask = await prisma.$transaction(async (tx) => {
+    const saved = await tx.task.create({
+      data: {
+        projectId: data.projectId,
+        name: data.name,
+        description,
+        status: data.status,
+        priority: data.priority,
+        progress: calculateProgress(data),
+        milestoneId: data.milestoneId,
+        startDate: startDate,
+        dueDate: dueDate,
+        completedAt,
+        tags,
+      },
+      include: { tags: true },
+    });
+    await updateSearchIndex(tx, "task", saved);
+    return saved;
   });
 
   if (newTask.milestoneId) {
     await updateMilestoneProgress(newTask.milestoneId);
   }
   await updateProjectProgress(newTask.projectId);
-
-  updateSearchIndex("task", newTask);
 
   return newTask;
 };
@@ -76,8 +80,6 @@ export const deleteTask = async (id: string) => {
   }
   await updateProjectProgress(deletedTask.projectId);
 
-  deleteSearchIndex("task", id);
-
   return deletedTask;
 };
 
@@ -86,6 +88,7 @@ export const updateTask = async (id: string, data: any) => {
   if (!currentTask) throw new AppError("Task not found", 404);
 
   if (!data.name) throw new AppError("Task name is required", 422);
+  const description = parseDescription(data.description);
 
   const startDate = data.startDate ? new Date(data.startDate) : null;
   const dueDate = data.dueDate ? new Date(data.dueDate) : null;
@@ -109,29 +112,31 @@ export const updateTask = async (id: string, data: any) => {
 
   const tags = data.tags ? await processTagsForUpdate(data.tags) : { set: [] };
 
-  const updatedTask = await prisma.task.update({
-    where: { id },
-    data: {
-      name: data.name,
-      description: data.description || "",
-      status: data.status,
-      priority: data.priority,
-      progress: calculateProgress(data),
-      milestoneId: data.milestoneId,
-      startDate: startDate,
-      dueDate: dueDate,
-      completedAt,
-      tags,
-    },
-    include: { tags: true },
+  const updatedTask = await prisma.$transaction(async (tx) => {
+    const saved = await tx.task.update({
+      where: { id },
+      data: {
+        name: data.name,
+        description,
+        status: data.status,
+        priority: data.priority,
+        progress: calculateProgress(data),
+        milestoneId: data.milestoneId,
+        startDate: startDate,
+        dueDate: dueDate,
+        completedAt,
+        tags,
+      },
+      include: { tags: true },
+    });
+    await updateSearchIndex(tx, "task", saved);
+    return saved;
   });
 
   if (updatedTask.milestoneId) {
     await updateMilestoneProgress(updatedTask.milestoneId);
   }
   await updateProjectProgress(updatedTask.projectId);
-
-  updateSearchIndex("task", updatedTask);
 
   return updatedTask;
 };

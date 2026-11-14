@@ -1,52 +1,52 @@
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
+import { markdownToPlainText } from "@/lib/markdown/plain-text";
 
 type SearchableEntity = "project" | "task" | "milestone" | "cost";
 
-type BaseEntity = {
+// The SearchIndex column that links a row to its record. Each link cascades on
+// delete, so removing a record (directly or through its project) removes its row.
+const linkTo = {
+  project: (id: string) => ({ projectId: id }),
+  task: (id: string) => ({ taskId: id }),
+  milestone: (id: string) => ({ milestoneId: id }),
+  cost: (id: string) => ({ costId: id }),
+} satisfies Record<SearchableEntity, (id: string) => Prisma.SearchIndexWhereUniqueInput>;
+
+type IndexedEntity = {
   id: string;
-  name: string;
-  description: string;
-  updatedDate: Date;
-  tags?: string[];
+  name: string | null;
+  description: string | null;
+  updatedAt: Date;
+  tags?: { name: string }[];
 };
 
+/**
+ * Write the search row for a saved record. Call it with the transaction that
+ * saved the record, so the row always matches what was saved.
+ */
 export async function updateSearchIndex(
+  db: Prisma.TransactionClient,
   entityType: SearchableEntity,
-  entity: any
+  entity: IndexedEntity
 ) {
-  const { id, name, description, updatedAt, tags } = entity;
+  const link = linkTo[entityType](entity.id);
+  const fields = {
+    entityType,
+    title: entity.name ?? "",
+    content: [
+      markdownToPlainText(entity.description),
+      ...(entity.tags?.map((tag) => tag.name) ?? []),
+    ]
+      .filter(Boolean)
+      .join(" | "),
+    date: entity.updatedAt,
+  };
 
-  const content = [
-    description,
-    ...(tags?.map((tag: { name: string }) => tag.name) ?? []),
-  ]
-    .join(" | ")
-    .trim();
-
-  await prisma.searchIndex.upsert({
-    where: { entityId: id },
-    update: {
-      title: name,
-      content,
-      date: updatedAt,
-      entityType,
-    },
-    create: {
-      entityId: id,
-      entityType,
-      title: name,
-      content,
-      date: updatedAt,
-    },
-  });
-}
-
-export async function deleteSearchIndex(
-  entityType: SearchableEntity,
-  entityId: string
-) {
-  await prisma.searchIndex.delete({
-    where: { entityType, entityId },
+  await db.searchIndex.upsert({
+    where: link,
+    update: fields,
+    create: { ...fields, ...link },
   });
 }
 
@@ -68,7 +68,7 @@ export async function find(
     ],
   };
 
-  const [results, totalCount] = await Promise.all([
+  const [rows, totalCount] = await Promise.all([
     prisma.searchIndex.findMany({
       where,
       orderBy: ordering,
@@ -77,6 +77,14 @@ export async function find(
     }),
     prisma.searchIndex.count({ where }),
   ]);
+
+  // Keep the response shape callers (the search page, boron-mcp) rely on.
+  const results = rows.map(
+    ({ projectId, taskId, milestoneId, costId, ...row }) => ({
+      ...row,
+      entityId: (projectId ?? taskId ?? milestoneId ?? costId)!,
+    })
+  );
 
   return { results, totalCount };
 }

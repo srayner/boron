@@ -11,13 +11,11 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -34,6 +32,8 @@ import { Milestone, Task } from "@/types/entities";
 import { SelectField } from "@/components/ui/form/SelectField";
 import { getReturnUrl } from "@/lib/navigation";
 import { NumberField } from "@/components/ui/form/NumberField";
+import { MarkdownEditorField } from "@/components/markdown/MarkdownEditorField";
+import { descriptionField } from "@/lib/validation/description";
 
 type TaskEditPageProps = {
   params: Promise<{ projectId: string; taskId: string }>;
@@ -53,7 +53,7 @@ const TaskEditPage: NextPage<TaskEditPageProps> = ({ params }) => {
     name: z.string().min(1, {
       message: "Name is required.",
     }),
-    description: z.string().nullable(),
+    description: descriptionField,
     status: z.string(),
     priority: z.string(),
     progress: z.number().min(0).max(100),
@@ -179,20 +179,11 @@ const TaskEditPage: NextPage<TaskEditPageProps> = ({ params }) => {
             control={form.control}
             name="description"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel>Description</FormLabel>
-                <FormControl>
-                  <Textarea
-                    className="h-32"
-                    {...field}
-                    value={field.value ?? ""}
-                  />
-                </FormControl>
-                <FormDescription>
-                  A brief description of what your task involves.
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
+              <MarkdownEditorField
+                field={field}
+                label="Description"
+                description="A brief description of what your task involves."
+              />
             )}
           />
 

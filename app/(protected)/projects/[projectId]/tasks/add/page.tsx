@@ -10,12 +10,13 @@ import { Button } from "@/components/ui/button";
 import { Form, FormField } from "@/components/ui/form";
 import { DatePickerField } from "@/components/ui/form/date-picker-field";
 import { SelectField } from "@/components/ui/form/SelectField";
-import { TextAreaField } from "@/components/ui/form/TextAreaField";
 import { TextField } from "@/components/ui/form/TextField";
 import { TagField } from "@/components/ui/form/TagField";
 import { formatLocalDate } from "@/lib/utils";
 import { NextPage } from "next";
 import { Milestone } from "@/types/entities";
+import { MarkdownEditorField } from "@/components/markdown/MarkdownEditorField";
+import { descriptionField } from "@/lib/validation/description";
 
 type TaskAddPageProps = {
   params: Promise<{ projectId: string }>;
@@ -33,7 +34,7 @@ const TaskAddPage: NextPage<TaskAddPageProps> = ({ params }) => {
     name: z.string().min(1, {
       message: "Name is required.",
     }),
-    description: z.string().nullable(),
+    description: descriptionField,
     status: z.string(),
     priority: z.string(),
     milestoneId: z.string().nullable(),
@@ -146,11 +147,10 @@ const TaskAddPage: NextPage<TaskAddPageProps> = ({ params }) => {
             control={form.control}
             name="description"
             render={({ field }) => (
-              <TextAreaField
+              <MarkdownEditorField
                 field={field}
                 label="Description"
                 description="A brief description of what your task involves."
-                className="h-32"
               />
             )}
           />

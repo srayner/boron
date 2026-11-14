@@ -20,6 +20,7 @@ import {
 import { ProjectPriorityBadge } from "@/components/projects/project-priority";
 import { ProjectStatusBadge } from "@/components/projects/project-status";
 import { getUrlParam } from "@/lib/utils";
+import { markdownToPlainText } from "@/lib/markdown/plain-text";
 
 export default function ProjectPage() {
   const router = useRouter();
@@ -115,7 +116,9 @@ export default function ProjectPage() {
                 </div>
               </div>
             </div>
-            <div className="text-muted-foreground">{project.description}</div>
+            <div className="text-muted-foreground line-clamp-3">
+              {markdownToPlainText(project.description)}
+            </div>
             <div className="flex gap-4 text-muted-foreground align-center">
               <ProjectTypeWithIcon type={project.type} />
 

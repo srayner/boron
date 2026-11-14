@@ -20,7 +20,8 @@ test.describe("Tests Search", () => {
     await expect(page).toHaveURL(/\/projects\/[a-z0-9]+\/tasks\/add$/);
 
     await page.locator('input[name="name"]').fill(data.name);
-    await page.locator('textarea[name="description"]').fill(data.description);
+    await page.getByRole("textbox", { name: "Description" }).click();
+    await page.keyboard.type(data.description);
     await page.locator('button[type="submit"]', { hasText: "Create" }).click();
     await expect(page).toHaveURL(/\/projects\/[a-z0-9]+\?tab=tasks$/);
 

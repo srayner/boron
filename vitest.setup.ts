@@ -10,6 +10,9 @@ vi.mock('@/lib/prisma', () => ({
 
 beforeEach(() => {
   mockReset(prismaMock)
+  // Interactive transactions run their callback against the same mock client.
+  prismaMock.$transaction.mockImplementation(((arg: unknown) =>
+    typeof arg === 'function' ? arg(prismaMock) : Promise.all(arg as Promise<unknown>[])) as never)
 })
 
 afterEach(() => {

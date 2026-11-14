@@ -9,7 +9,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -17,7 +16,6 @@ import {
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -31,6 +29,8 @@ import { formatLocalDate } from "@/lib/utils";
 import { useRecentProjects } from "@/app/context/recent-projects-context";
 import { Project } from "@/types/entities";
 import { getReturnUrl } from "@/lib/navigation";
+import { MarkdownEditorField } from "@/components/markdown/MarkdownEditorField";
+import { descriptionField } from "@/lib/validation/description";
 
 type ProjectEditPageProps = {
   params: Promise<{ projectId: string }>;
@@ -41,7 +41,7 @@ const ProjectEditPage: NextPage<ProjectEditPageProps> = ({ params }) => {
     name: z.string().min(1, {
       message: "Title is required.",
     }),
-    description: z.string().nullable(),
+    description: descriptionField,
     type: z.string(),
     status: z.string(),
     priority: z.string(),
@@ -144,20 +144,11 @@ const ProjectEditPage: NextPage<ProjectEditPageProps> = ({ params }) => {
             control={form.control}
             name="description"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel>Description</FormLabel>
-                <FormControl>
-                  <Textarea
-                    className="h-32"
-                    {...field}
-                    value={field.value ?? ""}
-                  />
-                </FormControl>
-                <FormDescription>
-                  A brief description of what your project involves.
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
+              <MarkdownEditorField
+                field={field}
+                label="Description"
+                description="A brief description of what your project involves."
+              />
             )}
           />
 
