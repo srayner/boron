@@ -2,11 +2,13 @@ import { prisma } from "@/lib/prisma";
 import { AppError } from "@/lib/api/error";
 import { processTagsForCreate, processTagsForUpdate } from "@/services/tags";
 import type { Prisma } from "@prisma/client";
-import { updateSearchIndex, deleteSearchIndex } from "./search";
+import { updateSearchIndex } from "./search";
+import { parseDescription } from "@/lib/validation/description";
 import { ProjectStatus, ProjectType } from "@/types/entities";
 
 export const createProject = async (data: any) => {
   if (!data.name) throw new AppError("Project name is required", 422);
+  const description = parseDescription(data.description);
 
   const startDate = data.startDate ? new Date(data.startDate) : null;
   const dueDate = data.dueDate ? new Date(data.dueDate) : null;
@@ -22,22 +24,24 @@ export const createProject = async (data: any) => {
     ? await processTagsForCreate(data.tags)
     : { connect: [] };
 
-  const newProject = await prisma.project.create({
-    data: {
-      name: data.name,
-      description: data.description || "",
-      type: data.type,
-      status: data.status,
-      priority: data.priority,
-      startDate: startDate,
-      dueDate: dueDate,
-      budget: data.budget,
-      tags,
-    },
-    include: { tags: true },
+  const newProject = await prisma.$transaction(async (tx) => {
+    const saved = await tx.project.create({
+      data: {
+        name: data.name,
+        description,
+        type: data.type,
+        status: data.status,
+        priority: data.priority,
+        startDate: startDate,
+        dueDate: dueDate,
+        budget: data.budget,
+        tags,
+      },
+      include: { tags: true },
+    });
+    await updateSearchIndex(tx, "project", saved);
+    return saved;
   });
-
-  updateSearchIndex("project", newProject);
 
   return newProject;
 };
@@ -47,13 +51,12 @@ export const deleteProject = async (id: string) => {
     where: { id },
   });
 
-  deleteSearchIndex("project", id);
-
   return deletedEntity;
 };
 
 export const updateProject = async (id: string, data: any) => {
   if (!data.name) throw new AppError("Project name is required", 422);
+  const description = parseDescription(data.description);
 
   const startDate = data.startDate ? new Date(data.startDate) : null;
   const dueDate = data.dueDate ? new Date(data.dueDate) : null;
@@ -67,23 +70,25 @@ export const updateProject = async (id: string, data: any) => {
 
   const tags = data.tags ? await processTagsForUpdate(data.tags) : { set: [] };
 
-  const updatedProject = await prisma.project.update({
-    where: { id },
-    data: {
-      name: data.name,
-      description: data.description || "",
-      type: data.type,
-      status: data.status,
-      priority: data.priority,
-      startDate: startDate,
-      dueDate: dueDate,
-      budget: data.budget,
-      tags,
-    },
-    include: { tags: true },
+  const updatedProject = await prisma.$transaction(async (tx) => {
+    const saved = await tx.project.update({
+      where: { id },
+      data: {
+        name: data.name,
+        description,
+        type: data.type,
+        status: data.status,
+        priority: data.priority,
+        startDate: startDate,
+        dueDate: dueDate,
+        budget: data.budget,
+        tags,
+      },
+      include: { tags: true },
+    });
+    await updateSearchIndex(tx, "project", saved);
+    return saved;
   });
-
-  updateSearchIndex("project", updatedProject);
 
   return updatedProject;
 };

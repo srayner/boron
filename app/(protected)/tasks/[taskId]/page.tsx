@@ -26,6 +26,7 @@ import { Link } from "@/components/ui/link";
 import { formatCurrency, formatDate, translate } from "@/lib/utils";
 import CostsTable from "@/components/costs/CostsTable";
 import { ProgressBar } from "@/components/ui/ProgressBar";
+import { MarkdownContent } from "@/components/markdown/MarkdownContent";
 
 type taskPageProps = {
   params: Promise<{ taskId: string }>;
@@ -126,7 +127,11 @@ const TaskDetailPage: NextPage<taskPageProps> = ({ params }) => {
       <Separator className="my-3" />
 
       {/* Description and tags */}
-      <p className="my-3">{task.description || descriptionFallback}</p>
+      {task.description ? (
+        <MarkdownContent markdown={task.description} className="my-3" />
+      ) : (
+        <p className="my-3">{descriptionFallback}</p>
+      )}
       <TagsList tags={task.tags} />
 
       {/* Info Grid */}

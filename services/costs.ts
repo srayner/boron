@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { processTagsForCreate, processTagsForUpdate } from "@/services/tags";
 import { updateProjectCost } from "./projects";
-import { updateSearchIndex, deleteSearchIndex } from "./search";
+import { updateSearchIndex } from "./search";
 
 const CostSchema = z.object({
   amount: z.coerce.number().min(0),
@@ -55,22 +55,25 @@ export const createCost = async (data: any) => {
     ? await processTagsForCreate(data.tags)
     : { connect: [] };
 
-  const newCost = await prisma.cost.create({
-    data: {
-      amount: validated.amount,
-      type: validated.type,
-      name: validated.name,
-      description: validated.description,
-      date: validated.date,
-      projectId: validated.projectId,
-      taskId: validated.taskId,
-      tags,
-    },
-    include: { tags: true },
+  const newCost = await prisma.$transaction(async (tx) => {
+    const saved = await tx.cost.create({
+      data: {
+        amount: validated.amount,
+        type: validated.type,
+        name: validated.name,
+        description: validated.description,
+        date: validated.date,
+        projectId: validated.projectId,
+        taskId: validated.taskId,
+        tags,
+      },
+      include: { tags: true },
+    });
+    await updateSearchIndex(tx, "cost", saved);
+    return saved;
   });
 
   updateProjectCost(newCost.projectId);
-  updateSearchIndex("cost", newCost);
 
   return newCost;
 };
@@ -81,7 +84,6 @@ export const deleteCost = async (id: string) => {
   });
 
   updateProjectCost(deletedCost.projectId);
-  deleteSearchIndex("cost", id);
 
   return deletedCost;
 };
@@ -91,22 +93,26 @@ export const updateCost = async (id: string, data: any) => {
 
   const tags = data.tags ? await processTagsForUpdate(data.tags) : { set: [] };
 
-  const updatedCost = await prisma.cost.update({
-    where: { id },
-    data: {
-      amount: validated.amount,
-      type: validated.type,
-      name: validated.name,
-      description: validated.description,
-      date: validated.date,
-      projectId: validated.projectId,
-      taskId: validated.taskId,
-      tags,
-    },
+  const updatedCost = await prisma.$transaction(async (tx) => {
+    const saved = await tx.cost.update({
+      where: { id },
+      data: {
+        amount: validated.amount,
+        type: validated.type,
+        name: validated.name,
+        description: validated.description,
+        date: validated.date,
+        projectId: validated.projectId,
+        taskId: validated.taskId,
+        tags,
+      },
+      include: { tags: true },
+    });
+    await updateSearchIndex(tx, "cost", saved);
+    return saved;
   });
 
   updateProjectCost(updatedCost.projectId);
-  updateSearchIndex("cost", updatedCost);
 
   return updatedCost;
 };

@@ -9,7 +9,7 @@ async function backfillSearchIndex() {
     include: { tags: true },
   });
   for (const project of projects) {
-    await updateSearchIndex("project", project);
+    await updateSearchIndex(prisma, "project", project);
   }
 
   console.log("Backfilling Tasks...");
@@ -17,7 +17,7 @@ async function backfillSearchIndex() {
     include: { tags: true },
   });
   for (const task of tasks) {
-    await updateSearchIndex("task", task);
+    await updateSearchIndex(prisma, "task", task);
   }
 
   console.log("Backfilling Milestones...");
@@ -25,7 +25,7 @@ async function backfillSearchIndex() {
     include: { tags: true },
   });
   for (const milestone of milestones) {
-    await updateSearchIndex("milestone", milestone);
+    await updateSearchIndex(prisma, "milestone", milestone);
   }
 
   console.log("Backfilling Costs...");
@@ -33,7 +33,7 @@ async function backfillSearchIndex() {
     include: { tags: true },
   });
   for (const cost of costs) {
-    await updateSearchIndex("cost", cost);
+    await updateSearchIndex(prisma, "cost", cost);
   }
 
   console.log("Backfill complete.");

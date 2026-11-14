@@ -10,14 +10,12 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -28,6 +26,8 @@ import {
 import { DatePickerField } from "@/components/ui/form/date-picker-field";
 import { TagField } from "@/components/ui/form/TagField";
 import { formatLocalDate } from "@/lib/utils";
+import { MarkdownEditorField } from "@/components/markdown/MarkdownEditorField";
+import { descriptionField } from "@/lib/validation/description";
 
 export default function AddProjectPage() {
   const router = useRouter();
@@ -37,7 +37,7 @@ export default function AddProjectPage() {
     name: z.string().min(1, {
       message: "Name is required.",
     }),
-    description: z.string().nullable(),
+    description: descriptionField,
     type: z.string(),
     status: z.string(),
     priority: z.string(),
@@ -114,20 +114,11 @@ export default function AddProjectPage() {
             control={form.control}
             name="description"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel>Description</FormLabel>
-                <FormControl>
-                  <Textarea
-                    className="h-32"
-                    {...field}
-                    value={field.value ?? ""}
-                  />
-                </FormControl>
-                <FormDescription>
-                  A brief description of what your project involves.
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
+              <MarkdownEditorField
+                field={field}
+                label="Description"
+                description="A brief description of what your project involves."
+              />
             )}
           />
 

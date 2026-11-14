@@ -2,7 +2,8 @@ import { prisma } from "@/lib/prisma";
 import { MilestoneStatus } from "@prisma/client";
 import { AppError } from "@/lib/api/error";
 import { processTagsForCreate, processTagsForUpdate } from "@/services/tags";
-import { updateSearchIndex, deleteSearchIndex } from "./search";
+import { updateSearchIndex } from "./search";
+import { parseDescription } from "@/lib/validation/description";
 import { parseLocalDate } from "@/lib/utils";
 
 const openStatuses: MilestoneStatus[] = ["PLANNED", "IN_PROGRESS", "ON_HOLD"];
@@ -10,6 +11,7 @@ const closeStatuses: MilestoneStatus[] = ["COMPLETED", "CANCELLED"];
 
 export const createMilestone = async (data: any) => {
   if (!data.name) throw new AppError("Milestone name is required", 422);
+  const description = parseDescription(data.description);
 
   const dueDate = data.dueDate ? new Date(data.dueDate) : null;
 
@@ -21,20 +23,22 @@ export const createMilestone = async (data: any) => {
     ? await processTagsForCreate(data.tags)
     : { connect: [] };
 
-  const newMilestone = await prisma.milestone.create({
-    data: {
-      projectId: data.projectId,
-      name: data.name,
-      description: data.description || "",
-      order: data.order,
-      status: data.status,
-      dueDate: dueDate,
-      tags,
-    },
-    include: { tags: true },
+  const newMilestone = await prisma.$transaction(async (tx) => {
+    const saved = await tx.milestone.create({
+      data: {
+        projectId: data.projectId,
+        name: data.name,
+        description,
+        order: data.order,
+        status: data.status,
+        dueDate: dueDate,
+        tags,
+      },
+      include: { tags: true },
+    });
+    await updateSearchIndex(tx, "milestone", saved);
+    return saved;
   });
-
-  updateSearchIndex("milestone", newMilestone);
 
   return newMilestone;
 };
@@ -44,13 +48,12 @@ export const deleteMilestone = async (id: string) => {
     where: { id },
   });
 
-  deleteSearchIndex("milestone", id);
-
   return deletedMilestone;
 };
 
 export const updateMilestone = async (id: string, data: any) => {
   if (!data.name) throw new AppError("Milestone name is required", 422);
+  const description = parseDescription(data.description);
 
   const dueDate = data.dueDate ? new Date(data.dueDate) : null;
 
@@ -60,20 +63,22 @@ export const updateMilestone = async (id: string, data: any) => {
 
   const tags = data.tags ? await processTagsForUpdate(data.tags) : { set: [] };
 
-  const updatedMilestone = await prisma.milestone.update({
-    where: { id },
-    data: {
-      name: data.name,
-      description: data.description || "",
-      order: data.order,
-      status: data.status,
-      dueDate: dueDate,
-      tags,
-    },
-    include: { tags: true },
+  const updatedMilestone = await prisma.$transaction(async (tx) => {
+    const saved = await tx.milestone.update({
+      where: { id },
+      data: {
+        name: data.name,
+        description,
+        order: data.order,
+        status: data.status,
+        dueDate: dueDate,
+        tags,
+      },
+      include: { tags: true },
+    });
+    await updateSearchIndex(tx, "milestone", saved);
+    return saved;
   });
-
-  updateSearchIndex("milestone", updatedMilestone);
 
   return updatedMilestone;
 };

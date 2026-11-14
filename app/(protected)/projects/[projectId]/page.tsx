@@ -29,6 +29,7 @@ import TasksTable from "@/components/tasks/TasksTable";
 import { DeleteInfo, DeletableType } from "@/types/ui";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import CostsTable from "@/components/costs/CostsTable";
+import { MarkdownContent } from "@/components/markdown/MarkdownContent";
 
 type ProjectPageProps = {
   params: Promise<{ projectId: string }>;
@@ -148,7 +149,11 @@ const ProjectDetailPage: NextPage<ProjectPageProps> = ({ params }) => {
       <Separator className="my-3" />
 
       {/* Description and tags */}
-      <p className="my-3">{project.description || descriptionFallback}</p>
+      {project.description ? (
+        <MarkdownContent markdown={project.description} className="my-3" />
+      ) : (
+        <p className="my-3">{descriptionFallback}</p>
+      )}
       <TagsList tags={project.tags} />
 
       {/* Info Grid */}
