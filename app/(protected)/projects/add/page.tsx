@@ -41,13 +41,13 @@ export default function AddProjectPage() {
     type: z.string(),
     status: z.string(),
     priority: z.string(),
-    startDate: z.coerce.date().nullable(),
-    dueDate: z.coerce.date().nullable(),
+    startDate: z.coerce.date<Date>().nullable(),
+    dueDate: z.coerce.date<Date>().nullable(),
     budget: z.string().nullable(),
     tags: z.string().nullable(),
   });
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",

@@ -1,6 +1,6 @@
 {
   "name": "boron",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "private": true,
   "engines": {
     "node": ">=26"
@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.9.1",
-    "@hookform/resolvers": "^5.0.1",
+    "@hookform/resolvers": "^5.9.2",
     "@prisma/client": "^6.17.1",
     "@radix-ui/react-avatar": "^1.1.7",
     "@radix-ui/react-dialog": "^1.1.13",
@@ -43,14 +43,14 @@
     "next": "15.5.28",
     "next-auth": "^5.0.0-beta",
     "next-themes": "^0.4.6",
-    "openai": "^5.11.0",
+    "openai": "^6.49.0",
     "react": "^18.3.1",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.56.1",
     "recharts": "^2.15.3",
     "tailwind-merge": "^3.2.0",
-    "zod": "^3.24.3"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

@@ -58,12 +58,12 @@ const TaskEditPage: NextPage<TaskEditPageProps> = ({ params }) => {
     priority: z.string(),
     progress: z.number().min(0).max(100),
     milestoneId: z.string().optional().nullable(),
-    startDate: z.coerce.date().nullable(),
-    dueDate: z.coerce.date().nullable(),
+    startDate: z.coerce.date<Date>().nullable(),
+    dueDate: z.coerce.date<Date>().nullable(),
     tags: z.string().nullable(),
   });
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
