@@ -52,11 +52,11 @@ const MilestoneEditPage: NextPage<MilestoneEditPageProps> = ({ params }) => {
     description: z.string().nullable(),
     status: z.string(),
     order: z.number().nullable(),
-    dueDate: z.coerce.date().nullable(),
+    dueDate: z.coerce.date<Date>().nullable(),
     tags: z.string().nullable(),
   });
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",

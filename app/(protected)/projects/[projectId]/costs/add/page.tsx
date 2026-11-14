@@ -42,7 +42,7 @@ const ProjectCostAddPage: NextPage<ProjectCostAddPageProps> = ({ params }) => {
   const formSchema = z.object({
     name: z.string().max(80).optional(),
     description: z.string().max(250).optional(),
-    amount: z.coerce.number().min(0),
+    amount: z.coerce.number<string | number>().min(0),
     type: z.enum([
       "PARTS",
       "LABOR",
@@ -53,12 +53,12 @@ const ProjectCostAddPage: NextPage<ProjectCostAddPageProps> = ({ params }) => {
       "MISC",
     ]),
 
-    date: z.coerce.date().optional(),
+    date: z.coerce.date<Date>().optional(),
     taskId: z.string().optional(),
     tags: z.string().nullable(),
   });
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",

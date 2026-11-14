@@ -45,13 +45,11 @@ const ProjectEditPage: NextPage<ProjectEditPageProps> = ({ params }) => {
     type: z.string(),
     status: z.string(),
     priority: z.string(),
-    startDate: z.coerce.date().nullable(),
-    dueDate: z.coerce.date().nullable(),
+    startDate: z.coerce.date<Date>().nullable(),
+    dueDate: z.coerce.date<Date>().nullable(),
     budget: z.string().nullable(),
     tags: z.string().nullable(),
   });
-
-  type EditProjectSchema = z.infer<typeof editProjectSchema>;
 
   const { projectId } = React.use(params);
 
@@ -62,7 +60,7 @@ const ProjectEditPage: NextPage<ProjectEditPageProps> = ({ params }) => {
   const searchParams = useSearchParams();
   const returnTo = searchParams.get("returnTo") ?? "";
 
-  const form = useForm<EditProjectSchema>({
+  const form = useForm({
     resolver: zodResolver(editProjectSchema),
   });
 
